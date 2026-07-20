@@ -1,0 +1,122 @@
+\begin{titlepage}
+    \thispagestyle{empty}
+
+    % Fond graphique de la couverture.
+    \begin{tikzpicture}[remember picture,overlay]
+        \fill[cgidark]
+            (current page.north west)
+            rectangle ([xshift=1.25cm]current page.south west);
+
+        \fill[cgired]
+            ([xshift=0.82cm,yshift=1.1cm]current page.south west)
+            rectangle ([xshift=1.62cm,yshift=2.15cm]current page.south west);
+
+        \fill[emsigreen]
+            ([xshift=0.82cm,yshift=-1.25cm]current page.north west)
+            rectangle ([xshift=1.62cm,yshift=-2.35cm]current page.north west);
+
+        \draw[cgired,line width=1.2pt]
+            ([xshift=2.05cm,yshift=-2.7cm]current page.north west)
+            -- ([xshift=-1.35cm,yshift=-2.7cm]current page.north east);
+
+        \draw[cgilight,line width=0.6pt]
+            ([xshift=2.05cm,yshift=2.25cm]current page.south west)
+            -- ([xshift=-1.35cm,yshift=2.25cm]current page.south east);
+    \end{tikzpicture}
+
+    \hspace*{1.15cm}
+    \begin{minipage}[t][0.94\textheight]{0.87\textwidth}
+        \sffamily
+
+        % Logos : un fallback textuel est utilisé tant que les images ne sont pas ajoutées.
+        \begin{minipage}[t]{0.31\textwidth}
+            \raggedright
+            \IfFileExists{figures/EMSI.png}{%
+                \includegraphics[height=1.5cm]{figures/EMSI.png}%
+            }{%
+                \fbox{\parbox[c][1.35cm][c]{3.2cm}{\centering\bfseries EMSI}}%
+            }
+        \end{minipage}
+        \hfill
+        \begin{minipage}[t]{0.31\textwidth}
+            \centering
+            \IfFileExists{figures/CGI.png}{%
+                \includegraphics[height=1.25cm]{figures/CGI.png}%
+            }{%
+                \fbox{\parbox[c][1.35cm][c]{3.0cm}{\centering\bfseries\textcolor{cgired}{CGI}}}%
+            }
+        \end{minipage}
+        \hfill
+        \begin{minipage}[t]{0.31\textwidth}
+            \raggedleft
+            \IfFileExists{figures/HONORIS.png}{%
+                \includegraphics[height=1.35cm]{figures/HONORIS.png}%
+            }{%
+                \fbox{\parbox[c][1.35cm][c]{3.2cm}{\centering\bfseries HONORIS}}%
+            }
+        \end{minipage}
+
+        \vspace{0.75cm}
+
+        \begin{center}
+            {\small\bfseries\MakeUppercase{\schoolname}}\\[0.18cm]
+            {\color{cgigray}\small 5\textsuperscript{e} année -- Ingénierie Informatique et Réseaux}
+
+            \vspace{0.75cm}
+
+            {\Large\bfseries RAPPORT DE PROJET DE FIN D'ÉTUDES}\\[0.18cm]
+            {\color{cgired}\rule{0.44\linewidth}{1.2pt}}
+
+            \vspace{0.75cm}
+
+            \begin{tikzpicture}
+                \node[
+                    draw=cgired,
+                    line width=1.1pt,
+                    rounded corners=3mm,
+                    fill=cgired!3,
+                    inner xsep=9mm,
+                    inner ysep=6mm,
+                    text width=0.83\textwidth,
+                    align=center
+                ] {
+                    {\fontsize{27}{31}\selectfont\bfseries\textcolor{cgired}{\projectname}}\\[0.45cm]
+                    {\Large\bfseries\reporttitle}\\[0.45cm]
+                    {\normalsize\color{cgigray}\reportsubtitle}
+                };
+            \end{tikzpicture}
+
+            \vspace{0.7cm}
+
+            \resizebox{0.95\textwidth}{!}{%
+            \begin{tikzpicture}[node distance=0.2cm]
+                \node[rounded corners=2mm,fill=cgiblue!9,text=cgiblue,inner xsep=4mm,inner ysep=1.6mm]
+                    (a) {Automatisation};
+                \node[rounded corners=2mm,fill=cgiblue!9,text=cgiblue,inner xsep=4mm,inner ysep=1.6mm,right=of a]
+                    (b) {Agents et LLM};
+                \node[rounded corners=2mm,fill=cgiblue!9,text=cgiblue,inner xsep=4mm,inner ysep=1.6mm,right=of b]
+                    (c) {Human-in-the-loop};
+                \node[rounded corners=2mm,fill=cgiblue!9,text=cgiblue,inner xsep=4mm,inner ysep=1.6mm,right=of c]
+                    (d) {Modernisation};
+            \end{tikzpicture}%
+            }
+        \end{center}
+
+        \vfill
+
+        \renewcommand{\arraystretch}{1.2}
+        \begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}X >{\raggedright\arraybackslash}X@{}}
+            \textcolor{cgigray}{Réalisé par} & \textcolor{cgigray}{Organisme d'accueil} \\
+            {\Large\bfseries\studentname} & {\large\bfseries\companyname} \\
+            & \\
+            \textcolor{cgigray}{Encadrant professionnel} & \textcolor{cgigray}{Encadrant pédagogique} \\
+            \textbf{\companysupervisor} & \textbf{\academicsupervisor} \\
+        \end{tabularx}
+
+        \vspace{0.55cm}
+        \begin{center}
+            {\color{cgigray}\small Année universitaire}\\[-0.05cm]
+            {\Large\bfseries 2025--2026}
+        \end{center}
+    \end{minipage}
+\end{titlepage}

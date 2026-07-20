@@ -1,42 +1,15 @@
 \chapter*{Résumé}
 \addcontentsline{toc}{chapter}{Résumé}
 
-Ce rapport présente les travaux réalisés dans le cadre de mon projet de fin
-d'études effectué au sein de CGI Technologies et Solutions Maroc. Le projet
-porte sur la conception et le développement d'une plateforme intelligente,
-flexible et gouvernée dédiée à l'automatisation des migrations logicielles.
+La modernisation des applications constitue un enjeu majeur pour les organisations qui exploitent des systèmes développés avec des versions devenues anciennes de langages, de frameworks et de bibliothèques. Malgré l'existence d'outils spécialisés, une grande partie des migrations reste encore réalisée manuellement : compréhension du projet source, identification des incompatibilités, mise à jour des dépendances, transformation du code, compilation, exécution des tests, analyse des erreurs et répétition de nombreux cycles de correction. Cette situation augmente les délais, les coûts et la dépendance à des expertises rares.
 
-Dans de nombreuses organisations, la modernisation des applications repose
-encore largement sur des interventions manuelles. Les développeurs doivent
-analyser les applications existantes, identifier les incompatibilités, mettre
-à jour les dépendances, modifier le code source, corriger les erreurs de
-compilation, résoudre les échecs de tests et répéter plusieurs cycles de
-débogage avant d'obtenir une version stable de l'application migrée. Cette
-approche mobilise des ressources importantes, allonge les délais de livraison
-et augmente les coûts ainsi que les risques d'erreurs.
+Ce projet de fin d'études, réalisé au sein de \textbf{CGI Technologies et Solutions Maroc}, porte sur la conception d'une \textbf{Migration Factory} intelligente, extensible et gouvernée. L'objectif est d'industrialiser le processus de migration logicielle en orchestrant, au sein d'une même plateforme, l'analyse d'une application, la construction d'un chemin de migration, l'exécution de transformations, les phases de build et de test, la collecte de preuves techniques et la production de résultats traçables.
 
-Le projet vise à répondre à cette problématique par la réalisation d'une
-\textit{Migration Factory} capable d'orchestrer différentes étapes du processus
-de modernisation. La solution combine des mécanismes déterministes de
-transformation, des modèles de langage de grande taille (LLM), une orchestration
-multi-étapes, des mécanismes de détection et d'analyse des échecs, ainsi qu'une
-gouvernance humaine permettant au développeur de conserver le contrôle des
-décisions importantes.
+La solution combine des mécanismes déterministes, des agents spécialisés et des grands modèles de langage. Lorsqu'un échec est détecté, un contexte de réparation est construit à partir des erreurs, des fichiers concernés et de l'état du pipeline. Un modèle propose alors une modification sous forme de diff, tandis qu'un second mécanisme de révision contrôle la pertinence et les risques de la proposition. Le développeur conserve l'autorité sur l'approbation, la demande de révision et l'application des changements. Les modifications autorisées sont exécutées dans un workspace isolé avant une nouvelle compilation et une nouvelle validation.
 
-La plateforme prend notamment en charge l'analyse du projet source, la
-planification de la migration, les transformations techniques, l'exécution
-des phases de compilation et de test, la collecte d'éléments de preuve en cas
-d'échec, la génération de propositions de réparation par un LLM spécialisé,
-leur révision indépendante par un second modèle, puis leur validation humaine
-avant toute application contrôlée dans un environnement isolé.
+L'architecture est pensée comme une plateforme générique fondée sur des profils de migration. Le profil Java/Spring Boot constitue le premier cas d'étude concret, avec une migration progressive vers des versions modernes de Java et Spring Boot. Un second profil Angular permet d'étudier la généralisation de l'orchestration à un autre écosystème et de préparer la prise en charge future de nouveaux langages et frameworks.
 
-La vision globale du projet est de construire un système extensible capable
-de prendre en charge plusieurs langages et frameworks. Java et Spring Boot
-constituent le premier cas d'étude concret, tandis que le support d'autres
-écosystèmes, notamment Angular, fait partie des perspectives d'évolution
-étudiées.
+Le résultat attendu est un système capable de réduire l'effort manuel, d'accélérer les cycles de migration, d'améliorer la reproductibilité et de rendre chaque décision vérifiable, sans rechercher une autonomie totale au détriment de la sécurité et du contrôle humain.
 
-\textbf{Mots-clés :} Migration logicielle, Modernisation applicative,
-Intelligence artificielle générative, LLM, Migration Factory, Java,
-Spring Boot, Automatisation, Human-in-the-loop, Orchestration,
-Réparation automatique.
+\vspace{0.5cm}
+\noindent\textbf{Mots-clés :} Migration logicielle, modernisation applicative, Migration Factory, intelligence artificielle générative, agents logiciels, LLM, Java, Spring Boot, Angular, orchestration, Human-in-the-loop, réparation logicielle.

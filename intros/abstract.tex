@@ -1,30 +1,15 @@
 \chapter*{Abstract}
 \addcontentsline{toc}{chapter}{Abstract}
 
-This report presents the work carried out as part of my final-year engineering
-project at CGI Technologies and Solutions Morocco. The project focuses on the
-design and development of an intelligent, flexible, and governed platform
-dedicated to software migration automation.
+Application modernization is a major challenge for organizations operating systems built on outdated versions of programming languages, frameworks, and libraries. Despite the availability of specialized tools, a significant part of software migration remains manual: understanding the source project, identifying incompatibilities, upgrading dependencies, transforming source code, compiling, running tests, analyzing failures, and repeating multiple debugging and repair cycles. This process increases delivery time and cost while creating a strong dependency on scarce technical expertise.
 
-In many organizations, application modernization is still largely performed
-manually. Developers must analyze legacy applications, identify compatibility
-issues, update dependencies, modify source code, resolve compilation errors,
-fix test failures, and perform repeated debugging cycles before obtaining a
-stable migrated application. This process consumes significant engineering
-resources, increases delivery time and costs, and introduces additional risks
-of human error.
+This final-year engineering project, conducted at \textbf{CGI Technologies and Solutions Morocco}, focuses on the design of an intelligent, extensible, and governed \textbf{Migration Factory}. Its purpose is to industrialize software migration by orchestrating application analysis, migration-path generation, code and configuration transformations, build and test execution, technical evidence collection, and traceable result production within a single platform.
 
-The proposed project addresses this challenge through the development of a
-Migration Factory capable of orchestrating the different stages of software
-modernization. The solution combines deterministic transformation mechanisms,
-large language models, multi-stage orchestration, failure detection and
-evidence collection, independent AI-based repair review, and human governance.
+The proposed approach combines deterministic mechanisms, specialized software agents, and large language models. When a migration failure is detected, the platform builds a repair context from error messages, affected files, and the current pipeline state. A model proposes a change as a source-code diff, while an independent review mechanism assesses its relevance and associated risks. The developer retains authority over approval, revision requests, and patch application. Approved changes are applied only inside an isolated workspace before the project is rebuilt and validated again.
 
-The global vision is to build an extensible migration system capable of
-supporting different programming languages and frameworks. Java and Spring Boot
-represent the first concrete use case, while other ecosystems such as Angular
-are considered as future extensions.
+The architecture is designed as a generic platform based on migration profiles. Java and Spring Boot represent the first concrete case study, with a progressive migration path toward modern Java and Spring Boot versions. A second Angular profile is used to study how the orchestration model can be generalized to another ecosystem and extended later to additional languages and frameworks.
 
-\textbf{Keywords:} Software Migration, Application Modernization,
-Generative AI, Large Language Models, Migration Factory, Java,
-Spring Boot, Automation, Human-in-the-loop, Software Repair.
+The expected outcome is a system that reduces manual effort, accelerates migration cycles, improves reproducibility, and makes each decision auditable, without pursuing uncontrolled full autonomy at the expense of safety and human governance.
+
+\vspace{0.5cm}
+\noindent\textbf{Keywords:} Software migration, application modernization, Migration Factory, generative artificial intelligence, software agents, large language models, Java, Spring Boot, Angular, orchestration, human-in-the-loop, automated software repair.
