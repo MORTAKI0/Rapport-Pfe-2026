@@ -1,0 +1,97 @@
+\chapter*{Introduction générale}
+\addcontentsline{toc}{chapter}{Introduction générale}
+
+Les systèmes logiciels occupent aujourd'hui une place centrale dans le
+fonctionnement des entreprises. Ils supportent les processus métiers,
+facilitent les interactions avec les clients et assurent le traitement d'une
+quantité croissante de données. Cependant, ces applications évoluent dans un
+environnement technologique en changement permanent. Les langages, les
+frameworks, les versions des environnements d'exécution, les dépendances et
+les exigences de sécurité évoluent continuellement, rendant la modernisation
+des applications existantes indispensable.
+
+La migration logicielle constitue ainsi un enjeu stratégique pour les
+organisations. Une application construite sur une version ancienne d'un
+framework ou d'un environnement d'exécution peut progressivement devenir plus
+difficile à maintenir, plus coûteuse à exploiter et plus vulnérable aux risques
+de sécurité. La migration vers des versions plus modernes permet de prolonger
+la durée de vie des applications, d'améliorer leur maintenabilité et de
+bénéficier des capacités offertes par les technologies actuelles.
+
+Cependant, les projets de migration restent complexes. Dans de nombreux cas,
+une grande partie du travail est encore réalisée manuellement par les
+développeurs. Ces derniers doivent comprendre une base de code parfois
+ancienne, identifier les dépendances incompatibles, appliquer des
+transformations, lancer les compilations et les tests, analyser les erreurs,
+corriger les problèmes puis recommencer ce cycle jusqu'à l'obtention d'une
+version stable.
+
+Cette approche entraîne plusieurs difficultés. Elle peut mobiliser des équipes
+pendant de longues périodes, nécessiter des compétences spécialisées et
+provoquer de nombreux cycles de débogage. Les coûts augmentent avec la taille
+et la complexité du portefeuille applicatif, tandis que la répétition des
+opérations manuelles augmente le risque d'erreurs et limite la capacité des
+organisations à moderniser simultanément un grand nombre d'applications.
+
+Les outils déterministes de transformation permettent déjà d'automatiser
+certaines modifications connues et répétitives. Ils offrent des propriétés
+importantes de reproductibilité, de contrôle et de traçabilité. Cependant,
+leur efficacité dépend principalement de règles prédéfinies et ils peuvent
+être limités face à des situations inattendues, à des erreurs spécifiques à
+une application ou à des incompatibilités non couvertes par leurs règles.
+
+Parallèlement, l'évolution récente de l'intelligence artificielle générative
+et des grands modèles de langage ouvre de nouvelles perspectives. Les LLM
+peuvent analyser du code, raisonner sur des messages d'erreur, proposer des
+modifications et assister les développeurs dans la résolution de problèmes.
+Cependant, leur caractère probabiliste implique également des risques :
+réponses incorrectes, hallucinations, modifications injustifiées ou patches
+non applicables.
+
+Le défi consiste donc à ne pas opposer automatisation déterministe et
+intelligence artificielle, mais à les combiner dans une architecture gouvernée.
+Les mécanismes déterministes peuvent conserver l'autorité sur les opérations
+d'exécution, les règles de sécurité et la validation, tandis que les LLM
+peuvent intervenir dans les activités nécessitant davantage de raisonnement,
+notamment l'analyse de situations complexes et la proposition de réparations.
+
+C'est dans cette perspective que s'inscrit ce projet de fin d'études réalisé
+au sein de CGI Technologies et Solutions Maroc. Il vise à concevoir et
+développer une \textbf{Migration Factory intelligente et gouvernée}, capable
+d'automatiser plusieurs phases du cycle de modernisation logicielle tout en
+maintenant le développeur au centre des décisions importantes.
+
+La vision à long terme est celle d'une plateforme flexible pouvant prendre en
+charge différents langages, frameworks et scénarios de migration. Le premier
+cas d'étude concret porte sur l'écosystème Java et Spring Boot. L'étude de
+l'extension du système à d'autres technologies, notamment Angular, constitue
+également une perspective importante du projet.
+
+La solution proposée repose sur plusieurs principes structurants :
+l'automatisation des tâches répétitives, l'utilisation d'outils de
+transformation déterministes lorsque cela est possible, l'orchestration des
+différentes étapes du processus, la détection automatique des échecs, la
+construction de preuves techniques, l'utilisation de LLM spécialisés pour la
+génération et la révision des propositions de réparation, la validation
+humaine des décisions importantes et l'exécution des changements dans des
+environnements isolés.
+
+La question centrale de ce travail peut ainsi être formulée de la manière
+suivante :
+
+\begin{quote}
+\textit{Comment concevoir un système intelligent, flexible et gouverné capable
+d'automatiser et d'accélérer les migrations logicielles, de réduire l'effort
+manuel et les cycles de débogage, tout en garantissant la traçabilité,
+la maîtrise des changements et le contrôle du développeur ?}
+\end{quote}
+
+Le présent rapport s'organise progressivement autour de cette problématique.
+Le premier chapitre présente CGI Technologies et Solutions, le contexte du
+projet, sa vision, ses objectifs et son organisation. Le deuxième chapitre
+analyse la problématique de la migration logicielle et présente l'état de
+l'art des principales approches existantes, des outils déterministes aux
+systèmes basés sur les LLM et les agents. Les chapitres suivants seront
+consacrés à l'analyse fonctionnelle, à l'architecture de la Migration Factory,
+à sa réalisation technique, au cas d'étude Java/Spring Boot et à l'évaluation
+des résultats obtenus.

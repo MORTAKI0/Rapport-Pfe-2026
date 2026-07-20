@@ -1,0 +1,796 @@
+\chapter{État de l'art et analyse de la problématique de migration}
+
+\section*{Introduction}
+
+La migration et la modernisation des applications constituent aujourd'hui des
+enjeux majeurs pour les organisations. Les systèmes logiciels évoluent dans un
+environnement caractérisé par des changements rapides des langages,
+frameworks, dépendances, environnements d'exécution et contraintes de
+sécurité.
+
+Face à cette évolution, les entreprises doivent régulièrement adapter leurs
+applications existantes afin de garantir leur maintenabilité, leur sécurité,
+leur compatibilité et leur capacité à répondre aux nouveaux besoins.
+
+Cependant, une migration logicielle est rarement une opération simple. Elle
+peut nécessiter des modifications de dépendances, de code source,
+d'architecture, de configuration et de tests. Elle implique généralement
+plusieurs cycles d'analyse, de transformation, de compilation, de débogage et
+de validation.
+
+Ce chapitre présente les concepts fondamentaux liés à la migration et à la
+modernisation logicielle, analyse les limites des approches manuelles, étudie
+les principales familles d'outils existantes et examine l'apport potentiel des
+modèles de langage et des architectures agentiques.
+
+L'objectif est de dégager les principes permettant de positionner la Migration
+Factory proposée dans ce projet.
+
+% ============================================================
+\section{Migration et modernisation logicielle}
+% ============================================================
+
+\subsection{Définition de la migration logicielle}
+
+La migration logicielle désigne le processus permettant de faire évoluer une
+application d'un environnement technologique vers un autre.
+
+Une migration peut concerner différents éléments :
+
+\begin{itemize}
+    \item une version de langage ;
+    \item une version de framework ;
+    \item un environnement d'exécution ;
+    \item un système d'exploitation ;
+    \item une base de données ;
+    \item une infrastructure ;
+    \item une architecture logicielle ;
+    \item des bibliothèques ou dépendances.
+\end{itemize}
+
+Par exemple, une application peut nécessiter une migration :
+
+\begin{itemize}
+    \item de Java 8 vers Java 17 ou Java 21 ;
+    \item d'une ancienne version de Spring Boot vers une version plus récente ;
+    \item d'anciennes API \texttt{javax.*} vers leurs équivalents
+    \texttt{jakarta.*} ;
+    \item d'une ancienne version d'Angular vers une version plus récente ;
+    \item d'une infrastructure locale vers un environnement cloud.
+\end{itemize}
+
+La migration peut sembler limitée à un changement de version, mais elle
+entraîne souvent des conséquences importantes sur le code et les dépendances.
+
+\subsection{Migration et modernisation}
+
+La migration et la modernisation sont liées mais ne sont pas toujours
+strictement identiques.
+
+La migration consiste principalement à déplacer ou faire évoluer une
+application vers un nouvel environnement cible.
+
+La modernisation possède généralement un périmètre plus large et peut
+inclure :
+
+\begin{itemize}
+    \item l'amélioration de l'architecture ;
+    \item la suppression de composants obsolètes ;
+    \item la mise à jour des pratiques de développement ;
+    \item l'amélioration de la sécurité ;
+    \item l'adoption de nouvelles infrastructures ;
+    \item l'automatisation du déploiement ;
+    \item l'amélioration de l'observabilité.
+\end{itemize}
+
+Dans le cadre de la Migration Factory, le terme migration est utilisé dans un
+sens suffisamment large pour inclure certaines opérations de modernisation
+nécessaires au passage de l'application vers une nouvelle cible.
+
+% ============================================================
+\section{Pourquoi migrer une application ?}
+% ============================================================
+
+Plusieurs facteurs peuvent rendre une migration nécessaire.
+
+\subsection{Fin de support des technologies}
+
+Les langages, frameworks et bibliothèques évoluent. Certaines versions ne
+reçoivent plus de correctifs ou de support officiel.
+
+Une application dépendant d'une technologie en fin de vie devient
+progressivement plus difficile à maintenir.
+
+\subsection{Sécurité}
+
+Les anciennes versions peuvent contenir des vulnérabilités connues ou utiliser
+des dépendances qui ne sont plus mises à jour.
+
+La migration permet d'accéder à des correctifs plus récents et de réduire la
+surface de risque.
+
+\subsection{Maintenabilité}
+
+Avec le temps, le code accumule souvent :
+
+\begin{itemize}
+    \item des dépendances obsolètes ;
+    \item des API dépréciées ;
+    \item des configurations devenues complexes ;
+    \item une dette technique importante.
+\end{itemize}
+
+La modernisation vise à réduire cette dette et à faciliter les évolutions
+futures.
+
+\subsection{Performance et scalabilité}
+
+Les nouvelles versions peuvent offrir de meilleures performances, une
+consommation de ressources optimisée et une meilleure capacité à gérer une
+augmentation de charge.
+
+\subsection{Cloud et nouvelles architectures}
+
+Certaines migrations sont motivées par l'adoption :
+
+\begin{itemize}
+    \item du cloud ;
+    \item des conteneurs ;
+    \item des architectures distribuées ;
+    \item des microservices ;
+    \item de nouveaux mécanismes d'observabilité.
+\end{itemize}
+
+% ============================================================
+\section{Cycle traditionnel d'une migration}
+% ============================================================
+
+Une migration classique suit généralement plusieurs étapes.
+
+\subsection{Analyse de l'application}
+
+Le développeur doit comprendre :
+
+\begin{itemize}
+    \item la structure du projet ;
+    \item le langage et sa version ;
+    \item les frameworks ;
+    \item les dépendances ;
+    \item l'outil de build ;
+    \item les tests existants ;
+    \item les configurations ;
+    \item les composants externes.
+\end{itemize}
+
+\subsection{Définition de la cible}
+
+La cible de migration peut inclure :
+
+\begin{itemize}
+    \item une nouvelle version de Java ;
+    \item une nouvelle version de Spring Boot ;
+    \item une nouvelle version de Spring Framework ;
+    \item un nouvel outil ou environnement de build ;
+    \item de nouvelles dépendances.
+\end{itemize}
+
+\subsection{Planification}
+
+La migration doit ensuite être décomposée en étapes afin de maîtriser les
+dépendances entre les différentes transformations.
+
+\subsection{Transformation}
+
+Le développeur met à jour :
+
+\begin{itemize}
+    \item les fichiers de build ;
+    \item les dépendances ;
+    \item les imports ;
+    \item les API ;
+    \item les annotations ;
+    \item les configurations ;
+    \item le code applicatif.
+\end{itemize}
+
+\subsection{Compilation et tests}
+
+Après les transformations, l'application est compilée et testée.
+
+Ces étapes révèlent souvent de nouveaux problèmes.
+
+\subsection{Débogage et réparation}
+
+Les erreurs peuvent être liées à :
+
+\begin{itemize}
+    \item des symboles introuvables ;
+    \item des changements d'API ;
+    \item des incompatibilités de versions ;
+    \item des dépendances absentes ;
+    \item des modifications de comportement ;
+    \item des tests devenus invalides.
+\end{itemize}
+
+Le développeur doit analyser ces erreurs, trouver leur origine, corriger le
+code puis relancer le processus.
+
+Le cycle devient donc :
+
+\begin{center}
+Analyse
+$\rightarrow$
+Transformation
+$\rightarrow$
+Build/Test
+$\rightarrow$
+Erreur
+$\rightarrow$
+Diagnostic
+$\rightarrow$
+Correction
+$\rightarrow$
+Nouvelle validation
+\end{center}
+
+Ce cycle peut être répété plusieurs fois.
+
+% ============================================================
+\section{Limites de la migration manuelle}
+% ============================================================
+
+\subsection{Durée élevée}
+
+Chaque étape nécessite une intervention humaine. Plus l'application est grande
+et complexe, plus la migration peut nécessiter du temps.
+
+\subsection{Coût en ressources humaines}
+
+Les migrations mobilisent des développeurs expérimentés capables de comprendre
+les technologies sources et cibles.
+
+Cette expertise peut être rare et coûteuse.
+
+\subsection{Débogage répétitif}
+
+Une part importante du travail peut être consacrée à :
+
+\begin{itemize}
+    \item lancer le build ;
+    \item lire les logs ;
+    \item localiser la source du problème ;
+    \item modifier le code ;
+    \item relancer la validation.
+\end{itemize}
+
+\subsection{Risque d'erreur humaine}
+
+Les opérations manuelles peuvent provoquer :
+
+\begin{itemize}
+    \item des modifications incorrectes ;
+    \item des oublis ;
+    \item des incohérences ;
+    \item des différences entre deux migrations similaires.
+\end{itemize}
+
+\subsection{Difficulté de passage à l'échelle}
+
+Une organisation possédant plusieurs dizaines ou centaines d'applications ne
+peut pas nécessairement mobiliser une équipe différente pendant plusieurs
+mois pour chaque migration.
+
+Une approche industrielle est donc nécessaire.
+
+% ============================================================
+\section{Automatisation déterministe des migrations}
+% ============================================================
+
+Une première famille de solutions repose sur des règles déterministes.
+
+Le principe est le suivant :
+
+\begin{center}
+Condition connue
+$\rightarrow$
+Règle de transformation connue
+$\rightarrow$
+Modification reproductible
+\end{center}
+
+Ces outils peuvent par exemple :
+
+\begin{itemize}
+    \item remplacer automatiquement un import ;
+    \item mettre à jour une dépendance ;
+    \item modifier une annotation ;
+    \item transformer certaines constructions syntaxiques ;
+    \item appliquer une recette prédéfinie.
+\end{itemize}
+
+\subsection{Avantages}
+
+Les mécanismes déterministes présentent plusieurs qualités importantes :
+
+\begin{itemize}
+    \item reproductibilité ;
+    \item prévisibilité ;
+    \item auditabilité ;
+    \item rapidité ;
+    \item possibilité de validation automatique.
+\end{itemize}
+
+\subsection{Limites}
+
+Cependant, leur domaine d'action dépend des règles déjà implémentées.
+
+Face à une erreur inattendue, un contexte spécifique à une application ou une
+combinaison non prévue de dépendances, la règle peut ne pas exister.
+
+Le système peut alors être incapable de poursuivre automatiquement.
+
+% ============================================================
+\section{Assistance par intelligence artificielle}
+% ============================================================
+
+L'évolution récente des grands modèles de langage introduit une nouvelle
+approche.
+
+Les LLM sont capables de :
+
+\begin{itemize}
+    \item comprendre des descriptions en langage naturel ;
+    \item analyser du code ;
+    \item interpréter des messages d'erreur ;
+    \item proposer des modifications ;
+    \item générer des explications ;
+    \item assister le développeur.
+\end{itemize}
+
+Dans un scénario de migration, un LLM peut recevoir :
+
+\begin{itemize}
+    \item la description de la migration ;
+    \item la pile technologique source ;
+    \item la pile cible ;
+    \item les erreurs de compilation ;
+    \item les résultats de tests ;
+    \item des extraits de code ;
+    \item les modifications déjà appliquées.
+\end{itemize}
+
+Il peut alors proposer une hypothèse de cause racine et une correction.
+
+% ============================================================
+\section{Limites d'un système basé uniquement sur les LLM}
+% ============================================================
+
+L'utilisation d'un LLM seul ne suffit pas à garantir une migration fiable.
+
+\subsection{Non-déterminisme}
+
+La même requête peut produire des réponses différentes.
+
+\subsection{Hallucinations}
+
+Le modèle peut inventer :
+
+\begin{itemize}
+    \item des classes inexistantes ;
+    \item des méthodes inexistantes ;
+    \item des dépendances incorrectes ;
+    \item des API qui ne correspondent pas à la version cible.
+\end{itemize}
+
+\subsection{Patch non applicable}
+
+Un LLM peut générer un diff qui semble correct mais qui ne correspond pas
+exactement au contenu réel du fichier.
+
+\subsection{Risque de modification excessive}
+
+Un modèle peut proposer des modifications plus larges que nécessaire.
+
+\subsection{Manque de preuve}
+
+Une réponse textuelle ne démontre pas automatiquement que :
+
+\begin{itemize}
+    \item la compilation réussit ;
+    \item les tests passent ;
+    \item aucune régression n'a été introduite ;
+    \item la modification est autorisée.
+\end{itemize}
+
+Ces limites justifient l'utilisation de mécanismes complémentaires.
+
+% ============================================================
+\section{Approche hybride : déterminisme, LLM et gouvernance humaine}
+% ============================================================
+
+La philosophie retenue dans ce projet est de combiner plusieurs types de
+capacités.
+
+\subsection{Rôle des mécanismes déterministes}
+
+Les mécanismes déterministes sont adaptés aux opérations où la règle est
+connue et où la reproductibilité est essentielle.
+
+Ils peuvent conserver l'autorité sur :
+
+\begin{itemize}
+    \item l'exécution des commandes ;
+    \item l'application des règles de transformation connues ;
+    \item la validation des chemins de fichiers ;
+    \item la vérification des patches ;
+    \item l'application dans le sandbox ;
+    \item l'exécution du build et des tests.
+\end{itemize}
+
+\subsection{Rôle des LLM}
+
+Les LLM interviennent dans les activités nécessitant davantage de raisonnement :
+
+\begin{itemize}
+    \item analyse des erreurs complexes ;
+    \item identification de la cause probable ;
+    \item proposition de stratégie de correction ;
+    \item génération d'un patch ;
+    \item révision indépendante d'une proposition.
+\end{itemize}
+
+\subsection{Rôle du développeur}
+
+Le développeur conserve la gouvernance.
+
+Il peut :
+
+\begin{itemize}
+    \item consulter les résultats ;
+    \item accepter ou refuser une étape ;
+    \item demander une modification ;
+    \item examiner un diff ;
+    \item approuver ou refuser une réparation ;
+    \item décider de poursuivre la migration.
+\end{itemize}
+
+L'approche peut être résumée comme suit :
+
+\begin{center}
+\textbf{Déterminisme pour le contrôle}
+\\
++
+\\
+\textbf{LLM pour le raisonnement}
+\\
++
+\\
+\textbf{Humain pour la gouvernance}
+\end{center}
+
+% ============================================================
+\section{Systèmes agentiques et orchestration}
+% ============================================================
+
+L'utilisation d'agents permet de séparer les responsabilités.
+
+Au lieu d'utiliser un seul modèle pour réaliser toute la migration, différentes
+responsabilités peuvent être définies.
+
+Par exemple :
+
+\begin{itemize}
+    \item un composant d'analyse ;
+    \item un composant de planification ;
+    \item un moteur de transformation ;
+    \item un collecteur de preuves ;
+    \item un LLM proposant une réparation ;
+    \item un LLM chargé de la révision ;
+    \item un orchestrateur coordonnant le workflow.
+\end{itemize}
+
+Cette séparation permet :
+
+\begin{itemize}
+    \item de limiter les responsabilités ;
+    \item d'utiliser des modèles différents selon les tâches ;
+    \item de contrôler les transitions ;
+    \item de persister les artefacts intermédiaires ;
+    \item de conserver un historique.
+\end{itemize}
+
+Dans la Migration Factory proposée, l'orchestrateur joue un rôle central. Il
+coordonne les différentes étapes et décide, selon le résultat obtenu, si le
+système doit poursuivre, demander une validation humaine ou déclencher un
+mécanisme de réparation.
+
+% ============================================================
+\section{Human-in-the-loop}
+% ============================================================
+
+Le principe \textit{Human-in-the-loop} consiste à maintenir une intervention
+humaine dans certaines décisions importantes d'un système automatisé.
+
+Cette approche est particulièrement adaptée aux migrations car certaines
+opérations peuvent :
+
+\begin{itemize}
+    \item toucher un grand nombre de fichiers ;
+    \item modifier le comportement métier ;
+    \item introduire un risque de régression ;
+    \item nécessiter une expertise spécifique.
+\end{itemize}
+
+Dans ce projet, l'humain ne réalise pas nécessairement toutes les opérations,
+mais il conserve la capacité d'autoriser, de refuser ou de demander la révision
+de décisions importantes.
+
+Cette philosophie évite deux extrêmes :
+
+\begin{center}
+Tout manuel
+\qquad $\longleftrightarrow$ \qquad
+Autonomie totale non contrôlée
+\end{center}
+
+La solution recherche un équilibre entre automatisation et maîtrise.
+
+% ============================================================
+\section{Gestion intelligente des échecs}
+% ============================================================
+
+Une migration réaliste ne peut pas supposer que toutes les transformations
+réussissent du premier coup.
+
+Les échecs doivent être considérés comme des événements normaux du workflow.
+
+Le processus de réparation peut être structuré de la manière suivante :
+
+\begin{enumerate}
+    \item une transformation est exécutée ;
+
+    \item le système lance le build ou les tests ;
+
+    \item un échec est détecté ;
+
+    \item les logs et informations pertinentes sont collectés ;
+
+    \item une preuve d'échec est persistée ;
+
+    \item un contexte de réparation est construit ;
+
+    \item un LLM propose une cause racine et un patch ;
+
+    \item un second LLM effectue une révision indépendante ;
+
+    \item le développeur examine la proposition ;
+
+    \item les contrôles déterministes sont appliqués ;
+
+    \item le patch autorisé est appliqué dans un sandbox ;
+
+    \item la validation est relancée.
+\end{enumerate}
+
+Cette approche transforme l'échec en information exploitable.
+
+% ============================================================
+\section{Importance de la traçabilité}
+% ============================================================
+
+Dans un système combinant automatisation et intelligence artificielle, la
+traçabilité est essentielle.
+
+Le système doit pouvoir répondre à des questions telles que :
+
+\begin{itemize}
+    \item quelle version de l'application a été analysée ?
+    \item quelle cible a été choisie ?
+    \item quelles transformations ont été appliquées ?
+    \item quel modèle a généré la proposition ?
+    \item quelles preuves lui ont été transmises ?
+    \item quel reviewer a examiné la proposition ?
+    \item quelle décision humaine a été prise ?
+    \item quel patch a réellement été appliqué ?
+    \item quel a été le résultat de la validation ?
+\end{itemize}
+
+La conservation d'artefacts, d'événements et de checksums améliore
+l'auditabilité et permet de relier les différentes décisions.
+
+% ============================================================
+\section{Comparaison des principales approches}
+% ============================================================
+
+Le tableau suivant présente une comparaison conceptuelle entre plusieurs
+familles d'approches.
+
+\begin{longtable}{|p{4cm}|p{3cm}|p{3cm}|p{3cm}|}
+\hline
+\textbf{Critère}
+&
+\textbf{Migration manuelle}
+&
+\textbf{Transformation déterministe}
+&
+\textbf{Approche hybride proposée}
+\\
+\hline
+
+Flexibilité
+&
+Élevée grâce à l'expertise humaine
+&
+Limitée aux règles connues
+&
+Élevée grâce à la combinaison règles + LLM
+\\
+\hline
+
+Reproductibilité
+&
+Variable
+&
+Élevée
+&
+Élevée pour les étapes contrôlées
+\\
+\hline
+
+Automatisation
+&
+Faible
+&
+Élevée sur les cas prédéfinis
+&
+Élevée sur plusieurs phases
+\\
+\hline
+
+Gestion des erreurs inattendues
+&
+Manuelle
+&
+Limitée
+&
+Assistance LLM + contrôle humain
+\\
+\hline
+
+Gouvernance humaine
+&
+Totale
+&
+Variable
+&
+Intégrée aux checkpoints importants
+\\
+\hline
+
+Traçabilité
+&
+Dépend du processus adopté
+&
+Généralement bonne
+&
+Artefacts, événements et décisions persistés
+\\
+\hline
+
+Scalabilité
+&
+Limitée par les ressources humaines
+&
+Bonne sur les cas connus
+&
+Objectif de forte extensibilité
+\\
+\hline
+
+Risque d'hallucination
+&
+Non applicable
+&
+Aucun risque lié à un LLM
+&
+Présent mais encadré par review et validation
+\\
+\hline
+
+\end{longtable}
+
+% ============================================================
+\section{Positionnement de la Migration Factory}
+% ============================================================
+
+La solution proposée ne vise pas simplement à créer un assistant de code.
+
+Elle cherche à couvrir un workflow plus large :
+
+\begin{center}
+Configuration
+$\rightarrow$
+Analyse
+$\rightarrow$
+Planification
+$\rightarrow$
+Transformation
+$\rightarrow$
+Build/Test
+$\rightarrow$
+Diagnostic
+$\rightarrow$
+Réparation
+$\rightarrow$
+Révision
+$\rightarrow$
+Approbation
+$\rightarrow$
+Validation
+\end{center}
+
+Ses principaux principes de différenciation sont :
+
+\begin{itemize}
+    \item une vision multi-langages et multi-frameworks ;
+    \item une orchestration complète du cycle ;
+    \item la combinaison de transformations déterministes et de LLM ;
+    \item la séparation entre modèle proposant et modèle révisant ;
+    \item la persistance des preuves avant réparation ;
+    \item la gouvernance humaine ;
+    \item l'application dans un environnement isolé ;
+    \item la validation par compilation et tests ;
+    \item la traçabilité des décisions et événements.
+\end{itemize}
+
+Le premier cas d'étude porte sur Java et Spring Boot, mais l'architecture vise
+à être extensible à d'autres écosystèmes, dont Angular.
+
+% ============================================================
+\section{Synthèse de l'état de l'art}
+% ============================================================
+
+L'analyse des différentes approches met en évidence qu'aucune famille de
+solutions ne répond seule à l'ensemble des besoins.
+
+La migration manuelle offre une grande flexibilité, mais elle mobilise beaucoup
+de temps et de ressources.
+
+Les outils déterministes permettent d'automatiser efficacement des
+transformations connues et offrent un niveau élevé de reproductibilité, mais
+ils restent limités face aux problèmes non anticipés.
+
+Les LLM offrent de nouvelles capacités de raisonnement et de génération, mais
+leur caractère probabiliste rend nécessaire l'utilisation de mécanismes de
+contrôle, de validation et de gouvernance.
+
+La Migration Factory proposée repose donc sur une approche hybride dans
+laquelle chaque mécanisme est utilisé pour le type de tâche auquel il est le
+plus adapté.
+
+% ============================================================
+\section*{Conclusion}
+% ============================================================
+
+Ce chapitre a permis de présenter les concepts fondamentaux liés à la migration
+et à la modernisation logicielle ainsi que les principales difficultés des
+processus traditionnels.
+
+L'analyse a montré que les migrations manuelles peuvent nécessiter des efforts
+importants, de nombreux cycles de débogage et des compétences spécialisées.
+Les outils déterministes apportent une automatisation fiable pour les cas
+connus, tandis que les LLM offrent une plus grande capacité d'adaptation face
+aux situations complexes.
+
+Cependant, une utilisation non contrôlée des LLM introduit des risques qui
+rendent indispensable l'ajout de mécanismes de révision, de validation,
+d'isolation et de gouvernance humaine.
+
+La solution retenue repose ainsi sur une architecture hybride associant
+automatisation déterministe, intelligence artificielle, orchestration et
+contrôle humain.
+
+Le chapitre suivant sera consacré à l'analyse fonctionnelle du système et à
+la définition précise des acteurs, des cas d'utilisation, des exigences
+fonctionnelles, des exigences non fonctionnelles et des règles de gestion de
+la Migration Factory.

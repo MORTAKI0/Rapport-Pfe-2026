@@ -1,0 +1,42 @@
+\chapter*{Résumé}
+\addcontentsline{toc}{chapter}{Résumé}
+
+Ce rapport présente les travaux réalisés dans le cadre de mon projet de fin
+d'études effectué au sein de CGI Technologies et Solutions Maroc. Le projet
+porte sur la conception et le développement d'une plateforme intelligente,
+flexible et gouvernée dédiée à l'automatisation des migrations logicielles.
+
+Dans de nombreuses organisations, la modernisation des applications repose
+encore largement sur des interventions manuelles. Les développeurs doivent
+analyser les applications existantes, identifier les incompatibilités, mettre
+à jour les dépendances, modifier le code source, corriger les erreurs de
+compilation, résoudre les échecs de tests et répéter plusieurs cycles de
+débogage avant d'obtenir une version stable de l'application migrée. Cette
+approche mobilise des ressources importantes, allonge les délais de livraison
+et augmente les coûts ainsi que les risques d'erreurs.
+
+Le projet vise à répondre à cette problématique par la réalisation d'une
+\textit{Migration Factory} capable d'orchestrer différentes étapes du processus
+de modernisation. La solution combine des mécanismes déterministes de
+transformation, des modèles de langage de grande taille (LLM), une orchestration
+multi-étapes, des mécanismes de détection et d'analyse des échecs, ainsi qu'une
+gouvernance humaine permettant au développeur de conserver le contrôle des
+décisions importantes.
+
+La plateforme prend notamment en charge l'analyse du projet source, la
+planification de la migration, les transformations techniques, l'exécution
+des phases de compilation et de test, la collecte d'éléments de preuve en cas
+d'échec, la génération de propositions de réparation par un LLM spécialisé,
+leur révision indépendante par un second modèle, puis leur validation humaine
+avant toute application contrôlée dans un environnement isolé.
+
+La vision globale du projet est de construire un système extensible capable
+de prendre en charge plusieurs langages et frameworks. Java et Spring Boot
+constituent le premier cas d'étude concret, tandis que le support d'autres
+écosystèmes, notamment Angular, fait partie des perspectives d'évolution
+étudiées.
+
+\textbf{Mots-clés :} Migration logicielle, Modernisation applicative,
+Intelligence artificielle générative, LLM, Migration Factory, Java,
+Spring Boot, Automatisation, Human-in-the-loop, Orchestration,
+Réparation automatique.

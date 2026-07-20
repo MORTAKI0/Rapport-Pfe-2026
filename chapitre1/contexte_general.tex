@@ -1,0 +1,449 @@
+\chapter{Contexte général du projet}
+
+\section*{Introduction}
+
+Ce chapitre présente le cadre général dans lequel s'inscrit le projet de fin
+d'études. Il introduit tout d'abord l'organisme d'accueil, CGI Technologies et
+Solutions, ainsi que son positionnement dans le domaine des services
+numériques et de la transformation technologique. Il présente ensuite le
+contexte ayant conduit à la mise en place du projet de Migration Factory,
+la problématique adressée, la vision générale de la solution, ses objectifs,
+son périmètre ainsi que son utilisateur cible.
+
+Le chapitre expose enfin l'approche de travail adoptée et la manière dont le
+projet s'inscrit dans une démarche progressive visant à automatiser davantage
+les activités de migration tout en préservant une gouvernance humaine.
+
+% ============================================================
+\section{Présentation de l'organisme d'accueil}
+% ============================================================
+
+\subsection{Le groupe CGI}
+
+CGI, dont le nom historique signifie \textit{Conseillers en Gestion et
+Informatique}, est une entreprise internationale spécialisée dans les services
+de conseil en technologies de l'information, l'intégration de systèmes, le
+développement et la maintenance applicative, les services d'infrastructure
+ainsi que l'accompagnement des organisations dans leurs programmes de
+transformation numérique.
+
+Depuis sa création au Canada en 1976, CGI a progressivement développé une
+présence internationale et intervient aujourd'hui auprès d'organisations de
+nombreux secteurs, notamment les services financiers, l'industrie, les
+administrations publiques, les télécommunications, l'énergie, la santé et les
+services publics.
+
+L'entreprise accompagne ses clients sur l'ensemble du cycle de vie des
+systèmes d'information. Ses activités couvrent notamment le conseil
+stratégique, la conception de solutions, la modernisation des applications,
+la migration des systèmes, le cloud, la cybersécurité, la gestion des
+infrastructures et l'exploitation des applications.
+
+Dans un contexte où les entreprises doivent continuellement adapter leurs
+systèmes aux nouvelles contraintes technologiques et métiers, les activités
+de modernisation applicative occupent une place importante. Elles visent à
+faire évoluer des applications existantes vers des environnements plus
+modernes, maintenables, sécurisés et adaptés aux nouveaux besoins.
+
+\subsection{CGI Technologies et Solutions Maroc}
+
+CGI Technologies et Solutions Maroc constitue une composante importante du
+dispositif international du groupe. L'entreprise dispose de plusieurs centres
+de services au Maroc et participe à la réalisation de projets technologiques
+pour des clients nationaux et internationaux.
+
+Les équipes interviennent sur des domaines variés, notamment :
+
+\begin{itemize}
+    \item le développement et la maintenance d'applications ;
+    \item la modernisation des systèmes existants ;
+    \item les technologies Java et .NET ;
+    \item les systèmes ERP ;
+    \item le cloud computing ;
+    \item la data et l'intelligence artificielle ;
+    \item la cybersécurité ;
+    \item l'intégration de systèmes.
+\end{itemize}
+
+Cette diversité technologique rend les problématiques de migration
+particulièrement importantes. Les équipes peuvent être amenées à maintenir des
+applications développées avec différentes générations de langages,
+frameworks, bibliothèques et environnements d'exécution.
+
+\subsection{Contexte de la mission}
+
+Le projet réalisé dans le cadre de ce PFE s'inscrit dans une démarche
+d'amélioration et d'automatisation des migrations logicielles.
+
+Les projets de migration nécessitent généralement plusieurs types
+d'interventions :
+
+\begin{itemize}
+    \item analyser l'application existante ;
+    \item identifier les versions des langages, frameworks et dépendances ;
+    \item définir une cible de migration ;
+    \item planifier les différentes transformations nécessaires ;
+    \item appliquer les modifications de configuration et de code ;
+    \item exécuter les compilations et les tests ;
+    \item diagnostiquer les erreurs ;
+    \item corriger les échecs ;
+    \item produire des preuves et rapports de migration.
+\end{itemize}
+
+Une grande partie de ces activités est historiquement réalisée manuellement.
+Le projet a donc pour ambition d'étudier comment ces différentes opérations
+peuvent être orchestrées et automatisées de manière plus avancée.
+
+% ============================================================
+\section{Genèse du projet}
+% ============================================================
+
+Les applications d'entreprise ont souvent une durée de vie importante.
+Certaines sont maintenues pendant de nombreuses années, au cours desquelles
+leurs technologies évoluent ou deviennent progressivement obsolètes.
+
+Une application peut par exemple reposer sur :
+
+\begin{itemize}
+    \item une ancienne version de Java ;
+    \item une version obsolète de Spring Boot ;
+    \item des dépendances qui ne sont plus maintenues ;
+    \item des API supprimées ou remplacées ;
+    \item des bibliothèques présentant des vulnérabilités ;
+    \item des conventions techniques incompatibles avec la plateforme cible.
+\end{itemize}
+
+La modernisation devient alors nécessaire. Cependant, la migration ne consiste
+pas uniquement à modifier un numéro de version. Elle peut impliquer des
+changements dans les dépendances, les imports, les API, les configurations,
+les outils de compilation, les tests et parfois l'architecture de
+l'application.
+
+Dans un processus traditionnel, un développeur analyse le projet, effectue les
+changements, compile, observe les erreurs, corrige les problèmes et recommence.
+Ce cycle peut se répéter de nombreuses fois.
+
+La situation peut être résumée ainsi :
+
+\begin{center}
+Application existante
+$\rightarrow$
+Analyse manuelle
+$\rightarrow$
+Transformation
+$\rightarrow$
+Compilation
+$\rightarrow$
+Échec
+$\rightarrow$
+Débogage
+$\rightarrow$
+Correction
+$\rightarrow$
+Nouvelle validation
+\end{center}
+
+Ce fonctionnement mobilise du temps, des compétences spécialisées et des
+ressources importantes. Lorsque les organisations possèdent un grand
+portefeuille applicatif, cette approche devient difficilement scalable.
+
+C'est à partir de ce constat qu'est née l'idée de construire une
+\textbf{Migration Factory} capable d'industrialiser et d'automatiser davantage
+le processus.
+
+% ============================================================
+\section{Problématique}
+% ============================================================
+
+Aujourd'hui, de nombreuses migrations logicielles restent largement
+manuelles. Les développeurs doivent intervenir à chaque étape, depuis
+l'analyse initiale jusqu'aux différentes corrections nécessaires après les
+échecs de compilation ou de test.
+
+Cette situation entraîne plusieurs difficultés :
+
+\begin{itemize}
+    \item des cycles de migration longs ;
+    \item une forte consommation de ressources humaines ;
+    \item de nombreux cycles de débogage ;
+    \item une augmentation des coûts ;
+    \item un risque d'erreurs lié aux opérations manuelles ;
+    \item une difficulté à reproduire exactement certaines interventions ;
+    \item une faible capacité à traiter de nombreuses migrations en parallèle ;
+    \item une forte dépendance aux connaissances des développeurs spécialisés.
+\end{itemize}
+
+Les outils automatisés existants peuvent traiter certains problèmes connus,
+mais ne couvrent pas toujours les cas particuliers rencontrés dans chaque
+application. À l'inverse, les modèles d'intelligence artificielle peuvent
+apporter davantage de flexibilité, mais leur comportement probabiliste exige
+des mécanismes de contrôle.
+
+La problématique générale du projet est donc la suivante :
+
+\begin{quote}
+\textbf{Comment concevoir une plateforme capable d'automatiser et d'accélérer
+les migrations logicielles, de réduire l'effort manuel, les coûts et les
+cycles de débogage, tout en conservant une gouvernance humaine, une
+traçabilité complète et des mécanismes déterministes de sécurité et de
+validation ?}
+\end{quote}
+
+% ============================================================
+\section{Vision générale du projet}
+% ============================================================
+
+La vision du projet dépasse la migration d'une seule technologie.
+
+L'objectif à long terme est de construire un système capable de prendre en
+charge différents langages, frameworks et chemins de migration grâce à une
+architecture flexible et extensible.
+
+La vision peut être représentée comme suit :
+
+\begin{center}
+\textbf{Migration Factory générique}
+\\
+$\downarrow$
+\\
+Profils de migration spécialisés
+\\
+$\downarrow$
+\\
+Java / Spring Boot \qquad Angular \qquad Autres technologies futures
+\end{center}
+
+Le premier cas d'étude concret concerne l'écosystème Java et Spring Boot.
+L'objectif est notamment de permettre l'analyse d'une application existante,
+la définition d'une cible de migration, l'application de transformations, la
+compilation, l'exécution des tests et la gestion des échecs.
+
+Le support d'Angular est également étudié comme future extension. Cette
+orientation permet de valider le caractère extensible de l'architecture et de
+préparer la plateforme à d'autres technologies.
+
+% ============================================================
+\section{Principe de gouvernance}
+% ============================================================
+
+La plateforme n'a pas pour objectif de supprimer le développeur du processus.
+
+Le principe retenu est celui d'une automatisation avancée mais gouvernée.
+
+Le système peut :
+
+\begin{itemize}
+    \item analyser une application ;
+    \item construire un plan de migration ;
+    \item appliquer certaines transformations ;
+    \item exécuter les builds et les tests ;
+    \item détecter automatiquement les échecs ;
+    \item construire des éléments de preuve ;
+    \item solliciter un LLM pour proposer une correction ;
+    \item solliciter un second modèle pour effectuer une révision indépendante ;
+    \item présenter les propositions au développeur ;
+    \item appliquer les changements autorisés dans un environnement isolé ;
+    \item revalider l'application.
+\end{itemize}
+
+Le développeur conserve néanmoins la gouvernance des décisions importantes.
+
+Le modèle retenu peut être résumé par l'équation conceptuelle suivante :
+
+\begin{center}
+\textbf{Automatisation déterministe}
++
+\textbf{Intelligence des LLM}
++
+\textbf{Gouvernance humaine}
+\end{center}
+
+% ============================================================
+\section{Utilisateur cible}
+% ============================================================
+
+L'utilisateur principal de la plateforme est le
+\textbf{développeur au sein de l'entreprise chargé de la migration ou de la
+modernisation d'une application}.
+
+Le système est conçu pour assister ce développeur dans différentes activités :
+
+\begin{itemize}
+    \item compréhension de l'application existante ;
+    \item analyse du stack technique ;
+    \item génération du plan de migration ;
+    \item suivi de l'exécution ;
+    \item diagnostic des erreurs ;
+    \item inspection des propositions de réparation ;
+    \item approbation ou refus des modifications ;
+    \item consultation des résultats et preuves de validation.
+\end{itemize}
+
+L'objectif n'est donc pas de remplacer le développeur, mais de réduire le
+volume de tâches répétitives et de lui permettre de se concentrer sur les
+décisions nécessitant une expertise réelle.
+
+% ============================================================
+\section{Objectifs du projet}
+% ============================================================
+
+\subsection{Objectif général}
+
+L'objectif principal consiste à concevoir et développer une plateforme
+intelligente, flexible et gouvernée permettant d'automatiser une part
+importante du cycle de migration logicielle.
+
+\subsection{Objectifs spécifiques}
+
+Les objectifs spécifiques sont les suivants :
+
+\begin{enumerate}
+    \item permettre la configuration d'une migration depuis un stack source
+    vers un stack cible ;
+
+    \item analyser automatiquement une application afin d'identifier son
+    environnement technique et les principaux éléments nécessaires à sa
+    migration ;
+
+    \item générer un plan de migration structuré ;
+
+    \item appliquer automatiquement certaines transformations déterministes ;
+
+    \item exécuter les commandes de compilation et de test dans un
+    environnement contrôlé ;
+
+    \item détecter automatiquement les échecs ;
+
+    \item construire et persister des preuves techniques exploitables ;
+
+    \item utiliser des LLM pour analyser les situations complexes et proposer
+    des réparations ;
+
+    \item soumettre les réparations à une révision indépendante ;
+
+    \item maintenir l'utilisateur dans la boucle de décision ;
+
+    \item appliquer les changements uniquement dans un environnement isolé ;
+
+    \item garantir la traçabilité des étapes, événements, décisions,
+    propositions et validations ;
+
+    \item préparer une architecture extensible à plusieurs langages et
+    frameworks.
+\end{enumerate}
+
+% ============================================================
+\section{Périmètre du projet}
+% ============================================================
+
+Le projet possède une vision multi-technologies, mais sa réalisation doit
+rester mesurable et progressive.
+
+Le périmètre principal du PFE porte sur :
+
+\begin{itemize}
+    \item la conception de la Migration Factory ;
+    \item la mise en place de l'orchestration des différentes étapes ;
+    \item la gouvernance humaine ;
+    \item l'intégration de mécanismes déterministes ;
+    \item l'intégration de modèles LLM ;
+    \item la collecte des erreurs et des preuves ;
+    \item la génération et la révision des propositions de réparation ;
+    \item l'application contrôlée des changements ;
+    \item le premier cas concret Java/Spring Boot.
+\end{itemize}
+
+Angular représente une extension étudiée mais ne constitue pas nécessairement
+un cas d'implémentation aussi avancé que Java/Spring Boot dans le périmètre
+initial.
+
+% ============================================================
+\section{Résultats et bénéfices attendus}
+% ============================================================
+
+La plateforme vise à apporter plusieurs bénéfices :
+
+\begin{itemize}
+    \item réduire la durée des migrations ;
+    \item diminuer le nombre d'opérations manuelles répétitives ;
+    \item réduire le temps consacré au débogage ;
+    \item améliorer la reproductibilité des migrations ;
+    \item faciliter le suivi des erreurs ;
+    \item renforcer la traçabilité des décisions ;
+    \item exploiter les capacités de raisonnement des LLM sans leur donner une
+    autorité d'exécution non contrôlée ;
+    \item permettre aux équipes de traiter davantage de migrations.
+\end{itemize}
+
+Ces éléments représentent les objectifs attendus du système. Les gains
+quantitatifs réels, notamment en termes de temps, de coût ou de réduction de
+l'effort manuel, doivent être mesurés à travers les scénarios d'évaluation
+présentés dans les chapitres ultérieurs.
+
+% ============================================================
+\section{Méthodologie et conduite du projet}
+% ============================================================
+
+Le développement d'une plateforme de migration intelligente nécessite une
+démarche progressive et itérative. Les fonctionnalités évoluent à partir des
+résultats obtenus lors des expérimentations, des échecs observés pendant les
+migrations et des retours des différentes démonstrations.
+
+Le projet est ainsi organisé autour de cycles courts :
+
+\begin{enumerate}
+    \item identification d'un besoin ou d'un problème ;
+    \item analyse du comportement existant ;
+    \item conception d'une amélioration ;
+    \item implémentation ;
+    \item tests ;
+    \item démonstration ;
+    \item collecte des retours ;
+    \item amélioration du backlog.
+\end{enumerate}
+
+Cette approche est particulièrement adaptée à un projet combinant ingénierie
+logicielle, automatisation et intelligence artificielle, car les résultats
+réels des modèles et des migrations peuvent conduire à réviser certains choix
+techniques.
+
+% ============================================================
+\section{Organisation du rapport}
+% ============================================================
+
+Le rapport est organisé autour de plusieurs chapitres complémentaires.
+
+Le premier chapitre présente CGI, le contexte général, la problématique, la
+vision et les objectifs du projet.
+
+Le deuxième chapitre analyse le domaine de la migration et de la modernisation
+logicielle. Il présente les difficultés des migrations manuelles, les outils
+déterministes, les solutions assistées par intelligence artificielle et le
+positionnement de la Migration Factory.
+
+Le troisième chapitre sera consacré à l'analyse fonctionnelle et aux exigences.
+
+Le quatrième présentera l'architecture et les choix de conception.
+
+Le cinquième détaillera l'ingénierie et la réalisation technique.
+
+Le sixième présentera le cas d'étude Java/Spring Boot.
+
+Enfin, le dernier chapitre évaluera les résultats, les performances, la
+fiabilité et les limites du système.
+
+% ============================================================
+\section*{Conclusion}
+% ============================================================
+
+Ce chapitre a présenté le contexte dans lequel s'inscrit le projet de Migration
+Factory. Face à des processus de migration encore fortement manuels, coûteux
+en temps et nécessitant de nombreux cycles de débogage, le projet propose une
+approche combinant automatisation déterministe, intelligence artificielle et
+gouvernance humaine.
+
+La vision retenue est celle d'un système extensible destiné à plusieurs
+technologies, dont le premier cas d'étude concret porte sur Java et Spring
+Boot. Le chapitre suivant analyse plus en profondeur les problématiques de la
+migration logicielle et présente les principales approches existantes afin de
+positionner précisément la solution proposée.

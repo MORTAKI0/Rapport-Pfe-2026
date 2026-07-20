@@ -1,0 +1,233 @@
+\documentclass[12pt,a4paper]{report}
+
+% ============================================================
+% ENCODAGE ET LANGUE
+% ============================================================
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[french]{babel}
+\usepackage{lmodern}
+
+% ============================================================
+% MISE EN PAGE
+% ============================================================
+
+\usepackage{
+    geometry,
+    graphicx,
+    float,
+    enumitem,
+    amsmath,
+    longtable,
+    array,
+    booktabs,
+    pdflscape,
+    chngcntr,
+    fancyhdr,
+    tikz,
+    pgfgantt,
+    glossaries
+}
+
+\geometry{
+    top=2.5cm,
+    bottom=2.5cm,
+    left=3cm,
+    right=2.5cm
+}
+
+\setlength{\headheight}{16pt}
+
+% ============================================================
+% FIGURES ET TABLEAUX
+% ============================================================
+
+\counterwithin{figure}{chapter}
+\counterwithin{table}{chapter}
+
+\renewcommand{\thefigure}{\thechapter.\arabic{figure}}
+\renewcommand{\thetable}{\thechapter.\arabic{table}}
+
+\renewcommand{\arraystretch}{1.4}
+
+% ============================================================
+% HEADER ET FOOTER
+% ============================================================
+
+\pagestyle{fancy}
+\fancyhf{}
+
+\fancyhead[L]{CGI}
+\fancyhead[C]{Rapport de Projet de Fin d'Études}
+\fancyhead[R]{EMSI}
+
+\fancyfoot[L]{2025/2026}
+\fancyfoot[R]{Page \thepage}
+
+% Appliquer le même style sur les premières pages des chapitres
+\fancypagestyle{plain}{
+    \fancyhf{}
+    \fancyhead[L]{CGI}
+    \fancyhead[C]{Rapport de Projet de Fin d'Études}
+    \fancyhead[R]{EMSI}
+    \fancyfoot[L]{2025/2026}
+    \fancyfoot[R]{Page \thepage}
+}
+
+% ============================================================
+% GLOSSAIRE
+% ============================================================
+
+\makeglossaries
+
+% ============================================================
+% HYPERLIENS
+% Toujours charger hyperref vers la fin
+% ============================================================
+
+\usepackage[hidelinks]{hyperref}
+
+% ============================================================
+% DOCUMENT
+% ============================================================
+
+\begin{document}
+
+% ============================================================
+% PAGES PRÉLIMINAIRES
+% ============================================================
+
+\pagenumbering{Roman}
+
+% ------------------------------------------------------------
+% Mentions légales
+% ------------------------------------------------------------
+
+\chapter*{Mentions légales}
+\addcontentsline{toc}{chapter}{Mentions légales}
+
+Les informations contenues dans ce document sont la propriété de
+\textbf{CGI Technologies et Solutions} et sont strictement confidentielles.
+Ces informations ne peuvent être divulguées, reproduites ou diffusées sans
+l'autorisation de \textbf{CGI Technologies et Solutions}.
+
+\vspace{1em}
+
+Il est expressément interdit de reproduire, présenter ou dupliquer sur quelque
+support que ce soit et de quelque manière que ce soit, tout ou une partie de ce
+document sans l'autorisation de \textbf{CGI Technologies et Solutions}.
+
+\vspace{2em}
+
+\begin{center}
+    \textcopyright\ CGI Technologies et Solutions, 2026 --
+    Tous droits réservés.
+\end{center}
+
+\clearpage
+
+% ------------------------------------------------------------
+% Dédicace
+% À ajouter plus tard :
+% \input{intros/dedicace}
+% \clearpage
+% ------------------------------------------------------------
+
+% ------------------------------------------------------------
+% Remerciements
+% À ajouter plus tard :
+% \input{intros/remerciements}
+% \clearpage
+% ------------------------------------------------------------
+
+% ------------------------------------------------------------
+% Résumé
+% ------------------------------------------------------------
+
+\input{intros/resume}
+
+\clearpage
+
+% ------------------------------------------------------------
+% Abstract
+% ------------------------------------------------------------
+
+\input{intros/abstract}
+
+\clearpage
+
+% ------------------------------------------------------------
+% Liste des figures
+% ------------------------------------------------------------
+
+\listoffigures
+\addcontentsline{toc}{chapter}{Liste des figures}
+
+\clearpage
+
+% ------------------------------------------------------------
+% Liste des tableaux
+% ------------------------------------------------------------
+
+\listoftables
+\addcontentsline{toc}{chapter}{Liste des tableaux}
+
+\clearpage
+
+% ------------------------------------------------------------
+% Table des matières
+% ------------------------------------------------------------
+
+\tableofcontents
+
+\clearpage
+
+% ============================================================
+% CONTENU PRINCIPAL
+% ============================================================
+
+\pagenumbering{arabic}
+\setcounter{page}{1}
+
+% ------------------------------------------------------------
+% Introduction générale
+% ------------------------------------------------------------
+
+\input{intros/introduction_generale}
+
+% ------------------------------------------------------------
+% Chapitre 1 — Contexte général du projet
+% ------------------------------------------------------------
+
+\input{chapitre1/contexte_general}
+
+% ------------------------------------------------------------
+% Chapitre 2 — État de l'art et problématique de migration
+% ------------------------------------------------------------
+
+\input{chapitre2/etat_art_migration}
+
+% ============================================================
+% CHAPITRES À AJOUTER PROGRESSIVEMENT
+% ============================================================
+
+% Chapitre 3 — Analyse fonctionnelle et exigences
+% \input{chapitre3/analyse_exigences}
+
+% Chapitre 4 — Architecture de la Migration Factory
+% \input{chapitre4/architecture}
+
+% Chapitre 5 — Ingénierie et implémentation
+% \input{chapitre5/implementation}
+
+% Chapitre 6 — Cas d'étude Java / Spring Boot
+% \input{chapitre6/cas_java_spring}
+
+% Chapitre 7 — Validation, évaluation et discussion
+% \input{chapitre7/evaluation}
+
+% Conclusion générale
+% \input{conclusion_generale}
+
+\end{document}
