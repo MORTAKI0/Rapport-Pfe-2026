@@ -1,97 +1,34 @@
 \chapter*{Introduction générale}
 \addcontentsline{toc}{chapter}{Introduction générale}
+\markboth{Introduction générale}{Introduction générale}
 
-Les systèmes logiciels occupent aujourd'hui une place centrale dans le
-fonctionnement des entreprises. Ils supportent les processus métiers,
-facilitent les interactions avec les clients et assurent le traitement d'une
-quantité croissante de données. Cependant, ces applications évoluent dans un
-environnement technologique en changement permanent. Les langages, les
-frameworks, les versions des environnements d'exécution, les dépendances et
-les exigences de sécurité évoluent continuellement, rendant la modernisation
-des applications existantes indispensable.
+Les systèmes logiciels constituent aujourd'hui un patrimoine stratégique pour les entreprises. Ils supportent les processus métiers, les échanges avec les clients, la production, la gestion des données et de nombreuses activités critiques. Toutefois, ce patrimoine évolue dans un environnement technologique en mouvement permanent : les versions des langages et des frameworks se succèdent, les dépendances deviennent obsolètes, certaines interfaces de programmation disparaissent et les exigences de sécurité ou de maintenabilité se renforcent.
 
-La migration logicielle constitue ainsi un enjeu stratégique pour les
-organisations. Une application construite sur une version ancienne d'un
-framework ou d'un environnement d'exécution peut progressivement devenir plus
-difficile à maintenir, plus coûteuse à exploiter et plus vulnérable aux risques
-de sécurité. La migration vers des versions plus modernes permet de prolonger
-la durée de vie des applications, d'améliorer leur maintenabilité et de
-bénéficier des capacités offertes par les technologies actuelles.
+Dans ce contexte, la migration logicielle ne se limite pas à modifier quelques numéros de version. Elle nécessite généralement de comprendre une base de code existante, d'identifier les incompatibilités, de planifier un chemin de transformation, de mettre à jour la configuration et les dépendances, d'adapter le code source, puis de compiler et de tester l'application. Lorsqu'une étape échoue, les développeurs doivent analyser les messages d'erreur, localiser les causes, proposer une correction, relancer la validation et répéter ce cycle jusqu'à l'obtention d'un résultat acceptable.
 
-Cependant, les projets de migration restent complexes. Dans de nombreux cas,
-une grande partie du travail est encore réalisée manuellement par les
-développeurs. Ces derniers doivent comprendre une base de code parfois
-ancienne, identifier les dépendances incompatibles, appliquer des
-transformations, lancer les compilations et les tests, analyser les erreurs,
-corriger les problèmes puis recommencer ce cycle jusqu'à l'obtention d'une
-version stable.
+Cette succession d'opérations reste, dans de nombreux projets, fortement manuelle. Elle mobilise des compétences spécialisées, consomme du temps et rend difficile le traitement simultané d'un portefeuille important d'applications. Les outils déterministes permettent d'automatiser certaines transformations connues et répétitives, mais ils atteignent leurs limites face aux cas particuliers, aux dépendances non prévues ou aux erreurs propres à une application donnée. À l'inverse, les grands modèles de langage peuvent analyser du code et proposer des corrections, mais leur comportement probabiliste ne permet pas de leur confier sans contrôle l'exécution de changements sur un système logiciel.
 
-Cette approche entraîne plusieurs difficultés. Elle peut mobiliser des équipes
-pendant de longues périodes, nécessiter des compétences spécialisées et
-provoquer de nombreux cycles de débogage. Les coûts augmentent avec la taille
-et la complexité du portefeuille applicatif, tandis que la répétition des
-opérations manuelles augmente le risque d'erreurs et limite la capacité des
-organisations à moderniser simultanément un grand nombre d'applications.
+Le besoin n'est donc pas de choisir entre automatisation déterministe et intelligence artificielle, mais de construire une architecture dans laquelle chaque mécanisme intervient dans le périmètre qui lui convient. Les règles, les outils de build, les tests, les contrôles d'intégrité et l'isolation des fichiers doivent conserver un comportement vérifiable. Les modèles de langage peuvent, quant à eux, assister l'analyse, la génération de propositions et la résolution de situations qui exigent davantage de raisonnement. Le développeur doit rester en mesure de comprendre, d'approuver, de refuser ou de faire réviser les changements proposés.
 
-Les outils déterministes de transformation permettent déjà d'automatiser
-certaines modifications connues et répétitives. Ils offrent des propriétés
-importantes de reproductibilité, de contrôle et de traçabilité. Cependant,
-leur efficacité dépend principalement de règles prédéfinies et ils peuvent
-être limités face à des situations inattendues, à des erreurs spécifiques à
-une application ou à des incompatibilités non couvertes par leurs règles.
+C'est dans cette perspective que s'inscrit ce projet de fin d'études réalisé au sein de \textbf{CGI Technologies et Solutions Maroc}. Il vise à concevoir une \textbf{Migration Factory} : une plateforme intelligente, extensible et gouvernée destinée à industrialiser plusieurs étapes du processus de migration logicielle. La plateforme doit permettre de configurer une migration, d'analyser le projet source, de construire un chemin de modernisation, d'orchestrer les transformations, de suivre les étapes d'exécution, de collecter les preuves en cas d'échec et d'engager une boucle de réparation contrôlée.
 
-Parallèlement, l'évolution récente de l'intelligence artificielle générative
-et des grands modèles de langage ouvre de nouvelles perspectives. Les LLM
-peuvent analyser du code, raisonner sur des messages d'erreur, proposer des
-modifications et assister les développeurs dans la résolution de problèmes.
-Cependant, leur caractère probabiliste implique également des risques :
-réponses incorrectes, hallucinations, modifications injustifiées ou patches
-non applicables.
+La vision du projet est volontairement plus large qu'un unique cas technologique. L'architecture est pensée autour de profils de migration spécialisés qui réutilisent un socle commun d'orchestration, de suivi, de validation et de gouvernance. Le premier profil concret concerne Java et Spring Boot. Il permet d'étudier une migration progressive depuis un environnement ancien vers des versions modernes, en tenant compte des changements de dépendances, d'API et de configuration. Le profil Angular constitue un deuxième terrain d'étude permettant d'évaluer la capacité de la plateforme à s'adapter à un écosystème différent, fondé notamment sur Node.js, npm, TypeScript et la chaîne d'outillage Angular.
 
-Le défi consiste donc à ne pas opposer automatisation déterministe et
-intelligence artificielle, mais à les combiner dans une architecture gouvernée.
-Les mécanismes déterministes peuvent conserver l'autorité sur les opérations
-d'exécution, les règles de sécurité et la validation, tandis que les LLM
-peuvent intervenir dans les activités nécessitant davantage de raisonnement,
-notamment l'analyse de situations complexes et la proposition de réparations.
+L'ambition n'est pas de produire un système totalement autonome qui remplacerait le développeur. Elle consiste à augmenter sa capacité d'action en automatisant les opérations répétitives, en structurant les preuves, en réduisant le temps consacré au diagnostic et en rendant les propositions de changement plus faciles à examiner. Cette orientation se traduit par trois principes directeurs :
 
-C'est dans cette perspective que s'inscrit ce projet de fin d'études réalisé
-au sein de CGI Technologies et Solutions Maroc. Il vise à concevoir et
-développer une \textbf{Migration Factory intelligente et gouvernée}, capable
-d'automatiser plusieurs phases du cycle de modernisation logicielle tout en
-maintenant le développeur au centre des décisions importantes.
+\begin{itemize}
+    \item \textbf{automatiser ce qui peut être reproduit et vérifié}, grâce à des transformations et des contrôles déterministes ;
+    \item \textbf{mobiliser les LLM pour les activités de raisonnement}, notamment l'analyse d'échecs et la proposition de réparations ;
+    \item \textbf{maintenir une gouvernance humaine explicite}, en particulier avant l'application de changements sensibles.
+\end{itemize}
 
-La vision à long terme est celle d'une plateforme flexible pouvant prendre en
-charge différents langages, frameworks et scénarios de migration. Le premier
-cas d'étude concret porte sur l'écosystème Java et Spring Boot. L'étude de
-l'extension du système à d'autres technologies, notamment Angular, constitue
-également une perspective importante du projet.
-
-La solution proposée repose sur plusieurs principes structurants :
-l'automatisation des tâches répétitives, l'utilisation d'outils de
-transformation déterministes lorsque cela est possible, l'orchestration des
-différentes étapes du processus, la détection automatique des échecs, la
-construction de preuves techniques, l'utilisation de LLM spécialisés pour la
-génération et la révision des propositions de réparation, la validation
-humaine des décisions importantes et l'exécution des changements dans des
-environnements isolés.
-
-La question centrale de ce travail peut ainsi être formulée de la manière
-suivante :
+La problématique centrale du projet peut ainsi être formulée comme suit :
 
 \begin{quote}
-\textit{Comment concevoir un système intelligent, flexible et gouverné capable
-d'automatiser et d'accélérer les migrations logicielles, de réduire l'effort
-manuel et les cycles de débogage, tout en garantissant la traçabilité,
-la maîtrise des changements et le contrôle du développeur ?}
+\itshape
+Comment concevoir une plateforme générique, intelligente et gouvernée capable d'automatiser et d'accélérer les migrations logicielles, de réduire l'effort manuel et les cycles de débogage, tout en garantissant l'isolation des modifications, la traçabilité des décisions et le contrôle du développeur ?
 \end{quote}
 
-Le présent rapport s'organise progressivement autour de cette problématique.
-Le premier chapitre présente CGI Technologies et Solutions, le contexte du
-projet, sa vision, ses objectifs et son organisation. Le deuxième chapitre
-analyse la problématique de la migration logicielle et présente l'état de
-l'art des principales approches existantes, des outils déterministes aux
-systèmes basés sur les LLM et les agents. Les chapitres suivants seront
-consacrés à l'analyse fonctionnelle, à l'architecture de la Migration Factory,
-à sa réalisation technique, au cas d'étude Java/Spring Boot et à l'évaluation
-des résultats obtenus.
+Pour répondre à cette problématique, le travail poursuit plusieurs objectifs complémentaires : formaliser un processus de migration réutilisable, concevoir une architecture extensible à plusieurs technologies, orchestrer des agents et des outils spécialisés, encadrer l'utilisation des LLM, construire une boucle de réparation révisée et approuvée, puis valider la solution sur des cas représentatifs Java/Spring Boot et Angular.
+
+Le présent rapport est organisé en six chapitres. Le premier chapitre présente l'organisme d'accueil, le contexte du projet, la problématique, la vision et le cadrage général. Le deuxième chapitre analyse l'état de l'art de la migration logicielle, des outils de transformation et des systèmes d'assistance fondés sur l'intelligence artificielle. Le troisième chapitre formalise les besoins et expose la méthodologie de conception itérative. Le quatrième chapitre détaille l'architecture et l'implémentation de la Migration Factory. Le cinquième chapitre retrace les principales évolutions techniques de la solution. Enfin, le sixième chapitre présente la stratégie de validation, les résultats, les limites et les perspectives d'industrialisation.
