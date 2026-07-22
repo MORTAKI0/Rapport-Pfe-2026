@@ -33,29 +33,42 @@
         \begin{center}
 
             % =================================================
-            % Logos officiels présents dans le dossier logos/
+            % Logos officiels
+            %
+            % EMSI.png contient une marge blanche interne importante :
+            % le trim permet de conserver uniquement le logo utile.
+            % Les deux logos utilisent des dimensions indépendantes afin
+            % d'obtenir une présence visuelle équilibrée.
             % =================================================
-            \vspace*{-0.85cm}
+            \vspace*{-0.72cm}
 
-            \begin{minipage}[t]{0.46\textwidth}
+            \begin{minipage}[c][2.10cm][c]{0.60\textwidth}
                 \raggedright
                 \IfFileExists{logos/EMSI.png}{%
-                    \includegraphics[width=0.94\textwidth,height=2.05cm,keepaspectratio]{logos/EMSI.png}%
+                    \includegraphics[
+                        width=6.15cm,
+                        trim=5bp 13bp 5bp 13bp,
+                        clip
+                    ]{logos/EMSI.png}%
                 }{%
-                    \fbox{\parbox[c][1.65cm][c]{0.9\textwidth}{\centering\bfseries EMSI}}%
+                    \fbox{\parbox[c][1.65cm][c]{5.8cm}{\centering\bfseries EMSI}}%
                 }
             \end{minipage}
             \hfill
-            \begin{minipage}[t]{0.46\textwidth}
+            \begin{minipage}[c][2.10cm][c]{0.34\textwidth}
                 \raggedleft
                 \IfFileExists{logos/cgi.png}{%
-                    \includegraphics[width=0.72\textwidth,height=1.75cm,keepaspectratio]{logos/cgi.png}%
+                    \includegraphics[
+                        width=3.25cm,
+                        height=1.55cm,
+                        keepaspectratio
+                    ]{logos/cgi.png}%
                 }{%
-                    \fbox{\parbox[c][1.65cm][c]{0.72\textwidth}{\centering\bfseries\textcolor{cgired}{CGI}}}%
+                    \fbox{\parbox[c][1.55cm][c]{3.25cm}{\centering\bfseries\textcolor{cgired}{CGI}}}%
                 }
             \end{minipage}
 
-            \vspace{0.85cm}
+            \vspace{0.72cm}
 
             % =================================================
             % Nature du document et formation
