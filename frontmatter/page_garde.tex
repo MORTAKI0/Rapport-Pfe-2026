@@ -33,38 +33,34 @@
         \begin{center}
 
             % =================================================
-            % Logos officiels
-            %
-            % EMSI.png contient une marge blanche interne importante :
-            % le trim permet de conserver uniquement le logo utile.
-            % Les deux logos utilisent des dimensions indépendantes afin
-            % d'obtenir une présence visuelle équilibrée.
+            % Logos officiels présents dans le dossier logos/
             % =================================================
-            \vspace*{-0.72cm}
+            \vspace*{-0.85cm}
 
-            \begin{minipage}[c][2.10cm][c]{0.60\textwidth}
+            \begin{minipage}[c][2.3cm][c]{0.56\textwidth}
                 \raggedright
                 \IfFileExists{logos/EMSI.png}{%
+                    % On enlève seulement un peu de marge verticale,
+                    % sans couper le texte à droite.
                     \includegraphics[
-                        width=6.15cm,
-                        trim=5bp 13bp 5bp 13bp,
+                        height=1.95cm,
+                        trim=0 12 0 12,
                         clip
                     ]{logos/EMSI.png}%
                 }{%
-                    \fbox{\parbox[c][1.65cm][c]{5.8cm}{\centering\bfseries EMSI}}%
+                    \fbox{\parbox[c][1.8cm][c]{0.92\textwidth}{\centering\bfseries EMSI}}%
                 }
             \end{minipage}
             \hfill
-            \begin{minipage}[c][2.10cm][c]{0.34\textwidth}
+            \begin{minipage}[c][2.3cm][c]{0.30\textwidth}
                 \raggedleft
                 \IfFileExists{logos/cgi.png}{%
                     \includegraphics[
-                        width=3.25cm,
                         height=1.55cm,
                         keepaspectratio
                     ]{logos/cgi.png}%
                 }{%
-                    \fbox{\parbox[c][1.55cm][c]{3.25cm}{\centering\bfseries\textcolor{cgired}{CGI}}}%
+                    \fbox{\parbox[c][1.6cm][c]{0.72\textwidth}{\centering\bfseries\textcolor{cgired}{CGI}}}%
                 }
             \end{minipage}
 
