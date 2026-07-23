@@ -267,6 +267,160 @@ Lorsqu'un échec d'installation, de compilation ou de test survient, la platefor
 
 La mise en œuvre est organisée en deux systèmes spécialisés et deux dépôts distincts : un système consacré aux migrations Java/Spring Boot et un système consacré aux migrations Angular. Cette séparation permet de préserver les spécificités de chaque écosystème, d'éviter une orchestration monolithique trop complexe et de faciliter les tests, l'évolution et la maintenance. Les deux systèmes partagent néanmoins les mêmes principes de gouvernance, de traçabilité, d'isolation et de collaboration entre automatisation déterministe, LLM et expertise humaine.
 
+\subsection{Présentation du client}
+
+Le client du projet est \textbf{CGI Technologies et Solutions Maroc}. La Migration Factory est actuellement développée comme une initiative interne destinée à structurer, expérimenter et industrialiser une nouvelle approche de la migration logicielle. Elle constitue également une vision susceptible d'être présentée et adaptée ultérieurement aux clients de CGI confrontés à des enjeux similaires de modernisation applicative.
+
+Dans ce cadre, CGI occupe plusieurs positions complémentaires : commanditaire interne, environnement d'expérimentation, source d'expertise technique et futur intégrateur de la solution. Les attentes portent à la fois sur la réduction de l'effort nécessaire pour réaliser une migration, l'amélioration de la qualité des résultats, la maîtrise des risques et la capacité à démontrer une approche reproductible à des clients opérant dans différents secteurs.
+
+\subsection{Contexte du projet}
+
+De nombreuses organisations exploitent encore des applications reposant sur des versions anciennes de langages, de frameworks et de dépendances. La modernisation de ces applications reste souvent longue et largement manuelle. Elle nécessite des profils expérimentés capables de comprendre le patrimoine existant, de choisir une trajectoire de migration, d'adapter le code, puis de résoudre les erreurs successives de compilation, d'installation ou de test.
+
+Cette situation engendre plusieurs difficultés : un nombre important d'applications à traiter, des cycles de migration et de débogage prolongés, des coûts élevés, une dépendance à des expertises Java/Spring Boot ou Angular parfois limitées, ainsi qu'une capacité insuffisante à conduire plusieurs migrations en parallèle. L'absence d'un processus homogène rend également le suivi, la comparaison et la capitalisation sur les migrations précédentes plus difficiles.
+
+La modernisation est aussi liée aux exigences des environnements de déploiement modernes. Les plateformes cloud et les services managés s'appuient sur des versions de runtimes officiellement prises en charge. Une application utilisant une version arrivée en fin de support peut perdre l'accès aux correctifs de sécurité, rencontrer des contraintes de compatibilité ou ne plus bénéficier du niveau d'assistance attendu. Les politiques de support d'Azure App Service précisent notamment qu'une application utilisant une version de langage non prise en charge doit évoluer vers une version supportée pour bénéficier du support du service.\footnote{Microsoft, \textit{Language Runtime Support Policy for Azure App Service}, \url{https://learn.microsoft.com/en-us/azure/app-service/language-support-policy}.}
+
+Le projet a d'abord été lancé sous la forme d'une première version dédiée aux migrations \textbf{Java/Spring Boot}, conformément à la priorité définie par l'équipe et la direction de CGI. Le parcours actuellement étudié couvre les transitions Spring Boot 2.1 vers 2.7, 2.7 vers 3.5 et 3.5 vers 4.0, avec une évolution progressive entre Java 11, Java 17 et Java 21. Cette trajectoire doit rester extensible afin d'intégrer ultérieurement d'autres versions et scénarios.
+
+Un second système consacré à \textbf{Angular} a ensuite été demandé afin d'appliquer la même vision de gouvernance et d'industrialisation à un autre écosystème. Le périmètre actuel couvre les migrations Angular 18 vers 19, 19 vers 20 et 20 vers 21. La vision d'évolution consiste à étendre progressivement cette couverture depuis Angular 11 jusqu'aux versions récentes du framework.
+
+Les deux solutions disposent chacune de leur propre backend, de leur propre frontend, de leur propre orchestration, de leurs propres agents et de leurs propres workflows de validation. Aucun service d'exécution n'est actuellement partagé entre les deux dépôts. Ce découpage réduit le couplage, maintient la spécificité des chaînes d'outillage et permet une évolution indépendante des deux systèmes.
+
+\subsection{Problématique}
+
+Les migrations logicielles combinent des opérations répétitives, des décisions techniques dépendantes du contexte, des exécutions longues et des cycles fréquents de débogage. Les outils classiques automatisent certaines transformations connues, mais ne couvrent pas tous les cas particuliers. Les LLM peuvent accélérer l'analyse et proposer des solutions, mais leurs résultats ne doivent pas être appliqués sans contrôle dans une base de code réelle.
+
+Le défi consiste donc à automatiser davantage le processus sans perdre la maîtrise des commandes, des modifications et des décisions. La solution doit être capable de traiter plusieurs migrations, de conserver des preuves vérifiables, de sécuriser les changements proposés et de maintenir le développeur au centre des validations importantes.
+
+La problématique centrale du projet est formulée comme suit :
+
+\begin{quote}
+\itshape
+Comment concevoir des systèmes de migration intelligents, spécialisés et gouvernés capables d'automatiser, d'accélérer et de suivre la modernisation d'applications Java/Spring Boot et Angular, tout en réduisant l'effort manuel et les cycles de débogage, en facilitant l'exécution de plusieurs migrations et en garantissant la reproductibilité, la traçabilité, l'isolation des modifications et le contrôle du développeur ?
+\end{quote}
+
+\subsection{Conduite du projet}
+
+La conduite du projet repose sur une démarche structurée combinant définition des objectifs, priorisation des besoins, développement incrémental, validation technique et collecte régulière des retours. Cette organisation permet d'adapter progressivement la solution aux problèmes observés pendant les expérimentations et d'éviter la construction d'une architecture figée avant la validation des principaux choix techniques.
+
+Le travail a été organisé selon une approche \textbf{Agile Scrum}. Celle-ci favorise la livraison régulière d'incréments fonctionnels, la communication entre les participants et l'ajustement des priorités en fonction des résultats obtenus. Le cadre a été adapté au contexte du projet afin d'associer les développeurs, les référents fonctionnels, l'expert technique et la direction aux moments de validation appropriés.
+
+\begin{figure}[H]
+    \centering
+    \IfFileExists{logos/agile.png}{%
+        \includegraphics[width=0.78\textwidth]{logos/agile.png}%
+    }{%
+        \fbox{\parbox[c][4.5cm][c]{0.74\textwidth}{\centering Méthodologie Agile}}%
+    }
+    \caption{Principes de la méthodologie Agile}
+    \label{fig:methodologie-agile}
+\end{figure}
+
+\subsection{Méthodologie Scrum}
+
+Le projet est découpé en \textbf{sprints de deux semaines}. Chaque sprint vise à produire un ensemble cohérent de fonctionnalités, de corrections ou de validations pouvant être présenté et évalué. Cette cadence permet de conserver des objectifs suffisamment courts pour être mesurables, tout en laissant le temps nécessaire à l'implémentation et aux expérimentations techniques.
+
+Les principales cérémonies mises en œuvre sont les suivantes :
+
+\begin{itemize}
+    \item \textbf{Sprint Planning :} définition des objectifs du sprint, sélection et priorisation des éléments du backlog, puis répartition des travaux à réaliser ;
+    \item \textbf{Daily Scrum :} point quotidien consacré à l'avancement, aux prochaines actions, aux dépendances et aux obstacles rencontrés ;
+    \item \textbf{Revue et démonstration :} présentation des incréments réalisés aux experts techniques et aux responsables de CGI afin de recueillir leurs observations, de valider les orientations et d'ajuster les priorités ;
+    \item \textbf{Rétrospective :} réunion interne de l'équipe destinée à analyser le déroulement du sprint, identifier les difficultés et définir les améliorations applicables au cycle suivant.
+\end{itemize}
+
+Cette organisation soutient une amélioration continue du produit et du mode de collaboration. Les démonstrations permettent de confronter rapidement les développements aux attentes du projet, tandis que les rétrospectives réduisent la répétition des difficultés techniques ou organisationnelles.
+
+\subsection{Organisation de l'équipe projet}
+
+L'équipe opérationnelle comprend \textbf{trois développeurs} travaillant conjointement sur la conception, l'implémentation, l'intégration et la validation des deux systèmes. Afin de ne pas fragmenter artificiellement les responsabilités, le rapport présente leur contribution comme un travail collectif portant sur les différentes composantes de la solution.
+
+Deux référents fonctionnels accompagnent l'équipe dans le suivi des besoins, la clarification des attentes et la cohérence des fonctionnalités avec la vision du projet. Un expert technique assure le suivi global des choix d'architecture, des orientations d'implémentation et des principaux risques techniques. La direction de CGI intervient principalement lors des revues et des démonstrations afin d'évaluer les résultats, de confirmer les priorités et d'assurer l'alignement avec la vision interne.
+
+\begin{table}[H]
+    \centering
+    \small
+    \arrayrulecolor{cgigray}
+    \rowcolors{2}{cgilight!70}{white}
+    \begin{tabularx}{0.96\textwidth}{|>{\bfseries\RaggedRight\arraybackslash}p{4cm}|>{\RaggedRight\arraybackslash}X|}
+        \hline
+        \rowcolor{cgilight!95}
+        \textbf{Intervenants} & \textbf{Contribution au projet} \\
+        \hline
+        Trois développeurs & Conception, développement, intégration, expérimentation et validation de la solution. \\
+        \hline
+        Deux référents fonctionnels & Suivi des besoins, clarification fonctionnelle et accompagnement de l'équipe. \\
+        \hline
+        Expert technique & Suivi global de l'architecture, des choix techniques et des risques majeurs. \\
+        \hline
+        Direction de CGI & Validation des orientations, priorisation et évaluation des démonstrations. \\
+        \hline
+    \end{tabularx}
+    \caption{Organisation des intervenants du projet}
+    \label{tab:organisation-equipe-projet}
+    \rowcolors{2}{white}{white}
+    \arrayrulecolor{black}
+\end{table}
+
+\subsection{Outils de collaboration et de suivi}
+
+La gestion du projet s'appuie sur plusieurs outils complémentaires. \textbf{Jira} est utilisé pour structurer le backlog, planifier les fonctionnalités et suivre l'avancement des tâches. \textbf{Microsoft Teams} assure la communication quotidienne, les réunions de coordination et les démonstrations à distance. \textbf{GitHub} centralise le versionnement du code, le travail collaboratif et le suivi des évolutions techniques. Enfin, \textbf{Confluence} est utilisé pour conserver les éléments de documentation, les décisions et les informations de référence du projet.
+
+\begin{figure}[H]
+    \centering
+    \begin{minipage}[c]{0.29\textwidth}
+        \centering
+        \IfFileExists{logos/jira.png}{\includegraphics[height=1.65cm]{logos/jira.png}}{\fbox{Jira}}\\[1mm]
+        \small Jira
+    \end{minipage}
+    \hfill
+    \begin{minipage}[c]{0.29\textwidth}
+        \centering
+        \IfFileExists{logos/teams-logo.png}{\includegraphics[height=1.65cm]{logos/teams-logo.png}}{\fbox{Teams}}\\[1mm]
+        \small Microsoft Teams
+    \end{minipage}
+    \hfill
+    \begin{minipage}[c]{0.29\textwidth}
+        \centering
+        \IfFileExists{logos/github.png}{\includegraphics[height=1.65cm]{logos/github.png}}{\fbox{GitHub}}\\[1mm]
+        \small GitHub
+    \end{minipage}
+    \caption{Principaux outils de collaboration et de suivi}
+    \label{fig:outils-collaboration}
+\end{figure}
+
+\subsection{Objectifs fonctionnels et techniques}
+
+Pour répondre à la problématique identifiée, le projet poursuit les objectifs fonctionnels suivants :
+
+\begin{itemize}
+    \item configurer les environnements et les versions source et cible d'une migration ;
+    \item analyser automatiquement le projet et identifier les incompatibilités principales ;
+    \item construire et présenter un chemin de migration progressif ;
+    \item préparer des espaces de travail isolés sans modifier la source originale ;
+    \item exécuter les transformations, installations, compilations et tests nécessaires ;
+    \item suivre l'état des phases, les événements, les blocages, les journaux et les preuves ;
+    \item proposer des réparations lorsque les mécanismes déterministes ne suffisent pas ;
+    \item permettre au développeur d'approuver, de refuser ou de demander la révision d'un correctif ;
+    \item produire un résultat et un rapport de migration traçables.
+\end{itemize}
+
+Les objectifs techniques associés sont les suivants :
+
+\begin{itemize}
+    \item garantir une orchestration déterministe et vérifiable des opérations ;
+    \item isoler les transformations et préserver l'intégrité du projet source ;
+    \item encadrer strictement l'intervention des agents et des LLM ;
+    \item conserver l'historique des commandes, états, preuves et décisions ;
+    \item appliquer les correctifs uniquement après contrôle et autorisation ;
+    \item valider les résultats par l'exécution réelle des installations, compilations et tests ;
+    \item permettre la reprise, le suivi et le diagnostic des migrations interrompues ou bloquées ;
+    \item maintenir deux architectures spécialisées, testables et évolutives pour Java/Spring Boot et Angular.
+\end{itemize}
+
+Ces objectifs orientent les choix d'architecture, l'organisation des workflows, la conception des agents et les mécanismes de gouvernance développés dans la suite du projet.
+
 \subsection{Missions et participation au niveau du projet}
 
 Les principales missions réalisées dans le cadre du projet comprennent :
@@ -289,4 +443,4 @@ La démarche suivie repose sur des cycles courts de conception, d'implémentatio
 \section*{Conclusion}
 \addcontentsline{toc}{section}{Conclusion}
 
-Ce chapitre a présenté CGI Technologies et Solutions, sa présence au Maroc, ses principales activités ainsi que l'environnement professionnel dans lequel le projet a été réalisé. Il a également exposé le cadre général de la Migration Factory, ses principes d'architecture, les deux systèmes spécialisés Java/Spring Boot et Angular, ainsi que les principales missions conduites durant le stage. Le chapitre suivant sera consacré à l'état de l'art de la migration logicielle, des outils de transformation et des approches d'assistance fondées sur l'intelligence artificielle.
+Ce chapitre a présenté CGI Technologies et Solutions, sa présence au Maroc, ses principales activités ainsi que l'environnement professionnel dans lequel le projet a été réalisé. Il a également exposé le client interne, le contexte et la problématique de la Migration Factory, les deux systèmes spécialisés Java/Spring Boot et Angular, les objectifs poursuivis, l'organisation de l'équipe et la démarche Agile Scrum adoptée. Le chapitre suivant sera consacré à l'état de l'art de la migration logicielle, des outils de transformation et des approches d'assistance fondées sur l'intelligence artificielle.
