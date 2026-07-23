@@ -1,508 +1,292 @@
-\chapter{Contexte général, problématique et cadrage du projet}
+\chapter{Contexte général du projet}
 
 \section*{Introduction}
+\addcontentsline{toc}{section}{Introduction}
 
-Ce chapitre situe le projet dans son environnement professionnel et technique. Il présente d'abord l'organisme d'accueil, CGI Technologies et Solutions, ainsi que sa présence au Maroc. Il expose ensuite le contexte de la modernisation applicative, les limites des processus de migration principalement manuels et les raisons ayant conduit à la conception d'une \textit{Migration Factory}. Enfin, il précise la vision globale de la plateforme, ses acteurs, ses objectifs, son périmètre, ses principes de gouvernance et la démarche retenue pour conduire le projet.
+Ce chapitre a pour vocation de situer le projet dans son contexte global. Il présente tout d'abord l'organisme d'accueil et son domaine d'activité, puis détaille le contexte, les enjeux et les objectifs du projet. Il se conclut par la présentation de la méthodologie de travail et de l'approche mise en œuvre pour assurer le bon déroulement des différentes phases du projet.
 
-\section{Présentation de l'organisme d'accueil}
+\section{Organisme d'accueil}
 
-\subsection{Le groupe CGI}
+\subsection{Groupe CGI}
 
-CGI, historiquement désignée par l'expression \textit{Conseillers en gestion et informatique}, est une entreprise internationale de services-conseils en technologies de l'information et en management. Fondée en 1976 au Canada, elle accompagne des organisations publiques et privées dans la transformation de leurs systèmes d'information, depuis le conseil et la conception jusqu'à l'intégration, l'exploitation et la maintenance.
-
-Le groupe intervient sur l'ensemble du cycle de vie des solutions numériques. Son portefeuille couvre notamment le conseil en management et en technologies, l'intégration de systèmes, les services applicatifs, les services managés, la gestion des processus d'affaires ainsi que des solutions fondées sur la propriété intellectuelle de CGI. Cette couverture de bout en bout place naturellement la modernisation et la migration des applications parmi les sujets structurants de son activité.
-
-À la fin de l'exercice fiscal 2025, CGI indiquait compter environ \textbf{94 000 professionnels}, servir \textbf{5 500 clients} dans le cadre de services de bout en bout, opérer depuis environ \textbf{400 emplacements} et avoir réalisé un chiffre d'affaires de près de \textbf{15,9 milliards de dollars canadiens}.\footnote{Données officielles de CGI pour l'exercice fiscal 2025 : \href{https://www.cgi.com/en/about-us/cgi-at-a-glance}{CGI at a glance}.}
+CGI, acronyme de \textit{Conseillers en gestion et informatique}, a été fondée en 1976 à Montréal par Serge Godin et André Imbeau, avec pour ambition d'offrir des services de qualité en technologie et en gestion. Aujourd'hui, CGI est reconnue comme l'une des principales entreprises mondiales de services-conseils en management et en technologies de l'information. Son expertise, son envergure internationale et sa capacité à accompagner durablement la transformation numérique de ses clients lui permettent d'intervenir sur des programmes complexes de modernisation, d'intégration et d'exploitation des systèmes d'information.
 
 \begin{figure}[H]
     \centering
-    \begin{tikzpicture}[
-        card/.style={
-            draw=cgilight,
-            line width=0.8pt,
-            rounded corners=2.5mm,
-            minimum width=3.25cm,
-            minimum height=2.05cm,
-            fill=cgired!3,
-            align=center,
-            inner sep=5pt
-        }
-    ]
-        \node[card] (a) {\fontsize{20}{22}\selectfont\bfseries\textcolor{cgired}{1976}\\[-1mm]
-            \small année de fondation};
-        \node[card,right=0.28cm of a] (b) {\fontsize{20}{22}\selectfont\bfseries\textcolor{cgired}{94\,000}\\[-1mm]
-            \small professionnels};
-        \node[card,right=0.28cm of b] (c) {\fontsize{20}{22}\selectfont\bfseries\textcolor{cgired}{400}\\[-1mm]
-            \small emplacements};
-        \node[card,right=0.28cm of c] (d) {\fontsize{20}{22}\selectfont\bfseries\textcolor{cgired}{15,9 G\$ CA}\\[-1mm]
-            \small chiffre d'affaires F2025};
-    \end{tikzpicture}
-    \caption{Quelques chiffres clés du groupe CGI pour l'exercice fiscal 2025}
-    \label{fig:chiffres-cgi}
+    \IfFileExists{logos/cgi.png}{%
+        \includegraphics[width=4.2cm]{logos/cgi.png}%
+    }{%
+        \fbox{\parbox[c][1.7cm][c]{4cm}{\centering\bfseries CGI}}%
+    }
+    \caption{Logo de CGI}
+    \label{fig:logo-cgi}
 \end{figure}
 
-Au-delà de sa dimension internationale, CGI s'appuie sur un modèle de proximité. Les équipes locales entretiennent la relation avec les clients et s'appuient sur un réseau mondial de compétences et de centres de services. Ce modèle permet d'associer la connaissance du contexte métier à des capacités de réalisation et d'industrialisation à grande échelle.
+CGI compte plus de 90\,000 professionnels répartis à l'échelle mondiale et a réalisé un chiffre d'affaires de 14,3 milliards de dollars canadiens au titre de l'exercice 2024. En 2012, le groupe a renforcé de manière significative sa position sur le marché international à travers l'acquisition de Logica, une société anglo-néerlandaise spécialisée dans les services technologiques. Cette opération stratégique, l'une des plus importantes de l'histoire de CGI, a permis au groupe d'étendre son empreinte géographique, d'élargir ses capacités opérationnelles et de consolider son expertise métier.
 
-\subsection{Repères historiques}
+CGI est présente dans plus de 40 pays et intervient sur une grande diversité de marchés, allant du secteur public aux industries privées les plus complexes. Son approche orientée client, associée à une maîtrise approfondie des processus métiers et des systèmes d'information, lui permet de proposer des solutions adaptées aux exigences propres à chaque organisation, à son secteur d'activité et à son contexte géographique.
 
-L'évolution de CGI peut être résumée par plusieurs étapes importantes :
+Sa philosophie centrée sur le client constitue l'un des piliers de sa stratégie. En combinant une proximité locale avec une envergure mondiale, CGI peut mobiliser des expertises internationales tout en maintenant une relation de proximité avec ses clients. Son offre couvre l'ensemble du cycle de vie des projets : conseil stratégique, conception, intégration de systèmes, développement applicatif, gestion des infrastructures, maintenance et infogérance.
 
-\begin{description}[style=nextline,leftmargin=2.7cm,labelwidth=2.2cm,font=\normalfont\bfseries\color{cgired}]
-    \item[1976] Création de CGI à Québec par Serge Godin et André Imbeau, avec une activité initialement centrée sur le conseil en gestion et en informatique.
-    \item[Années 1980--2000] Développement progressif au Canada, puis expansion internationale par croissance organique et acquisitions.
-    \item[2012] Acquisition de Logica, qui renforce fortement la présence internationale et les capacités de services de CGI.
-    \item[2017] Ouverture du centre d'excellence de Fès, après les implantations de Rabat et de Casablanca.
-    \item[2025--2026] Poursuite de l'expansion mondiale, renforcement des capacités en ingénierie, données, cloud et intelligence artificielle, et célébration des cinquante ans du groupe en 2026.
-\end{description}
+Enfin, CGI se distingue par un modèle de gestion participatif fondé sur une culture d'actionnariat et de responsabilité partagée. Une partie importante de ses professionnels participe au capital de l'entreprise, ce qui renforce l'engagement, l'esprit entrepreneurial et la volonté de contribuer durablement à la réussite des clients et de l'organisation.
 
-Ces étapes illustrent une stratégie de croissance fondée sur la proximité client, l'élargissement des expertises et la capacité à accompagner des transformations technologiques complexes.\footnote{Voir l'historique officiel : \href{https://www.cgi.com/en/about-us/cgi-history}{CGI history}.}
-
-\subsection{Fiche signalétique}
+\subsection{Fiche signalétique de CGI Technologies et Solutions}
 
 \begin{table}[H]
     \centering
-    \caption{Fiche signalétique synthétique de CGI}
-    \label{tab:fiche-cgi}
-    \begin{tabularx}{\textwidth}{@{}>{\bfseries\color{cgidark}}p{4.1cm}X@{}}
-        \toprule
-        Raison sociale & CGI Inc. / CGI Technologies et Solutions selon les entités locales \\
-        \midrule
-        Année et lieu de création & 1976, Québec, Canada \\
+    \small
+    \arrayrulecolor{cgigray}
+    \rowcolors{2}{cgilight!80}{white}
+    \begin{tabularx}{0.98\textwidth}{|>{\bfseries\RaggedRight\arraybackslash}p{4.1cm}|>{\RaggedRight\arraybackslash}X|}
+        \hline
+        Raison sociale & CGI Technologies et Solutions \\
+        \hline
+        Forme juridique & Incorporation \\
+        \hline
+        Actionnaires majoritaires &
+        \begin{minipage}[t]{\linewidth}
+            \begin{itemize}[leftmargin=1.3em,itemsep=0.1em,topsep=0.1em]
+                \item Serge Godin : fondateur et coprésident du conseil d'administration ;
+                \item Julie Godin : présidente exécutive du conseil d'administration ;
+                \item François Boulanger : président et chef de la direction.
+            \end{itemize}
+        \end{minipage} \\
+        \hline
+        Actionnaires institutionnels &
+        \begin{minipage}[t]{\linewidth}
+            \begin{itemize}[leftmargin=1.3em,itemsep=0.1em,topsep=0.1em]
+                \item La Caisse de dépôt et placement du Québec (CDPQ) ;
+                \item Fidelity Investments Canada ULC ;
+                \item Mawer Investment Management Ltd.
+            \end{itemize}
+        \end{minipage} \\
+        \hline
+        Activités principales & Services-conseils en technologies de l'information et gestion des processus d'affaires \\
+        \hline
+        Directeur général & François Boulanger -- Président et chef de la direction \\
+        \hline
         Siège social & Montréal, Québec, Canada \\
-        Domaine principal & Conseil en management et en technologies de l'information, intégration de systèmes et services numériques \\
-        Offre & Conseil, intégration, services applicatifs, services managés, processus d'affaires et solutions de propriété intellectuelle \\
-        Présence mondiale & Environ 400 emplacements \\
-        Effectif mondial & Environ 94 000 professionnels à la fin de l'exercice fiscal 2025 \\
-        Chiffre d'affaires & Environ 15,9 milliards de dollars canadiens pour l'exercice fiscal 2025 \\
-        Modèle organisationnel & Proximité locale complétée par un réseau mondial de prestation de services \\
-        \bottomrule
+        \hline
+        Date et lieu de création & 1976, Québec, Canada \\
+        \hline
+        Effectif du personnel & Plus de 90\,000 professionnels \\
+        \hline
+        Chiffre d'affaires & 14,3 milliards CAD (exercice 2024) \\
+        \hline
+        Site Web & \url{https://www.cgi.com/fr} \\
+        \hline
     \end{tabularx}
+    \caption{Fiche signalétique de CGI Technologies et Solutions}
+    \label{tab:fiche-signaletique-cgi}
+    \rowcolors{2}{white}{white}
+    \arrayrulecolor{black}
 \end{table}
 
-\subsection{CGI Technologies et Solutions Maroc}
+\subsection{Historique}
 
-CGI est présente au Maroc à travers trois sites situés à \textbf{Rabat}, \textbf{Casablanca} et \textbf{Fès}. Le site de Rabat est implanté à Technopolis, celui de Casablanca à Casanearshore et celui de Fès à Fès Shore Park. Ces implantations participent au réseau de centres d'excellence et de services du groupe.\footnote{Implantations officielles de CGI au Maroc : \href{https://www.cgi.com/maroc/fr-fr/offices}{Bureaux CGI Maroc}.}
-
-La présentation officielle de CGI au Maroc indique plus de \textbf{1 300 professionnels} répartis sur ces trois sites. Les équipes interviennent notamment dans les services applicatifs, la gestion d'infrastructure et le support, en s'appuyant sur des technologies liées à la donnée, aux progiciels de gestion, aux systèmes historiques, au développement moderne et aux environnements cloud. CGI au Maroc indique également disposer de certifications telles qu'ISO 9001, ISO 27001, ISO 27701 et ISO 14001.\footnote{Présentation officielle : \href{https://www.cgi.com/maroc/fr-fr}{CGI Maroc}.}
-
-\begin{figure}[H]
-    \centering
-    \resizebox{0.95\textwidth}{!}{%
-    \begin{tikzpicture}[
-        site/.style={draw=cgiblue!35,fill=cgiblue!5,rounded corners=2mm,minimum width=4cm,minimum height=1.5cm,align=center},
-        hub/.style={draw=cgired,fill=cgired!4,rounded corners=2.5mm,minimum width=4.6cm,minimum height=1.6cm,align=center,font=\bfseries},
-        arrow/.style={-{Latex[length=2.3mm]},thick,color=cgigray}
-    ]
-        \node[hub] (maroc) {CGI Technologies et Solutions\\Maroc};
-        \node[site,below left=1.25cm and 2.0cm of maroc] (rabat) {Rabat\\Technopolis};
-        \node[site,below=1.25cm of maroc] (casa) {Casablanca\\Casanearshore};
-        \node[site,below right=1.25cm and 2.0cm of maroc] (fes) {Fès\\Fès Shore Park};
-        \draw[arrow] (maroc) -- (rabat);
-        \draw[arrow] (maroc) -- (casa);
-        \draw[arrow] (maroc) -- (fes);
-    \end{tikzpicture}%
-    }
-    \caption{Principales implantations de CGI au Maroc}
-    \label{fig:cgi-maroc-sites}
-\end{figure}
-
-Le projet présenté dans ce rapport s'inscrit dans cet environnement, où les équipes sont régulièrement confrontées à des applications développées sur plusieurs générations technologiques. La modernisation de ces systèmes exige à la fois une compréhension du patrimoine existant, une maîtrise des stacks cibles et une capacité à industrialiser les opérations répétitives.
-
-\subsection{Services et secteurs d'activité}
-
-CGI intervient dans de nombreux secteurs, notamment la banque, l'assurance, l'énergie, l'industrie, le transport, le secteur public, les télécommunications, la santé et la distribution. Même si les contraintes métier diffèrent d'un domaine à l'autre, les organisations partagent plusieurs enjeux : maintenir des applications critiques, réduire la dette technique, sécuriser les plateformes et faire évoluer les systèmes sans interrompre les activités.
-
-La migration logicielle se situe au croisement de plusieurs offres de CGI :
-
-\begin{itemize}
-    \item \textbf{conseil et architecture}, pour définir la trajectoire de modernisation ;
-    \item \textbf{intégration de systèmes}, pour faire évoluer les composants et leurs interfaces ;
-    \item \textbf{services applicatifs}, pour maintenir, corriger et transformer les applications ;
-    \item \textbf{cloud et infrastructure}, pour adapter les environnements d'exécution ;
-    \item \textbf{intelligence artificielle et automatisation}, pour augmenter la capacité des équipes et accélérer les traitements ;
-    \item \textbf{cybersécurité et conformité}, pour réduire les risques liés aux composants obsolètes.
-\end{itemize}
-
-\section{Contexte de la mission}
-
-\subsection{La modernisation applicative comme besoin industriel}
-
-Les applications d'entreprise sont souvent exploitées pendant de nombreuses années. Au cours de leur cycle de vie, leur environnement technique évolue : certaines versions ne sont plus maintenues, des dépendances disparaissent, des API sont dépréciées, de nouvelles exigences de sécurité apparaissent et les compétences nécessaires deviennent plus difficiles à mobiliser.
-
-Une migration peut concerner un langage, un framework, un outil de build, une base de données, une bibliothèque ou plusieurs de ces éléments simultanément. Elle peut également nécessiter une progression par étapes intermédiaires lorsque la distance entre la version source et la version cible est trop importante. La migration doit donc être considérée comme un \textbf{processus contrôlé} plutôt que comme une simple mise à jour de configuration.
-
-\subsection{Processus traditionnel de migration}
-
-Dans un fonctionnement classique, le développeur commence par analyser l'application et ses dépendances. Il choisit ensuite une cible, modifie les fichiers de configuration, adapte le code, lance la compilation et exécute les tests. Lorsqu'une erreur apparaît, il doit retrouver la cause, rechercher une solution, appliquer une correction et relancer l'ensemble ou une partie de la validation.
-
-\begin{figure}[H]
-    \centering
-    \resizebox{\textwidth}{!}{%
-    \begin{tikzpicture}[
-        proc/.style={draw=cgilight,fill=white,rounded corners=2mm,minimum width=2.6cm,minimum height=1.25cm,align=center,font=\small\bfseries},
-        fail/.style={draw=cgired,fill=cgired!5,rounded corners=2mm,minimum width=2.6cm,minimum height=1.25cm,align=center,font=\small\bfseries},
-        arr/.style={-{Latex[length=2.2mm]},thick,color=cgigray}
-    ]
-        \node[proc] (source) {Application\\existante};
-        \node[proc,right=0.45cm of source] (analyse) {Analyse\\manuelle};
-        \node[proc,right=0.45cm of analyse] (transform) {Transformations\\et mises à jour};
-        \node[proc,right=0.45cm of transform] (build) {Compilation\\et tests};
-        \node[fail,right=0.45cm of build] (failure) {Échec ou\\régression};
-        \node[proc,right=0.45cm of failure] (debug) {Diagnostic\\et correction};
-        \node[proc,right=0.45cm of debug] (valid) {Nouvelle\\validation};
-        \draw[arr] (source) -- (analyse);
-        \draw[arr] (analyse) -- (transform);
-        \draw[arr] (transform) -- (build);
-        \draw[arr] (build) -- (failure);
-        \draw[arr] (failure) -- (debug);
-        \draw[arr] (debug) -- (valid);
-        \draw[arr,rounded corners=4mm] (valid.south) -- ++(0,-0.65) -| (transform.south);
-    \end{tikzpicture}%
-    }
-    \caption{Cycle traditionnel d'une migration logicielle}
-    \label{fig:cycle-manuel}
-\end{figure}
-
-Ce cycle peut se répéter de nombreuses fois. Il devient particulièrement coûteux lorsque l'application est volumineuse, peu documentée, couplée à plusieurs systèmes ou dépendante de bibliothèques obsolètes. Les difficultés ne proviennent pas uniquement du volume de code, mais également du caractère spécifique de chaque application.
-
-\subsection{Limites observées}
-
-Les limites principales d'un processus largement manuel sont les suivantes :
-
-\begin{itemize}
-    \item \textbf{durée élevée}, en raison de la répétition des analyses, corrections et validations ;
-    \item \textbf{mobilisation d'experts}, qui doivent intervenir sur des tâches parfois répétitives ;
-    \item \textbf{faible reproductibilité}, car certaines décisions et corrections ne sont pas formalisées ;
-    \item \textbf{traçabilité incomplète}, notamment lorsque les preuves et les motifs de changement sont dispersés ;
-    \item \textbf{risque de régression}, lié aux modifications manuelles et aux dépendances entre composants ;
-    \item \textbf{difficulté de passage à l'échelle}, lorsqu'un portefeuille comprend de nombreuses applications ;
-    \item \textbf{hétérogénéité technologique}, chaque framework nécessitant des outils, des règles et des validations spécifiques.
-\end{itemize}
-
-Les outils de transformation déterministes réduisent une partie de cet effort, mais ils reposent sur des règles connues à l'avance. Ils peuvent automatiser efficacement des changements répétables, sans pour autant résoudre tous les échecs spécifiques au projet. Les LLM introduisent une capacité d'analyse plus flexible, mais leur utilisation doit être encadrée par des contrôles, des preuves et une validation humaine.
-
-\section{Présentation du projet Migration Factory}
-
-\subsection{Big Picture}
-
-La \textbf{Migration Factory} est conçue comme une plateforme de pilotage et d'exécution des migrations logicielles. Elle reçoit un projet source, identifie son environnement technique, construit un chemin de migration, prépare un workspace isolé, exécute les transformations et vérifie le résultat au moyen des outils de build et de test propres à la technologie concernée.
-
-En cas d'échec, la plateforme ne se contente pas d'afficher un log brut. Elle collecte les informations utiles, construit un dossier de preuves, localise les fichiers concernés et peut solliciter des agents spécialisés pour proposer puis réviser une réparation. La décision d'appliquer la modification reste contrôlée par le développeur.
-
-\begin{figure}[H]
-    \centering
-    \resizebox{0.98\textwidth}{!}{%
-    \begin{tikzpicture}[
-        block/.style={draw=cgiblue!35,fill=cgiblue!5,rounded corners=2mm,minimum width=3.1cm,minimum height=1.45cm,align=center,font=\small\bfseries},
-        core/.style={draw=cgired,fill=cgired!5,rounded corners=2.5mm,minimum width=4.0cm,minimum height=1.65cm,align=center,font=\bfseries},
-        arr/.style={-{Latex[length=2.4mm]},thick,color=cgigray}
-    ]
-        \node[block] (input) {Projet source\\ZIP ou workspace};
-        \node[block,right=0.55cm of input] (analyse) {Analyse du stack\\et du projet};
-        \node[core,right=0.55cm of analyse] (factory) {Migration Factory\\Orchestration gouvernée};
-        \node[block,right=0.55cm of factory] (workspace) {Workspace isolé\\Transformations};
-        \node[block,right=0.55cm of workspace] (validation) {Build, tests\\et preuves};
-        \node[block,below=1.2cm of factory] (repair) {Boucle de réparation\\Proposition, review, approbation};
-        \node[block,right=0.55cm of validation] (result) {Application migrée\\et rapport final};
-
-        \draw[arr] (input) -- (analyse);
-        \draw[arr] (analyse) -- (factory);
-        \draw[arr] (factory) -- (workspace);
-        \draw[arr] (workspace) -- (validation);
-        \draw[arr] (validation) -- (result);
-        \draw[arr] (validation.south) |- (repair.east);
-        \draw[arr] (repair.west) -| (factory.south);
-    \end{tikzpicture}%
-    }
-    \caption{Vue conceptuelle de la Migration Factory}
-    \label{fig:big-picture}
-\end{figure}
-
-\subsection{Vision générique et profils de migration}
-
-La plateforme n'est pas conçue pour un unique framework. Elle repose sur un socle commun et sur des profils spécialisés :
-
-\begin{itemize}
-    \item le \textbf{socle commun} gère les jobs, les étapes, les événements, les workspaces, la gouvernance, la collecte de preuves, l'affichage de la progression et les interactions avec les agents ;
-    \item chaque \textbf{profil de migration} apporte les outils, règles, commandes, critères d'acceptation et agents propres à un écosystème technologique.
-\end{itemize}
-
-Cette séparation permet d'ajouter de nouveaux cas d'usage sans reconstruire l'ensemble du système. Le projet étudie en priorité deux profils complémentaires.
+Pour présenter l'historique de CGI, seules les principales étapes de son développement sont retenues.
 
 \begin{table}[H]
     \centering
-    \caption{Positionnement des premiers profils de migration}
-    \label{tab:profils-migration}
-    \begin{tabularx}{\textwidth}{@{}>{\bfseries}p{3.2cm}XX@{}}
-        \toprule
-        Élément & Profil Java / Spring Boot & Profil Angular \\
-        \midrule
-        Finalité & Moderniser progressivement une application Java et Spring Boot vers des versions maintenues et récentes & Moderniser une application Angular en adaptant le framework, TypeScript, Node.js, les dépendances et la chaîne de build \\
-        Cas étudié & Trajectoire progressive depuis Java 11 / Spring Boot 2.x vers Java 21 / Spring Boot 4.x & MVP Angular 18 vers Angular 21, avec extension envisagée vers des versions sources plus anciennes \\
-        Outils principaux & Maven, JDK, transformations Java, analyse des POM et tests JVM & Node.js, npm, Angular CLI, TypeScript, build et tests frontend \\
-        Valeur pour l'architecture & Valider la profondeur de la boucle de migration et de réparation & Valider la généricité du socle sur un écosystème différent \\
-        \bottomrule
+    \small
+    \arrayrulecolor{cgigray}
+    \rowcolors{2}{cgilight!65}{white}
+    \begin{tabularx}{0.94\textwidth}{|>{\bfseries\centering\arraybackslash}p{2.3cm}|>{\RaggedRight\arraybackslash}X|}
+        \hline
+        1976 & Création de CGI à Québec par Serge Godin et André Imbeau. \\
+        \hline
+        Années 1980--2000 & Développement progressif au Canada, diversification de l'offre et expansion internationale par croissance organique et acquisitions. \\
+        \hline
+        1998 & Renforcement des activités canadiennes par l'acquisition de Bell Sygma. \\
+        \hline
+        2001 & Acquisition d'IMRglobal, qui contribue à élargir la présence internationale et les capacités de services du groupe. \\
+        \hline
+        2012 & Acquisition de Logica, étape majeure dans l'expansion internationale de CGI. \\
+        \hline
+        2012 à aujourd'hui & Développement continu des capacités mondiales, consolidation des expertises sectorielles et élargissement de l'offre en services numériques. \\
+        \hline
+        Avenir & Poursuite de l'expansion internationale, renforcement des capacités d'innovation et accompagnement des clients dans leurs programmes de transformation numérique. \\
+        \hline
     \end{tabularx}
+    \caption{Principales étapes de l'histoire de CGI}
+    \label{tab:historique-cgi}
+    \rowcolors{2}{white}{white}
+    \arrayrulecolor{black}
 \end{table}
 
-Ces cibles représentent la direction du projet et non une promesse d'autonomie complète sur tous les projets possibles. Le niveau d'automatisation dépend de la qualité du projet source, de la couverture des règles, de la disponibilité des tests et de la complexité des incompatibilités rencontrées.
+Depuis 2012, CGI poursuit une stratégie de croissance fondée sur la proximité client, la solidité de ses unités d'affaires et le développement de capacités internationales. Cette organisation lui permet de disposer d'une expertise approfondie sur ses marchés cibles et d'une gamme complète de services en technologies de l'information.
 
-\subsection{Utilisateur cible}
-
-L'utilisateur principal est le \textbf{développeur chargé de moderniser une application}. La plateforme doit lui permettre de conserver une vue claire sur le processus et d'intervenir aux moments où son expertise est nécessaire.
-
-Ses besoins principaux sont les suivants :
-
-\begin{itemize}
-    \item configurer la source, la cible et les paramètres de la migration ;
-    \item comprendre le chemin proposé et les étapes intermédiaires ;
-    \item suivre l'état du pipeline et les événements en temps réel ;
-    \item consulter les logs, les preuves et les fichiers impactés ;
-    \item examiner les transformations proposées ;
-    \item approuver, refuser ou demander la révision d'une réparation ;
-    \item vérifier les résultats de compilation et de test ;
-    \item obtenir un rapport final exploitable.
-\end{itemize}
-
-La plateforme assiste donc le développeur sans supprimer son rôle. Elle vise à réduire le volume d'opérations répétitives et à améliorer la qualité de l'information disponible pour la décision.
-
-\subsection{Acteurs du système}
-
-\begin{table}[H]
-    \centering
-    \caption{Principaux acteurs de la Migration Factory}
-    \label{tab:acteurs}
-    \begin{tabularx}{\textwidth}{@{}>{\bfseries}p{3.6cm}p{3.7cm}X@{}}
-        \toprule
-        Acteur & Rôle & Responsabilités principales \\
-        \midrule
-        Développeur & Utilisateur et décideur & Configure la migration, suit l'exécution, analyse les preuves et valide les changements sensibles \\
-        Responsable technique & Supervision & Définit les politiques, les critères d'acceptation et les règles de gouvernance \\
-        Orchestrateur & Coordination & Détermine la prochaine étape, maintient l'état du job et coordonne les agents et outils \\
-        Agents déterministes & Exécution contrôlée & Analysent le projet, appliquent des recettes connues, exécutent les builds et collectent les résultats \\
-        Agents LLM & Assistance au raisonnement & Analysent des échecs, proposent des réparations, révisent les propositions et expliquent les décisions \\
-        Services techniques & Support d'exécution & Fournissent les runtimes, outils de build, systèmes de fichiers, stockage et mécanismes de monitoring \\
-        \bottomrule
-    \end{tabularx}
-\end{table}
-
-\section{Problématique}
-
-\subsection{Question centrale}
-
-Le projet part d'un constat : l'automatisation complète par des règles fixes n'est pas suffisamment flexible, tandis qu'une autonomie complète confiée à des modèles génératifs n'offre pas le niveau de maîtrise requis pour modifier une application d'entreprise.
-
-La problématique centrale est donc formulée ainsi :
-
-\begin{quote}
-\bfseries
-Comment concevoir une plateforme capable d'automatiser et d'accélérer les migrations logicielles, de réduire l'effort manuel, les coûts et les cycles de débogage, tout en conservant une gouvernance humaine, une traçabilité complète et des mécanismes déterministes de sécurité et de validation ?
-\end{quote}
-
-Cette question implique plusieurs sous-problèmes :
-
-\begin{enumerate}
-    \item comment représenter un processus de migration sous forme d'étapes configurables et réutilisables ;
-    \item comment adapter ce processus à plusieurs langages et frameworks ;
-    \item comment isoler le projet source et sécuriser l'application des changements ;
-    \item comment transformer les erreurs de build et de test en preuves exploitables ;
-    \item comment utiliser les LLM sans leur donner une autorité d'exécution incontrôlée ;
-    \item comment permettre au développeur de comprendre et de gouverner les décisions ;
-    \item comment évaluer objectivement la réussite d'une migration.
-\end{enumerate}
-
-\subsection{Enjeux du projet}
-
-Les enjeux sont à la fois techniques, organisationnels et économiques.
-
-\begin{itemize}
-    \item \textbf{Enjeu technique :} coordonner des outils hétérogènes, maintenir un état cohérent et gérer les échecs de manière reproductible.
-    \item \textbf{Enjeu de qualité :} éviter qu'une migration déclarée réussie introduise des régressions ou masque des tests non exécutés.
-    \item \textbf{Enjeu de sécurité :} empêcher toute modification non contrôlée du projet original et vérifier chaque patch avant son application.
-    \item \textbf{Enjeu humain :} présenter suffisamment d'informations pour permettre une décision rapide et justifiée.
-    \item \textbf{Enjeu de passage à l'échelle :} réutiliser le même socle sur plusieurs applications, versions et technologies.
-    \item \textbf{Enjeu économique :} réduire le temps consacré aux tâches répétitives et augmenter le nombre de migrations pouvant être traitées.
-\end{itemize}
-
-\section{Objectifs du projet}
-
-\subsection{Objectif général}
-
-L'objectif général est de concevoir et développer une plateforme intelligente, extensible et gouvernée capable d'industrialiser une partie significative du processus de migration logicielle, depuis l'analyse du projet source jusqu'à la validation et à la production d'un résultat traçable.
-
-\subsection{Objectifs spécifiques}
-
-Les objectifs spécifiques sont les suivants :
-
-\begin{enumerate}
-    \item définir un modèle commun de job, d'étape, d'événement, de preuve et de résultat de migration ;
-    \item permettre la configuration d'une migration depuis un stack source vers un stack cible ;
-    \item analyser automatiquement la structure et l'environnement technique du projet ;
-    \item construire un chemin de migration progressif lorsque plusieurs étapes intermédiaires sont nécessaires ;
-    \item appliquer des transformations déterministes et contrôlées ;
-    \item exécuter les builds et les tests avec les runtimes appropriés ;
-    \item détecter les échecs et produire un contexte de diagnostic structuré ;
-    \item générer une proposition de réparation sous forme de diff ;
-    \item soumettre cette proposition à une révision indépendante et à une validation humaine ;
-    \item appliquer les changements uniquement dans un workspace isolé ;
-    \item reprendre le pipeline après correction et revalider l'application ;
-    \item fournir une interface de pilotage, des journaux et un rapport final ;
-    \item démontrer la réutilisabilité du socle avec les profils Java/Spring Boot et Angular.
-\end{enumerate}
-
-\section{Périmètre et critères de réussite}
-
-\subsection{Éléments inclus dans le périmètre}
-
-Le périmètre fonctionnel visé comprend :
-
-\begin{itemize}
-    \item l'import ou la sélection d'un projet source ;
-    \item la configuration du stack source, du stack cible et de la politique d'approbation ;
-    \item l'analyse de l'application et la préparation du workspace ;
-    \item l'orchestration d'un pipeline composé d'étapes observables ;
-    \item les transformations de code et de configuration ;
-    \item les builds, les tests et la collecte de preuves ;
-    \item la boucle de réparation révisée et gouvernée ;
-    \item le suivi en temps réel et l'assistant lié au contexte de migration ;
-    \item la génération de rapports et de contrats de résultat ;
-    \item l'extension du socle à plusieurs profils technologiques.
-\end{itemize}
-
-\subsection{Limites assumées}
-
-Le projet ne cherche pas à garantir qu'une application arbitraire pourra être migrée sans intervention humaine. Il ne vise pas non plus à permettre à un LLM de modifier directement le projet original. Certaines incompatibilités métier, dépendances propriétaires, erreurs d'environnement ou absences de tests peuvent nécessiter une expertise spécifique.
-
-La réussite du projet repose donc sur une automatisation progressive et mesurable, plutôt que sur une promesse d'autonomie totale.
-
-\subsection{Critères de réussite}
-
-Les critères suivants permettent d'évaluer la cohérence du système :
-
-\begin{itemize}
-    \item le projet source d'origine n'est jamais modifié par le pipeline ;
-    \item chaque job possède un état, une chronologie et des preuves consultables ;
-    \item le chemin de migration est explicite et peut comporter plusieurs étapes ;
-    \item une étape n'est validée que si ses critères de build et de test sont satisfaits ;
-    \item une proposition LLM est matérialisée par un diff vérifiable ;
-    \item un patch sensible ne peut être appliqué sans respecter la politique d'approbation ;
-    \item l'application du patch est précédée de contrôles d'intégrité et de compatibilité ;
-    \item le système peut reprendre ou créer un nouveau cycle après un échec de réparation ;
-    \item le socle commun peut être réutilisé par au moins deux profils technologiques ;
-    \item le rapport final permet de comprendre les actions réalisées et leur résultat.
-\end{itemize}
-
-\section{Principes de conception}
-
-\subsection{Automatisation déterministe, intelligence des LLM et gouvernance humaine}
-
-La conception repose sur une séparation claire des responsabilités :
+À l'avenir, le groupe entend maintenir une croissance durable et renforcer son implantation internationale. Cette orientation répond à la mondialisation des marchés et à l'évolution des besoins de ses clients, qui recherchent des partenaires capables de les accompagner à la fois localement et à grande échelle.
 
 \begin{figure}[H]
     \centering
-    \resizebox{0.96\textwidth}{!}{%
-    \begin{tikzpicture}[
-        pillar/.style={draw=cgilight,rounded corners=3mm,minimum width=4.25cm,minimum height=2.35cm,align=center,inner sep=6pt},
-        center/.style={draw=cgired,fill=cgired!5,rounded corners=3mm,minimum width=4.3cm,minimum height=1.55cm,align=center,font=\bfseries},
-        arr/.style={-{Latex[length=2.4mm]},thick,color=cgigray}
-    ]
-        \node[pillar,fill=cgiblue!5] (det) {\textbf{Automatisation déterministe}\\[1mm]\small règles, outils, builds, tests, checksums et politiques};
-        \node[pillar,fill=cgired!4,right=0.7cm of det] (llm) {\textbf{Intelligence des LLM}\\[1mm]\small analyse, proposition, explication et révision};
-        \node[pillar,fill=emsigreen!5,right=0.7cm of llm] (human) {\textbf{Gouvernance humaine}\\[1mm]\small décision, contrôle, retour et validation};
-        \node[center,below=1.1cm of llm] (platform) {Migration Factory gouvernée};
-        \draw[arr] (det) -- (platform);
-        \draw[arr] (llm) -- (platform);
-        \draw[arr] (human) -- (platform);
-    \end{tikzpicture}%
+    \IfFileExists{logos/Historique du groupe CGI.png}{%
+        \includegraphics[width=0.92\textwidth]{logos/Historique du groupe CGI.png}%
+    }{%
+        \fbox{\parbox[c][5cm][c]{0.88\textwidth}{\centering Historique du groupe CGI}}%
     }
-    \caption{Trois piliers de la Migration Factory}
-    \label{fig:trois-piliers}
+    \caption{Historique du groupe CGI}
+    \label{fig:historique-groupe-cgi}
 \end{figure}
 
-Les opérations qui modifient le système, exécutent des commandes ou déterminent la réussite d'une étape restent encadrées par des mécanismes vérifiables. Les LLM produisent des propositions structurées, mais ne disposent pas d'un accès libre à l'environnement. Le développeur conserve la capacité d'interrompre le processus, de demander une correction ou de refuser un changement.
+Le groupe CGI s'appuie sur une organisation structurée en unités d'affaires géographiques. Ce modèle vise à préserver la proximité avec les clients, à renforcer la cohérence entre les équipes locales et à mobiliser les expertises disponibles au sein du réseau mondial du groupe.
 
-\subsection{Isolation et traçabilité}
+\begin{figure}[H]
+    \centering
+    \IfFileExists{logos/Organigramme du groupe CGI.png}{%
+        \includegraphics[width=0.94\textwidth]{logos/Organigramme du groupe CGI.png}%
+    }{%
+        \fbox{\parbox[c][5cm][c]{0.9\textwidth}{\centering Organigramme du groupe CGI}}%
+    }
+    \caption{Organigramme du groupe CGI}
+    \label{fig:organigramme-groupe-cgi}
+\end{figure}
 
-Le projet source est traité comme une référence immuable. La migration est exécutée dans une copie de travail dédiée au job ou à l'étape. Cette isolation permet de comparer les états, de rejouer certaines opérations et d'éviter qu'une tentative de réparation ne dégrade l'application originale.
+CGI Maroc est une filiale du groupe CGI, intégrée à l'organisation regroupant notamment la France, le Luxembourg et le Maroc. Elle applique les processus, méthodologies et cadres de gestion définis à l'échelle mondiale, ce qui garantit son alignement avec les standards internationaux du groupe.
 
-La traçabilité couvre les paramètres de la migration, les étapes exécutées, les commandes, les résultats, les fichiers modifiés, les propositions, les décisions et les validations. Elle constitue une exigence centrale, aussi importante que l'automatisation elle-même.
+Le stage s'est déroulé au sein du centre de services de Rabat, situé à Technopolis, à Sala Al Jadida. Ce site constitue l'un des centres d'excellence de CGI au Maroc, aux côtés de Casablanca et de Fès. Créé en 2004, le centre de Rabat joue un rôle important dans la fourniture de services de proximité et de services \textit{nearshore} à destination de clients internationaux, en particulier en Europe francophone.
 
-\subsection{Boucle de réparation gouvernée}
+Le site bénéficie d'une infrastructure moderne et d'un environnement favorable à l'innovation. Il accueille des projets dans des domaines variés tels que le développement logiciel, l'intelligence artificielle, la gestion d'infrastructures, les progiciels de gestion intégrés, la gestion de la relation client et la cybersécurité. Cette implantation a constitué un cadre adapté à la réalisation du projet et à l'intégration dans une organisation industrielle mature.
 
-Lorsqu'une étape échoue, la plateforme suit un cycle contrôlé :
+\subsection{Les partenaires de CGI}
 
-\begin{enumerate}
-    \item capturer le message d'erreur, la commande, les fichiers concernés et l'état du workspace ;
-    \item construire un contexte limité et pertinent ;
-    \item demander à un agent de proposer une réparation structurée ;
-    \item faire réviser la proposition par un mécanisme indépendant ;
-    \item présenter au développeur le motif, les risques et le diff ;
-    \item vérifier l'intégrité du diff et son applicabilité ;
-    \item appliquer le changement dans le sandbox après approbation ;
-    \item relancer le build et les tests ;
-    \item poursuivre la migration ou ouvrir un nouveau cycle de réparation.
-\end{enumerate}
+CGI accompagne de nombreux clients publics et privés dans leurs programmes de transformation. Le groupe intervient notamment auprès d'organisations actives dans les services publics, l'énergie, la finance, l'industrie, la santé, le transport et les télécommunications. Cette diversité lui permet de capitaliser sur une connaissance approfondie des environnements métiers et des systèmes critiques.
 
-Cette boucle matérialise la philosophie du projet : automatiser le diagnostic et la préparation d'une solution, sans supprimer les contrôles nécessaires avant l'exécution.
+\begin{figure}[H]
+    \centering
+    \IfFileExists{logos/Les partenaires de CGI.png}{%
+        \includegraphics[width=0.90\textwidth]{logos/Les partenaires de CGI.png}%
+    }{%
+        \fbox{\parbox[c][5cm][c]{0.86\textwidth}{\centering Les partenaires de CGI}}%
+    }
+    \caption{Les partenaires de CGI}
+    \label{fig:partenaires-cgi}
+\end{figure}
 
-\section{Méthodologie et conduite du projet}
+\subsection{Les services et les secteurs d'activité de CGI Technologies et Solutions}
 
-\subsection{Approche itérative}
+CGI propose une gamme étendue de services et de solutions visant à améliorer la performance des organisations et à accélérer la réalisation de leurs objectifs de transformation. Son offre couvre notamment le conseil, l'intégration, le développement et la maintenance d'applications, l'exploitation des infrastructures, les services managés, la cybersécurité, les données, le cloud et l'intelligence artificielle.
 
-La nature expérimentale du projet impose une démarche progressive. Les choix d'architecture doivent être confrontés aux comportements réels des applications, des outils de migration et des modèles. Le projet est donc mené selon des cycles courts inspirés des pratiques agiles :
+\begin{figure}[H]
+    \centering
+    \IfFileExists{logos/Les services de CGI.png}{%
+        \includegraphics[width=0.90\textwidth]{logos/Les services de CGI.png}%
+    }{%
+        \fbox{\parbox[c][5cm][c]{0.86\textwidth}{\centering Les services de CGI}}%
+    }
+    \caption{Les services de CGI}
+    \label{fig:services-cgi}
+\end{figure}
 
-\begin{enumerate}
-    \item identifier un besoin ou une limite observée ;
-    \item analyser les causes et définir des critères d'acceptation ;
-    \item concevoir une amélioration limitée ;
-    \item implémenter et intégrer la fonctionnalité ;
-    \item tester le scénario de bout en bout ;
-    \item démontrer le résultat et collecter les retours ;
-    \item mettre à jour les priorités et la documentation.
-\end{enumerate}
+Les principaux secteurs servis par CGI comprennent notamment :
 
-Cette méthode permet de sécuriser l'évolution du produit et d'éviter qu'une architecture théorique ne s'éloigne des contraintes réelles.
+\begin{itemize}
+    \item \textbf{Services bancaires :} accompagnement des banques dans la modernisation de leurs systèmes, la gestion des paiements, la conformité et l'amélioration de l'expérience client.
+    \item \textbf{Communications :} transformation des systèmes de facturation, d'orchestration des commandes, d'assurance des revenus et de gestion de la relation client.
+    \item \textbf{Gouvernements :} conception et exploitation de services numériques destinés aux administrations nationales, régionales et locales.
+    \item \textbf{Santé :} amélioration des systèmes d'information des établissements de santé, des organismes d'assurance et des acteurs de l'écosystème médical.
+    \item \textbf{Assurance :} modernisation des plateformes, gestion des contrats, automatisation des processus et exploitation des données.
+    \item \textbf{Secteur manufacturier :} accompagnement des entreprises de l'automobile, de l'aéronautique, de la haute technologie, de l'industrie minière et des industries de transformation.
+    \item \textbf{Pétrole, gaz et énergie :} services couvrant différentes étapes de la chaîne de valeur, de la production jusqu'à la distribution.
+    \item \textbf{Transport, services postaux et logistique :} transformation des systèmes utilisés dans le transport aérien, ferroviaire, maritime, routier et les activités logistiques.
+\end{itemize}
 
-\subsection{Phases structurantes}
+\begin{figure}[H]
+    \centering
+    \IfFileExists{logos/Client et Secteurs CGI.png}{%
+        \includegraphics[width=0.94\textwidth]{logos/Client et Secteurs CGI.png}%
+    }{%
+        \fbox{\parbox[c][5cm][c]{0.9\textwidth}{\centering Clients et secteurs d'activité de CGI}}%
+    }
+    \caption{Clients et secteurs d'activité du groupe CGI}
+    \label{fig:clients-secteurs-cgi}
+\end{figure}
+
+\subsection{CGI Maroc}
+
+Le premier centre de services au Maroc a été créé à Rabat en 2004 par Unilog, en alliance avec Sofrecom. Cette implantation a permis de développer une capacité de prestation dans les domaines du développement, de la maintenance des systèmes d'information et de l'externalisation informatique. Afin de répondre à la croissance des besoins, d'autres sites ont ensuite été ouverts à Casablanca en 2006 et à Fès en 2017.
+
+Les équipes marocaines interviennent sur plusieurs environnements technologiques, parmi lesquels les progiciels de gestion, Java/JEE, .NET, les systèmes historiques, les bases de données Oracle et les technologies de développement modernes. Cette diversité technologique place la modernisation applicative au cœur de nombreux enjeux opérationnels.
+
+À l'instar du groupe, CGI Maroc fournit des prestations dans plusieurs domaines :
+
+\begin{itemize}
+    \item \textbf{Tierce maintenance applicative :} maintenance corrective, évolutive et préventive d'applications confiées à un prestataire externe.
+    \item \textbf{Intégration de systèmes :} conception, réalisation et interfaçage de systèmes et d'applications au sein du système d'information.
+    \item \textbf{Externalisation des processus d'affaires :} prise en charge de processus opérationnels ou de fonctions de support pour le compte des clients.
+    \item \textbf{Développement et modernisation :} conception de nouvelles applications, évolution de solutions existantes et migration vers des versions technologiques plus récentes.
+    \item \textbf{Services d'infrastructure et de support :} exploitation, supervision et assistance sur les environnements techniques.
+\end{itemize}
+
+\subsection{Formation chez CGI}
+
+L'intégration chez CGI commence par une phase de découverte de l'organisation, de ses valeurs, de ses pratiques et de ses règles en matière de sécurité. Les stagiaires suivent des formations obligatoires afin de se familiariser avec l'environnement de travail, les politiques internes et les standards applicables aux activités réalisées pour les clients.
+
+Ces formations sont accessibles à travers les plateformes internes de formation du groupe. Elles permettent d'acquérir les connaissances nécessaires pour évoluer dans un environnement professionnel structuré et pour respecter les exigences de qualité, de confidentialité et de sécurité.
+
+Le parcours de stage a également débuté par une période de formation intensive de cinq semaines. Cette phase a permis d'échanger avec des ingénieurs expérimentés, de renforcer les compétences techniques et de se familiariser avec les pratiques de développement et d'exploitation utilisées dans l'entreprise.
+
+Les formations et certifications suivies ont porté sur le développement logiciel assisté par l'intelligence artificielle, le cloud computing et l'intelligence artificielle générative.
 
 \begin{table}[H]
     \centering
-    \caption{Phases structurantes de la démarche projet}
-    \label{tab:phases-projet}
-    \begin{tabularx}{\textwidth}{@{}>{\bfseries}p{3.2cm}X>{\raggedright\arraybackslash}p{4.2cm}@{}}
-        \toprule
-        Phase & Finalité & Livrables principaux \\
-        \midrule
-        Cadrage & Formaliser le problème, la vision, les utilisateurs et les critères de réussite & Vision, backlog initial, architecture cible \\
-        Baseline Java & Valider le premier pipeline de migration de bout en bout & Analyse, route, transformations, build et tests \\
-        Flexibilité & Rendre les étapes et les versions configurables & Profils, politiques de stage, import de versions \\
-        Gouvernance & Encadrer les échecs et les réparations & Preuves, proposer/reviewer, approbation et sandbox \\
-        Expérience utilisateur & Donner une vue claire sur le job et les décisions & Nouvelle migration, cockpit, assistant, rapports \\
-        Généralisation Angular & Vérifier la réutilisation du socle sur un second écosystème & Profil Angular, contrats d'agents, MVP 18 vers 21 \\
-        Validation & Mesurer la fiabilité, les gains et les limites & Scénarios, métriques, bilan et perspectives \\
-        \bottomrule
+    \small
+    \arrayrulecolor{cgigray}
+    \rowcolors{2}{cgilight!70}{white}
+    \begin{tabularx}{0.98\textwidth}{|>{\RaggedRight\arraybackslash}p{6.3cm}|>{\RaggedRight\arraybackslash}p{3.6cm}|>{\RaggedRight\arraybackslash}X|}
+        \hline
+        \rowcolor{cgilight!95}
+        \textbf{Certification ou formation} & \textbf{Organisme} & \textbf{Domaine} \\
+        \hline
+        GitHub Copilot Fundamentals & GitHub & Développement assisté par l'IA \\
+        \hline
+        Microsoft Azure Fundamentals (AZ-900) & Microsoft & Cloud computing \\
+        \hline
+        Microsoft Azure Developer Associate (AZ-204) & Microsoft & Développement cloud Azure \\
+        \hline
+        Generative AI Fundamentals & Formation interne / Oracle & Intelligence artificielle générative \\
+        \hline
+        Formation sur les grands modèles de langage & Formation interne & Intelligence artificielle générative \\
+        \hline
     \end{tabularx}
+    \caption{Principales formations suivies}
+    \label{tab:formations-cgi}
+    \rowcolors{2}{white}{white}
+    \arrayrulecolor{black}
 \end{table}
 
-\section{Résultats et bénéfices attendus}
+\section{Cadre général du projet}
 
-À l'échelle du projet, la Migration Factory doit permettre :
+\subsection{Présentation du projet}
+
+Le projet vise à concevoir et à développer une \textbf{Migration Factory intelligente, extensible et gouvernée} destinée à industrialiser la modernisation d'applications. La solution combine une orchestration déterministe, des agents spécialisés et des grands modèles de langage afin d'automatiser les opérations reproductibles, d'accélérer les activités nécessitant une analyse approfondie et de maintenir un contrôle humain explicite sur les décisions sensibles.
+
+La partie déterministe encapsule les outils, les commandes, les règles, les transitions et les validations propres à chaque écosystème. Elle contrôle l'état du workflow, prépare des espaces de travail isolés, applique les transformations autorisées, exécute les installations, les compilations et les tests, puis collecte les journaux et les preuves techniques. Les agents et les LLM interviennent à l'intérieur de ce cadre pour analyser le projet, enrichir le plan de migration, interpréter les résultats, assister le suivi et proposer des adaptations lorsqu'un problème imprévu est rencontré.
+
+Lorsqu'un échec d'installation, de compilation ou de test survient, la plateforme construit un contexte de réparation à partir des erreurs, des fichiers concernés et de l'état du pipeline. Un modèle peut alors proposer un correctif, soumis à une révision indépendante et à l'approbation du développeur avant toute application dans un workspace isolé. Le système relance ensuite les opérations de validation afin de vérifier l'efficacité de la correction.
+
+La mise en œuvre est organisée en deux systèmes spécialisés et deux dépôts distincts : un système consacré aux migrations Java/Spring Boot et un système consacré aux migrations Angular. Cette séparation permet de préserver les spécificités de chaque écosystème, d'éviter une orchestration monolithique trop complexe et de faciliter les tests, l'évolution et la maintenance. Les deux systèmes partagent néanmoins les mêmes principes de gouvernance, de traçabilité, d'isolation et de collaboration entre automatisation déterministe, LLM et expertise humaine.
+
+\subsection{Missions et participation au niveau du projet}
+
+Les principales missions réalisées dans le cadre du projet comprennent :
 
 \begin{itemize}
-    \item de réduire la durée consacrée aux opérations répétitives ;
-    \item de diminuer le nombre de cycles de diagnostic entièrement manuels ;
-    \item de standardiser le déroulement des migrations ;
-    \item d'améliorer la reproductibilité et la qualité des preuves ;
-    \item de faciliter l'examen des propositions de réparation ;
-    \item de capitaliser sur des profils, règles et expériences réutilisables ;
-    \item de traiter progressivement un volume plus important d'applications ;
-    \item de conserver le développeur au centre des décisions à risque.
+    \item l'analyse des besoins fonctionnels et techniques liés à la modernisation d'applications ;
+    \item la définition des workflows de migration Java/Spring Boot et Angular ;
+    \item la conception de l'architecture d'orchestration et des contrats d'échange entre les différents composants ;
+    \item l'implémentation d'agents spécialisés pour l'analyse, la planification, la transformation, la validation et la réparation ;
+    \item la mise en place de workspaces isolés et de mécanismes déterministes pour l'exécution des commandes ;
+    \item le développement d'une boucle de réparation gouvernée intégrant proposition, révision, approbation, application et revalidation ;
+    \item la conception d'interfaces de configuration, de suivi et de pilotage de la migration ;
+    \item l'intégration de journaux, d'événements, de preuves techniques et de rapports permettant d'assurer la traçabilité ;
+    \item la réalisation de tests fonctionnels et techniques sur des scénarios représentatifs ;
+    \item l'amélioration continue de la solution à partir des résultats de validation, des erreurs observées et des retours de l'équipe.
 \end{itemize}
 
-Ces bénéfices constituent des objectifs à vérifier par l'expérimentation. Les chapitres consacrés à la réalisation et à la validation devront distinguer les fonctionnalités effectivement démontrées, les résultats mesurés et les perspectives qui restent à industrialiser.
+La démarche suivie repose sur des cycles courts de conception, d'implémentation, d'expérimentation et de correction. Les fonctionnalités sont développées progressivement, testées sur des applications représentatives, puis améliorées avant leur intégration dans le workflow global. Cette approche permet de maîtriser les risques techniques, de valider les choix d'architecture et de maintenir une progression cohérente du projet.
 
 \section*{Conclusion}
+\addcontentsline{toc}{section}{Conclusion}
 
-Ce chapitre a présenté CGI et son implantation au Maroc, puis a situé le projet dans le contexte de la modernisation applicative. L'analyse du processus traditionnel a mis en évidence des cycles longs, une forte mobilisation d'expertise, une traçabilité souvent insuffisante et une difficulté à généraliser les pratiques à un portefeuille d'applications.
-
-La Migration Factory répond à cette problématique par une approche combinant automatisation déterministe, agents spécialisés, modèles de langage et gouvernance humaine. Sa conception autour d'un socle commun et de profils technologiques vise à dépasser un cas unique, avec Java/Spring Boot comme première validation approfondie et Angular comme second axe de généralisation. Le chapitre suivant présentera les concepts, outils et approches existantes qui permettent de positionner cette proposition dans l'état de l'art de la migration logicielle.
+Ce chapitre a présenté CGI Technologies et Solutions, sa présence au Maroc, ses principales activités ainsi que l'environnement professionnel dans lequel le projet a été réalisé. Il a également exposé le cadre général de la Migration Factory, ses principes d'architecture, les deux systèmes spécialisés Java/Spring Boot et Angular, ainsi que les principales missions conduites durant le stage. Le chapitre suivant sera consacré à l'état de l'art de la migration logicielle, des outils de transformation et des approches d'assistance fondées sur l'intelligence artificielle.
