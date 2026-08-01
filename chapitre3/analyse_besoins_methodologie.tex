@@ -3,90 +3,77 @@
 \section*{Introduction}
 \addcontentsline{toc}{section}{Introduction}
 
-À la suite de l'étude de l'existant et du positionnement de la Migration Factory, il convient de transformer la problématique générale en un ensemble cohérent de besoins, de contraintes et de critères de validation. Cette étape permet de définir ce que la solution doit apporter au développeur chargé d'une migration, tout en précisant les limites d'autorité des mécanismes automatiques et des modèles de langage.
+L'étude de l'existant a mis en évidence que la difficulté d'une migration ne réside pas uniquement dans la modification du code source. Elle tient également à la préparation des environnements, à l'identification des incompatibilités, à la succession des validations et à la capacité de reprendre une exécution interrompue sans perdre les preuves produites. Le présent chapitre traduit ces constats en besoins structurés pour la Migration Factory.
 
-L'analyse présentée dans ce chapitre s'appuie sur les besoins exprimés par l'équipe, les retours des démonstrations, le backlog du projet et l'observation du comportement réellement implémenté dans le système Java/Spring Boot. Cette implémentation constitue à ce stade la référence la plus mature pour formaliser les exigences. Les principes identifiés sont destinés à être réutilisés dans le système Angular, sans supposer un partage de code entre les deux dépôts. Chaque solution conserve en effet son propre backend, son propre frontend, son orchestration et ses mécanismes de validation.
+L'analyse s'appuie sur quatre sources : les échanges avec l'équipe et les parties prenantes, les retours recueillis lors des démonstrations, le backlog du projet et l'observation du comportement effectivement disponible dans le prototype Java/Spring Boot. Ce dernier constitue aujourd'hui la référence la plus mature pour formaliser les exigences. Les mêmes principes de gouvernance, d'isolation et de traçabilité orientent le système Angular, mais les deux solutions restent techniquement indépendantes.
 
-La démarche adoptée rejoint les principes de l'ingénierie des exigences décrits par la norme ISO/IEC/IEEE 29148, qui couvre la définition, l'analyse, la spécification et la gestion des exigences tout au long du cycle de vie d'un système logiciel.\footnote{ISO, \textit{ISO/IEC/IEEE 29148:2018 -- Systems and software engineering -- Life cycle processes -- Requirements engineering}, \url{https://www.iso.org/standard/72089.html}.} Le chapitre identifie d'abord les parties prenantes, puis présente les besoins fonctionnels et non fonctionnels, les règles de gouvernance, les principaux scénarios d'utilisation, l'organisation du backlog et la méthodologie suivie.
+La démarche retenue s'inscrit dans les principes de l'ingénierie des exigences définis par la norme ISO/IEC/IEEE 29148, qui encadre l'identification, l'analyse, la spécification et la gestion des exigences sur le cycle de vie d'un système logiciel.\footnote{ISO, \textit{ISO/IEC/IEEE 29148:2018 -- Systems and software engineering -- Life cycle processes -- Requirements engineering}, \url{https://www.iso.org/standard/72089.html}.} Le chapitre présente successivement le périmètre étudié, les acteurs, les besoins fonctionnels et non fonctionnels, les règles de gouvernance, les principaux cas d'utilisation, l'organisation du backlog et la méthodologie suivie.
 
 % ============================================================
 \section{Démarche d'analyse des besoins}
 % ============================================================
 
-L'analyse a été menée selon une démarche progressive articulée autour de quatre sources complémentaires :
+L'objectif de cette analyse est de distinguer clairement trois niveaux de besoin :
 
 \begin{itemize}
-    \item \textbf{les besoins métier}, exprimant la nécessité de réduire le temps, les coûts et l'effort manuel associés aux migrations ;
-    \item \textbf{les besoins des utilisateurs}, principalement ceux du développeur chargé d'analyser, d'exécuter et de valider une migration ;
-    \item \textbf{les contraintes techniques}, issues des écosystèmes Java/Spring Boot et Angular, des outils de build et des versions d'exécution ;
-    \item \textbf{les preuves issues du prototype}, permettant de distinguer les capacités réellement disponibles des fonctionnalités encore envisagées.
+    \item \textbf{le noyau du produit minimum viable}, indispensable pour conduire une migration contrôlée de bout en bout ;
+    \item \textbf{les compléments opérationnels}, qui renforcent le suivi, la réparation, la reprise et l'expérience du développeur ;
+    \item \textbf{les évolutions d'industrialisation}, nécessaires avant un déploiement multi-utilisateur ou une exploitation à plus grande échelle.
 \end{itemize}
 
-Cette distinction est essentielle. Le projet se trouve encore dans une phase de tests sur des applications réelles et n'est pas déployé comme produit auprès d'utilisateurs externes. Certaines exigences décrivent donc le noyau déjà opérationnel, tandis que d'autres correspondent aux évolutions nécessaires avant une industrialisation à plus grande échelle.
+Cette classification a été construite pour le rapport à partir de la priorité observée dans le backlog et de l'état réel du prototype. Elle ne correspond pas à une application formelle de la méthode MoSCoW. Elle permet surtout de ne pas confondre les objectifs à long terme avec les fonctions déjà disponibles.
 
-Dans le présent chapitre, les besoins sont classés selon trois niveaux :
+Les besoins ont été formulés à partir de situations concrètes : préparation d'un projet ancien, choix d'une trajectoire de versions, contrôle des prérequis, analyse de l'application, transformation dans un espace isolé, validation par compilation et tests, traitement des échecs et production de preuves. Chaque exigence est ainsi reliée à une étape du processus de migration et à un résultat observable.
+
+% ============================================================
+\section{Périmètre et parties prenantes}
+% ============================================================
+
+\subsection{Périmètre fonctionnel}
+
+La Migration Factory vise à assister le développeur depuis la configuration initiale jusqu'à la production d'un candidat migré et vérifié. Le système ne réalise pas de déploiement automatique en production. Il produit un résultat dans un espace de travail isolé, accompagné de journaux, d'artefacts et d'un rapport permettant d'examiner les opérations effectuées.
+
+Pour Java/Spring Boot, la trajectoire de référence couvre les passages successifs de Spring Boot 2.1 vers 2.7, puis vers 3.5, l'évolution de Java 17 vers Java 21 lorsque celle-ci est requise, et enfin le passage vers Spring Boot 4.0. Les environnements Java 11, Java 17 et Java 21 sont mobilisés selon l'étape exécutée. Pour Angular, la première trajectoire étudiée couvre Angular 18 vers 19, 19 vers 20 et 20 vers 21, avec une perspective d'extension à partir d'Angular 11.
+
+Le mécanisme d'acquisition reste propre à chaque écosystème. Dans le prototype Java/Spring Boot, l'application est fournie par un chemin local. Ce choix correspond au périmètre actuel et ne constitue pas une règle imposée aux futures extensions de la solution.
+
+\subsection{Utilisateur principal}
+
+L'utilisateur opérationnel est le \textbf{développeur chargé de la migration}. Il prépare l'environnement, sélectionne les versions source et cible, lance l'exécution, consulte les résultats et prend les décisions nécessaires lorsque le processus atteint un point de validation.
+
+Ses principales responsabilités sont les suivantes :
 
 \begin{itemize}
-    \item \textbf{noyau du MVP} : indispensable à l'exécution d'une migration contrôlée ;
-    \item \textbf{complément opérationnel} : améliore le pilotage, la réparation ou l'expérience du développeur ;
-    \item \textbf{évolution d'industrialisation} : nécessaire pour un déploiement multi-utilisateur ou une exploitation à grande échelle.
-\end{itemize}
-
-Cette classification est une synthèse utilisée pour le rapport. Elle ne doit pas être confondue avec une méthode MoSCoW formelle, qui n'a pas été appliquée explicitement dans le projet.
-
-% ============================================================
-\section{Périmètre du système étudié}
-% ============================================================
-
-La Migration Factory vise à assister la modernisation d'applications en combinant automatisation déterministe, agents spécialisés, modèles de langage et décisions humaines. Le périmètre fonctionnel couvre le cycle allant de la configuration initiale jusqu'à la production d'un candidat migré et d'un rapport de preuve.
-
-Pour Java/Spring Boot, la trajectoire actuellement prise en charge est progressive : Spring Boot 2.1 vers 2.7, puis vers 3.5, évolution de Java 17 vers Java 21 lorsque nécessaire, et enfin passage vers Spring Boot 4.0. Les environnements Java 11, Java 17 et Java 21 interviennent selon l'étape exécutée. Pour Angular, la première trajectoire couvre Angular 18 vers 19, 19 vers 20 et 20 vers 21, avec une vision d'extension depuis Angular 11 vers les versions récentes.
-
-La solution ne cherche pas à déployer automatiquement l'application migrée en production. Le résultat attendu est un \textbf{candidat de migration validé dans un workspace isolé}, accompagné d'artefacts, de journaux et d'un rapport permettant au développeur d'examiner le travail réalisé.
-
-Le mécanisme d'entrée dépend de l'écosystème. Dans le prototype Java/Spring Boot, l'application est fournie sous la forme d'un chemin local. Le système vérifie ensuite le projet, les JDK, Maven, les profils de migration et le répertoire de sortie. Cette méthode d'entrée ne doit pas être présentée comme une contrainte générique de toutes les futures Migration Factories : chaque dépôt peut définir un mécanisme d'acquisition adapté à son écosystème.
-
-% ============================================================
-\section{Identification des parties prenantes}
-% ============================================================
-
-\subsection{Utilisateur opérationnel principal}
-
-L'utilisateur principal est le \textbf{développeur chargé de la migration}. Dans l'état actuel du prototype, il configure l'application, choisit les versions source et cible, lance les contrôles, supervise le workflow, examine les preuves et prend les principales décisions humaines.
-
-Ses responsabilités comprennent notamment :
-
-\begin{itemize}
-    \item sélectionner ou indiquer l'application à migrer ;
-    \item fournir les environnements et paramètres nécessaires ;
-    \item lancer la migration et suivre son avancement ;
-    \item examiner les résultats de l'analyse et de la planification ;
-    \item approuver, rejeter ou demander la révision d'une décision ;
-    \item examiner les erreurs, les propositions de réparation et les différences de code ;
-    \item valider le résultat final et consulter les rapports produits.
+    \item fournir l'application et les paramètres nécessaires à la migration ;
+    \item contrôler les prérequis avant le lancement ;
+    \item examiner l'analyse, le plan et les risques détectés ;
+    \item suivre l'avancement et interpréter les blocages ;
+    \item approuver, rejeter ou demander la révision d'une proposition ;
+    \item contrôler les résultats de compilation et de test ;
+    \item consulter les preuves et le rapport final.
 \end{itemize}
 
 \subsection{Parties prenantes du projet}
 
-L'équipe projet est composée de trois développeurs travaillant sur la conception, l'implémentation, l'intégration et la validation de la solution. Elle est accompagnée par deux référents fonctionnels, un expert technique assurant le suivi global et la direction de CGI lors des revues et démonstrations.
+L'équipe est composée de trois développeurs travaillant conjointement sur la conception, l'implémentation, l'intégration et la validation de la solution. Elle est accompagnée par deux référents fonctionnels, un expert technique assurant le suivi global et la direction de CGI lors des revues et démonstrations.
 
 \begin{table}[H]
     \centering
     \small
     \arrayrulecolor{cgigray}
     \rowcolors{2}{cgilight!60}{white}
-    \begin{tabularx}{\textwidth}{|>{\bfseries\RaggedRight\arraybackslash}p{3.8cm}|>{\RaggedRight\arraybackslash}X|>{\RaggedRight\arraybackslash}p{4.2cm}|}
+    \begin{tabularx}{\textwidth}{|>{\bfseries\RaggedRight\arraybackslash}p{3.7cm}|>{\RaggedRight\arraybackslash}X|>{\RaggedRight\arraybackslash}p{4.1cm}|}
         \hline
         \rowcolor{cgilight!95}
-        \textbf{Partie prenante} & \textbf{Contribution au projet} & \textbf{Utilisation actuelle de l'application} \\
+        \textbf{Partie prenante} & \textbf{Contribution au projet} & \textbf{Interaction avec le prototype} \\
         \hline
-        Développeurs & Conception, développement, intégration, tests et exécution des migrations. & Utilisation directe du prototype. \\
+        Développeurs & Conception, développement, intégration, tests et exécution des migrations. & Utilisation directe de l'application. \\
         \hline
-        Référents fonctionnels & Suivi des besoins, clarification fonctionnelle et retour sur les incréments. & Participation aux échanges et validations, sans compte applicatif distinct. \\
+        Référents fonctionnels & Clarification des besoins, suivi des incréments et retour fonctionnel. & Participation aux échanges et validations. \\
         \hline
-        Expert technique & Suivi de la cohérence technique, examen des orientations et accompagnement global. & Participation aux revues et démonstrations. \\
+        Expert technique & Suivi de la cohérence technique et examen des orientations. & Participation aux revues et démonstrations. \\
         \hline
-        Direction CGI & Appréciation de l'avancement, de la valeur et du potentiel de présentation aux clients. & Consultation des résultats lors des démonstrations. \\
+        Direction CGI & Suivi de l'avancement et appréciation du potentiel de la solution. & Consultation des résultats lors des démonstrations. \\
         \hline
     \end{tabularx}
     \caption{Parties prenantes du projet}
@@ -97,125 +84,89 @@ L'équipe projet est composée de trois développeurs travaillant sur la concept
 
 \subsection{Gestion actuelle des accès}
 
-Le prototype fonctionne comme un outil local à opérateur unique. Il ne possède actuellement ni comptes utilisateurs, ni authentification, ni rôles, ni mécanisme RBAC, ni rôle d'administrateur. Les protections disponibles portent principalement sur l'accès local, l'origine des requêtes et l'identification du client frontend. Elles ne permettent pas de distinguer un développeur, un expert technique ou un responsable fonctionnel.
+Le prototype fonctionne comme un outil local utilisé par les développeurs pendant les essais sur des applications réelles. Il ne comporte actuellement ni comptes utilisateurs, ni authentification, ni séparation de rôles, ni rôle d'administrateur. Les protections existantes limitent l'accès au poste local et contrôlent l'origine des requêtes, mais elles ne permettent pas d'identifier de manière fiable la personne qui effectue une approbation.
 
-Cette situation est cohérente avec une phase de prototypage et de tests internes, mais elle devient une limite importante pour une future mise à disposition à plusieurs utilisateurs. Une version industrialisée devra introduire une authentification, une attribution fiable des décisions et une séparation des responsabilités.
+Cette situation reste acceptable pour une phase de prototypage interne. Elle devient toutefois une contrainte majeure pour une future mise à disposition à plusieurs utilisateurs. L'industrialisation devra donc introduire une authentification, une attribution fiable des décisions et une séparation explicite des responsabilités.
 
 % ============================================================
 \section{Analyse des besoins fonctionnels}
 % ============================================================
 
-Les besoins fonctionnels décrivent les services que la solution doit fournir au développeur. Ils sont organisés selon les principales étapes du workflow.
+\subsection{Préparer et qualifier la migration}
 
-\subsection{Configuration et qualification de l'environnement}
+Avant de créer une exécution, le développeur doit pouvoir indiquer l'application source, le répertoire de sortie, les versions de départ et d'arrivée ainsi que les environnements requis. Le système vérifie ensuite l'existence du projet, la disponibilité des JDK et de Maven, la cohérence des profils et la possibilité d'écrire dans le répertoire de travail.
 
-Avant tout lancement, le système doit permettre de définir l'application source, le répertoire de travail, les versions source et cible ainsi que les outils d'exécution. Il doit contrôler la présence des ressources nécessaires avant de créer le job de migration.
+Dans le périmètre actuel, les runtimes manquants ne sont pas installés automatiquement. Le processus doit s'arrêter avant le lancement et présenter les prérequis à corriger. Cette décision évite de démarrer une migration dans un environnement incomplet ou incompatible.
 
-Dans le cas Java/Spring Boot, cette qualification porte notamment sur :
+\subsection{Analyser et planifier}
 
-\begin{itemize}
-    \item l'existence du projet et de son fichier de build ;
-    \item la séparation entre le projet source et le répertoire de sortie ;
-    \item la disponibilité de Java 11, Java 17 et Java 21 ;
-    \item la disponibilité et la version de Maven ;
-    \item la cohérence des profils de migration ;
-    \item la capacité à écrire dans le répertoire de travail ;
-    \item la disponibilité du fournisseur LLM lorsque son utilisation est requise.
-\end{itemize}
+L'analyse doit examiner l'application sans modifier la source. Elle identifie notamment le framework, la version Java, les dépendances, les fichiers de configuration, les tests et les incompatibilités susceptibles d'affecter la migration.
 
-Le système ne doit pas installer automatiquement les runtimes absents dans le périmètre actuel. Il doit bloquer le lancement, expliquer les prérequis manquants et permettre au développeur de corriger la configuration.
+À partir de ces résultats, le système construit une trajectoire progressive, détermine les transformations attendues et produit un plan accompagné d'une évaluation des impacts. Le développeur doit pouvoir consulter ces éléments avant toute modification du projet. Lorsqu'une version source est mal détectée ou qu'un plan paraît incomplet, une correction explicite ou une demande de révision doit pouvoir être enregistrée.
 
-\subsection{Analyse et planification}
+\subsection{Transformer et valider}
 
-Le système doit analyser l'application sans modifier la source. L'analyse doit identifier la version du framework, la version Java, les dépendances, les fichiers de configuration, les tests, les imports sensibles et les incompatibilités potentielles.
+Après approbation, l'application source est copiée dans un \textbf{espace de travail isolé} (\textit{sandbox}). Les transformations connues sont alors appliquées à l'aide de règles déterministes et d'outils de refactorisation structurée. L'application originale reste inchangée.
 
-À partir de ces informations, le système doit construire une trajectoire de migration progressive, déterminer les étapes nécessaires, produire un plan, évaluer les impacts et signaler les risques. Les résultats doivent être présentés au développeur avant le passage aux transformations.
+La réussite d'une étape ne peut pas reposer sur une appréciation textuelle produite par un modèle. Elle doit être établie par l'exécution réelle des commandes de compilation et de test. La progression vers l'étape suivante dépend donc des résultats techniques obtenus et de la trajectoire de versions sélectionnée.
 
-Une détection incorrecte de la version source doit pouvoir être corrigée par une décision explicite et traçable. De même, le développeur doit pouvoir demander une réanalyse ou une révision du plan lorsque les éléments produits ne sont pas satisfaisants.
+\subsection{Traiter les échecs}
 
-\subsection{Transformation et validation}
+Lorsqu'une transformation, une compilation ou un test échoue, le système doit conserver les journaux et les éléments nécessaires au diagnostic. À partir de ces preuves, il construit un contexte limité aux informations utiles, puis sollicite une chaîne de proposition et de révision.
 
-Après approbation, le système doit créer un sandbox à partir du projet source, appliquer les transformations prévues et utiliser les outils adaptés à la cible. Les transformations connues peuvent être réalisées par des recettes déterministes ou des outils de refactorisation structurée.
+L'agent de proposition produit un premier correctif. L'agent de révision peut l'accepter, le refuser ou produire une version consolidée. Le correctif final ne devient applicable qu'après vérification déterministe, contrôle de son empreinte et approbation explicite du développeur. Après application, la compilation et les tests sont obligatoirement relancés. En cas de nouvel échec, un autre cycle peut être ouvert dans la limite du nombre de tentatives autorisé.
 
-Chaque étape doit ensuite être vérifiée par des commandes réelles de compilation et de test. Une étape ne doit pas être considérée comme terminée sur la seule base d'une réponse textuelle ou d'une estimation produite par un modèle de langage.
+\subsection{Piloter et restituer}
 
-La progression entre versions doit être pilotée par la trajectoire sélectionnée. Les étapes antérieures à la version source peuvent être marquées comme déjà franchies, mais le système ne doit pas permettre un saut arbitraire qui violerait l'ordre des profils compatibles.
+Le développeur doit disposer d'une vue centralisée sur les étapes, les événements, les décisions, les journaux et les blocages. L'assistant contextuel complète cette vue en expliquant l'état courant, les phases terminées et la prochaine action disponible.
 
-\subsection{Gestion des échecs et réparation}
+Cet assistant reste consultatif : il ne peut ni approuver une réparation, ni exécuter directement une commande protégée, ni modifier librement les fichiers. Les actions sensibles sont transmises à des services déterministes et restent soumises aux règles de gouvernance.
 
-Lorsqu'une transformation, une compilation ou un test échoue, le système doit :
+Lorsque la cible est atteinte, le système doit produire un rapport regroupant les versions traversées, les étapes exécutées, les validations, les réparations et les références vers les preuves. Le résultat demeure un candidat de migration et non une application promue en production.
 
-\begin{enumerate}
-    \item préserver les journaux et les preuves de l'échec ;
-    \item construire un contexte borné à partir des erreurs et des fichiers concernés ;
-    \item produire une proposition de réparation ;
-    \item soumettre cette proposition à une révision indépendante ;
-    \item présenter le diff final et ses preuves au développeur ;
-    \item permettre l'approbation, le rejet ou la demande d'une nouvelle version ;
-    \item appliquer uniquement le diff approuvé ;
-    \item relancer obligatoirement le build et les tests ;
-    \item poursuivre, recommencer un cycle ou déclarer l'épuisement des tentatives.
-\end{enumerate}
+\subsection{Catalogue synthétique}
 
-Dans l'implémentation actuelle, le reviewer LLM peut accepter, refuser, corriger ou remplacer la proposition initiale du proposer. Le diff final reste toutefois soumis à des contrôles déterministes, à des checksums et à une approbation humaine avant application. Cette règle doit être décrite telle qu'elle existe, sans présenter le reviewer comme un composant strictement incapable de réécrire une proposition.
+Le tableau suivant présente les exigences fonctionnelles de référence. Le statut correspond principalement à l'état du système Java/Spring Boot, qui constitue l'implémentation la plus avancée au moment de la rédaction.
 
-\subsection{Pilotage, assistant et reporting}
-
-Le développeur doit disposer d'un cockpit permettant de suivre les étapes, les événements, les erreurs, les preuves et les décisions. Un assistant contextuel peut expliquer l'état du workflow, résumer les phases terminées, indiquer la prochaine action et aider à comprendre une proposition de réparation.
-
-L'assistant demeure consultatif. Il ne doit pas exécuter directement une commande protégée, approuver une réparation ou modifier librement les fichiers. Les actions sensibles sont transmises à des services déterministes et soumises aux règles de gouvernance.
-
-À la fin de la migration, le système doit produire un rapport contenant les versions traversées, les étapes exécutées, les résultats de validation, les réparations et les références vers les preuves. Le candidat migré reste un résultat de sandbox et ne constitue pas un déploiement de production.
-
-\subsection{Catalogue synthétique des besoins fonctionnels}
-
-\begin{longtable}{|>{\bfseries\RaggedRight\arraybackslash}p{1.7cm}|>{\RaggedRight\arraybackslash}p{9.6cm}|>{\centering\arraybackslash}p{2.4cm}|}
-    \caption{Besoins fonctionnels principaux}\label{tab:besoins-fonctionnels-ch3}\\
+\begin{longtable}{|>{\bfseries\RaggedRight\arraybackslash}p{1.5cm}|>{\RaggedRight\arraybackslash}p{7.5cm}|>{\centering\arraybackslash}p{2.2cm}|>{\centering\arraybackslash}p{2.5cm}|}
+    \caption{Exigences fonctionnelles principales}\label{tab:besoins-fonctionnels-ch3}\\
     \hline
     \rowcolor{cgilight!95}
-    \textbf{ID} & \textbf{Besoin fonctionnel} & \textbf{Niveau} \\
+    \textbf{ID} & \textbf{Exigence fonctionnelle} & \textbf{Priorité} & \textbf{État actuel} \\
     \hline
     \endfirsthead
     \hline
     \rowcolor{cgilight!95}
-    \textbf{ID} & \textbf{Besoin fonctionnel} & \textbf{Niveau} \\
+    \textbf{ID} & \textbf{Exigence fonctionnelle} & \textbf{Priorité} & \textbf{État actuel} \\
     \hline
     \endhead
-    BF-01 & Configurer une migration à partir d'une application, d'une cible, d'un espace de travail et de profils d'exécution. & Noyau MVP \\
+    BF-01 & Configurer une migration à partir d'une application, d'une cible et de profils d'exécution. & MVP & Implémenté \\
     \hline
-    BF-02 & Vérifier les chemins, outils, versions et prérequis avant la création du job. & Noyau MVP \\
+    BF-02 & Vérifier les chemins, outils, versions et prérequis avant la création de l'exécution. & MVP & Implémenté \\
     \hline
-    BF-03 & Détecter le profil technologique de l'application et construire la trajectoire compatible. & Noyau MVP \\
+    BF-03 & Détecter le profil technologique et construire une trajectoire compatible. & MVP & Implémenté \\
     \hline
-    BF-04 & Analyser la structure, les dépendances, la configuration, les tests et les incompatibilités. & Noyau MVP \\
+    BF-04 & Analyser la structure, les dépendances, la configuration, les tests et les risques. & MVP & Implémenté \\
     \hline
-    BF-05 & Générer un plan progressif, un inventaire des unités de migration et une évaluation des impacts. & Noyau MVP \\
+    BF-05 & Produire un plan progressif et une évaluation des impacts. & MVP & Implémenté \\
     \hline
-    BF-06 & Permettre l'approbation, le rejet, la réanalyse ou la révision des résultats produits. & Noyau MVP \\
+    BF-06 & Permettre au développeur d'approuver, rejeter ou demander une révision. & MVP & Implémenté avec limites d'identité \\
     \hline
-    BF-07 & Créer un sandbox sans modifier l'application source. & Noyau MVP \\
+    BF-07 & Créer un espace isolé et appliquer les transformations sans modifier la source. & MVP & Implémenté \\
     \hline
-    BF-08 & Appliquer les transformations déterministes et les changements autorisés dans le sandbox. & Noyau MVP \\
+    BF-08 & Exécuter la compilation et les tests dans un environnement contrôlé. & MVP & Implémenté \\
     \hline
-    BF-09 & Exécuter l'installation, la compilation et les tests selon un environnement contrôlé. & Noyau MVP \\
+    BF-09 & Construire une proposition de réparation, la réviser, l'approuver et la revalider. & Opérationnel & Implémenté \\
     \hline
-    BF-10 & Détecter un échec et construire un contexte de réparation à partir des preuves disponibles. & Noyau MVP \\
+    BF-10 & Afficher les étapes, événements, preuves, décisions et blocages dans un cockpit. & Opérationnel & Implémenté \\
     \hline
-    BF-11 & Proposer, réviser, approuver et appliquer un correctif vérifié, puis relancer les validations. & Complément opérationnel \\
+    BF-11 & Annuler une migration et reprendre une exécution depuis un état persistant autorisé. & Opérationnel & Partiellement implémenté \\
     \hline
-    BF-12 & Annuler une migration et reprendre un workflow depuis un état persistant autorisé. & Complément opérationnel \\
+    BF-12 & Comparer et mettre à jour des versions de dépendances avec validation automatique. & Opérationnel & Implémenté, restitution partielle \\
     \hline
-    BF-13 & Comparer et aligner des versions de dépendances, avec validation après modification. & Complément opérationnel \\
+    BF-13 & Générer et télécharger un rapport final lié aux preuves de la migration. & Opérationnel & Implémenté \\
     \hline
-    BF-14 & Afficher les événements, artefacts, journaux, décisions, étapes et blocages. & Complément opérationnel \\
-    \hline
-    BF-15 & Fournir un assistant explicatif sans autorité directe sur les actions protégées. & Complément opérationnel \\
-    \hline
-    BF-16 & Générer un rapport final et permettre le téléchargement des artefacts de rapport. & Complément opérationnel \\
-    \hline
-    BF-17 & Introduire ultérieurement des comptes, rôles et responsabilités séparées. & Industrialisation \\
-    \hline
-    BF-18 & Étendre les catalogues de versions, de frameworks et de transformations. & Industrialisation \\
+    BF-14 & Gérer plusieurs utilisateurs, rôles et responsabilités séparées. & Industrialisation & Non implémenté \\
     \hline
 \end{longtable}
 
@@ -223,116 +174,98 @@ L'assistant demeure consultatif. Il ne doit pas exécuter directement une comman
 \section{Analyse des besoins non fonctionnels}
 % ============================================================
 
-Les besoins non fonctionnels déterminent les propriétés de confiance attendues. Ils sont particulièrement importants, car la solution manipule du code source, exécute des commandes et utilise des sorties probabilistes produites par des LLM.
+Les exigences non fonctionnelles portent sur la confiance accordée au processus. Elles sont essentielles, car la solution manipule du code source, exécute des commandes et exploite des sorties probabilistes produites par de grands modèles de langage.
 
-\begin{longtable}{|>{\bfseries\RaggedRight\arraybackslash}p{1.8cm}|>{\RaggedRight\arraybackslash}p{4.1cm}|>{\RaggedRight\arraybackslash}p{7.6cm}|}
+\begin{longtable}{|>{\bfseries\RaggedRight\arraybackslash}p{1.6cm}|>{\RaggedRight\arraybackslash}p{3.5cm}|>{\RaggedRight\arraybackslash}p{6.2cm}|>{\centering\arraybackslash}p{2.4cm}|}
     \caption{Exigences non fonctionnelles principales}\label{tab:besoins-non-fonctionnels-ch3}\\
     \hline
     \rowcolor{cgilight!95}
-    \textbf{ID} & \textbf{Exigence} & \textbf{Description} \\
+    \textbf{ID} & \textbf{Exigence} & \textbf{Critère attendu} & \textbf{État actuel} \\
     \hline
     \endfirsthead
     \hline
     \rowcolor{cgilight!95}
-    \textbf{ID} & \textbf{Exigence} & \textbf{Description} \\
+    \textbf{ID} & \textbf{Exigence} & \textbf{Critère attendu} & \textbf{État actuel} \\
     \hline
     \endhead
-    BNF-01 & Intégrité de la source & L'application originale ne doit jamais être écrasée ou modifiée par le workflow. \\
+    BNF-01 & Intégrité de la source & L'application originale ne doit pas être modifiée ; les écritures sont confinées à l'espace de travail. & Implémenté \\
     \hline
-    BNF-02 & Isolation & Toutes les transformations doivent être appliquées dans un workspace contrôlé et contenu dans le répertoire du run. \\
+    BNF-02 & Isolation & Les chemins, copies et correctifs doivent rester contenus dans le répertoire de l'exécution. & Implémenté \\
     \hline
-    BNF-03 & Autorité déterministe & Les chemins, commandes, environnements, transitions et applications de patchs doivent rester contrôlés par le backend. \\
+    BNF-03 & Autorité déterministe & Le backend doit contrôler les commandes, environnements, transitions et applications de correctifs. & Implémenté \\
     \hline
-    BNF-04 & Traçabilité & Les événements, artefacts, décisions, propositions et résultats doivent être reliés au job et à l'étape concernés. \\
+    BNF-04 & Traçabilité & Chaque étape, décision, artefact et résultat doit être rattaché à une exécution identifiable. & Implémenté \\
     \hline
-    BNF-05 & Intégrité des preuves & Les artefacts et décisions sensibles doivent être liés par des checksums afin de détecter toute modification ou vue obsolète. \\
+    BNF-05 & Intégrité des preuves & Les décisions sensibles doivent être liées à des empreintes de contrôle afin de détecter une version obsolète ou modifiée. & Implémenté \\
     \hline
-    BNF-06 & Reproductibilité & Les profils, plans approuvés, commandes et états doivent permettre de comprendre et de reproduire une exécution. \\
+    BNF-06 & Reprise et idempotence & Une interruption ou la répétition d'une requête ne doit ni perdre l'état ni dupliquer une action protégée. & Partiellement implémenté \\
     \hline
-    BNF-07 & Reprise & Les interruptions et approbations doivent être persistées afin de permettre une reprise contrôlée. \\
+    BNF-07 & Sécurité des commandes & Les objectifs de compilation, chemins de correctif et contenus dangereux doivent être filtrés par des règles d'autorisation. & Implémenté \\
     \hline
-    BNF-08 & Idempotence & La répétition d'une requête ou d'une décision ne doit pas créer de doublons ni appliquer plusieurs fois la même modification. \\
+    BNF-08 & Confidentialité & Les secrets et chemins sensibles doivent être masqués ; le contexte transmis aux LLM doit rester limité aux informations nécessaires. & Partiellement implémenté \\
     \hline
-    BNF-09 & Gestion des erreurs & Les échecs doivent être classifiés, conservés et présentés sans masquer leur état réel. \\
+    BNF-09 & Gouvernance humaine & Une sortie LLM ne doit pas devenir une modification autoritaire sans validation déterministe et décision humaine lorsque le risque l'exige. & Implémenté avec auto-approbation optionnelle \\
     \hline
-    BNF-10 & Sécurité des commandes & Les objectifs de build, chemins de patch et contenus dangereux doivent être limités par des listes d'autorisation et des validations. \\
+    BNF-10 & Lisibilité opérationnelle & L'interface doit présenter l'état courant, le blocage actif, les preuves associées et la prochaine action disponible. & Implémenté \\
     \hline
-    BNF-11 & Confidentialité & Les secrets, chemins sensibles et informations inutiles doivent être supprimés ou masqués avant stockage, affichage ou transmission externe. \\
+    BNF-11 & Portabilité documentée & Les systèmes d'exploitation et outils pris en charge doivent être explicitement identifiés. & Partiel, environnement Windows dominant \\
     \hline
-    BNF-12 & Contexte LLM borné & Le volume de code, de journaux et d'historique transmis à un modèle doit être sélectionné et limité. \\
-    \hline
-    BNF-13 & Gouvernance humaine & Une sortie LLM ne doit pas devenir une modification autoritaire sans validation déterministe et décision humaine lorsque le risque le nécessite. \\
-    \hline
-    BNF-14 & Maintenabilité & Les profils et règles propres aux écosystèmes doivent pouvoir évoluer sans coupler les dépôts Java et Angular. \\
-    \hline
-    BNF-15 & Ergonomie & Le développeur doit pouvoir comprendre rapidement l'état, les blocages, les preuves et les prochaines actions. \\
-    \hline
-    BNF-16 & Portabilité maîtrisée & Les plateformes réellement prises en charge doivent être explicites. Le prototype actuel reste principalement orienté Windows. \\
-    \hline
-    BNF-17 & Attribution des décisions & Une version industrialisée doit identifier de manière fiable la personne à l'origine d'une approbation ou d'un rejet. \\
-    \hline
-    BNF-18 & Passage à l'échelle & La gestion de plusieurs migrations et plusieurs utilisateurs devra être encadrée par des règles de concurrence et de capacité explicites. \\
+    BNF-12 & Passage à l'échelle & La concurrence entre migrations et l'accès multi-utilisateur doivent être encadrés par des règles explicites. & À industrialiser \\
     \hline
 \end{longtable}
 
-Les exigences liées à l'IA suivent une logique de maîtrise du risque : la confiance ne repose pas uniquement sur la qualité apparente d'une réponse, mais sur l'encadrement de son usage, la traçabilité et la vérification. Cette orientation est cohérente avec l'AI Risk Management Framework du NIST et son profil consacré à l'intelligence artificielle générative.\footnote{NIST, \textit{Artificial Intelligence Risk Management Framework}, \url{https://www.nist.gov/itl/ai-risk-management-framework}.}
+Les exigences relatives à l'intelligence artificielle suivent une logique de maîtrise du risque : la confiance ne repose pas sur la seule qualité apparente d'une réponse, mais sur la limitation de son autorité, la traçabilité de son utilisation et la validation des résultats. Cette orientation est cohérente avec l'AI Risk Management Framework du NIST et son profil consacré à l'intelligence artificielle générative.\footnote{NIST, \textit{Artificial Intelligence Risk Management Framework (AI RMF 1.0)}, 2023, et \textit{Artificial Intelligence Risk Management Framework: Generative Artificial Intelligence Profile}, NIST AI 600-1, 2024, \url{https://www.nist.gov/itl/ai-risk-management-framework}.}
 
 % ============================================================
-\section{Règles de gouvernance de la solution}
+\section{Règles de gouvernance}
 % ============================================================
 
-Les règles suivantes structurent l'autorité au sein du workflow :
+La gouvernance de la Migration Factory repose sur une répartition explicite de l'autorité entre les composants automatiques, les modèles de langage et le développeur.
 
 \begin{enumerate}
-    \item \textbf{Le backend est la source d'autorité.} Le frontend projette l'état et transmet des intentions, mais ne choisit pas librement les commandes, les variables d'environnement ou les transitions.
-    \item \textbf{La source externe reste protégée.} L'analyse peut lire le projet, mais les écritures sont réalisées dans un sandbox après les validations nécessaires.
-    \item \textbf{La progression est conditionnelle.} Une étape ne peut avancer que si les prérequis, artefacts et validations attendus sont disponibles.
-    \item \textbf{Les preuves sont liées aux décisions.} Les approbations utilisent des références et des checksums afin d'empêcher l'application d'une version différente de celle examinée.
-    \item \textbf{Les LLM assistent sans disposer d'un pouvoir d'exécution direct.} Ils peuvent analyser, expliquer, proposer et réviser, mais les actions protégées sont exécutées par des services déterministes.
-    \item \textbf{Le reviewer peut améliorer le diff.} Dans la version actuelle, il peut corriger ou remplacer la proposition initiale. Sa sortie n'est cependant jamais appliquée sans contrôles supplémentaires et approbation.
-    \item \textbf{La réparation doit être vérifiée.} Tout correctif appliqué est suivi d'un rebuild et d'une réexécution des tests ; un échec entraîne un nouveau cycle ou l'arrêt après épuisement des tentatives.
-    \item \textbf{L'auto-approbation reste explicite.} Lorsqu'elle est activée pour un job, elle constitue une exception contrôlée et traçable, non une autorité implicite du modèle.
-    \item \textbf{Les états réels ne doivent pas être normalisés artificiellement.} Un succès avec avertissements reste distingué d'un succès complet.
-    \item \textbf{Le résultat final reste un candidat.} Aucune promotion en production, création de pull request ou opération de déploiement n'est supposée par le workflow actuel.
+    \item \textbf{Le backend demeure la source d'autorité.} L'interface présente l'état et transmet des intentions, mais ne définit pas librement les commandes, les variables d'environnement ou les transitions.
+    \item \textbf{La source externe reste protégée.} L'analyse travaille en lecture seule et les modifications sont réalisées dans un espace isolé après les validations requises.
+    \item \textbf{Les décisions sont liées aux preuves.} Une approbation porte sur une version précise d'un plan ou d'un correctif, identifiée par ses références et son empreinte.
+    \item \textbf{Les LLM assistent sans exécuter directement.} Ils peuvent analyser, expliquer, proposer ou réviser. L'application des changements reste confiée à des services déterministes.
+    \item \textbf{Toute réparation est revalidée.} Après application d'un correctif, la compilation et les tests sont relancés ; un nouvel échec ouvre un autre cycle ou conduit à l'arrêt lorsque la limite est atteinte.
+    \item \textbf{Le résultat reste un candidat de migration.} Le processus actuel ne réalise ni promotion en production, ni déploiement, ni création automatique d'une demande de fusion.
 \end{enumerate}
 
+L'auto-approbation constitue une exception explicite activée pour une exécution donnée. Elle doit rester traçable et ne doit pas être interprétée comme une autorité autonome accordée au modèle.
+
 % ============================================================
-\section{Scénarios d'utilisation principaux}
+\section{Cas d'utilisation principaux}
 % ============================================================
 
-Les scénarios suivants synthétisent les interactions attendues avec le développeur. Les diagrammes UML détaillés et les spécifications de séquence seront présentés dans le Chapitre IV.
+Les interactions principales sont regroupées autour d'un acteur opérationnel : le développeur chargé de la migration. Les diagrammes UML et les séquences détaillées seront présentés au Chapitre IV.
 
 \begin{table}[H]
     \centering
     \small
     \arrayrulecolor{cgigray}
     \rowcolors{2}{cgilight!55}{white}
-    \begin{tabularx}{\textwidth}{|>{\bfseries\RaggedRight\arraybackslash}p{1.7cm}|>{\RaggedRight\arraybackslash}p{4.1cm}|>{\RaggedRight\arraybackslash}X|}
+    \begin{tabularx}{\textwidth}{|>{\bfseries\RaggedRight\arraybackslash}p{1.5cm}|>{\RaggedRight\arraybackslash}p{4.3cm}|>{\RaggedRight\arraybackslash}X|}
         \hline
         \rowcolor{cgilight!95}
         \textbf{ID} & \textbf{Cas d'utilisation} & \textbf{Résultat attendu} \\
         \hline
-        CU-01 & Configurer une migration & Un setup cohérent est enregistré avec l'application, les versions et les environnements. \\
+        CU-01 & Configurer une migration & Les chemins, versions et environnements requis sont enregistrés. \\
         \hline
-        CU-02 & Vérifier les prérequis & Les ressources disponibles et les blocages sont présentés avant le lancement. \\
+        CU-02 & Vérifier les prérequis & Les ressources disponibles et les éléments bloquants sont présentés avant le lancement. \\
         \hline
-        CU-03 & Lancer une migration & Un job est créé et la première étape compatible est mise en exécution. \\
+        CU-03 & Lancer et analyser & Une exécution est créée, puis l'application est analysée et une trajectoire est produite. \\
         \hline
-        CU-04 & Examiner l'analyse et le plan & Le développeur consulte les risques, preuves, versions détectées et étapes proposées. \\
+        CU-04 & Examiner et décider & Le développeur consulte les risques et choisit de poursuivre, rejeter ou demander une révision. \\
         \hline
-        CU-05 & Décider sur un gate & Le développeur poursuit, rejette, demande une révision ou arrête le workflow. \\
+        CU-05 & Exécuter et suivre & Les transformations, compilations et tests sont exécutés dans l'espace isolé et suivis depuis le cockpit. \\
         \hline
-        CU-06 & Suivre l'exécution & Le cockpit affiche l'état des étapes, les événements, les logs et les blocages. \\
+        CU-06 & Traiter un échec & Les preuves sont conservées et une proposition de réparation révisée est présentée. \\
         \hline
-        CU-07 & Traiter un échec & Le développeur examine les preuves et une proposition de réparation révisée. \\
+        CU-07 & Approuver une réparation & Le correctif exact approuvé est appliqué puis revalidé. \\
         \hline
-        CU-08 & Approuver une réparation & Le diff exact approuvé est appliqué dans le sandbox puis revalidé. \\
+        CU-08 & Annuler ou reprendre & L'exécution est arrêtée ou reprise selon les états et transitions autorisés. \\
         \hline
-        CU-09 & Aligner les dépendances & Les versions cibles sont comparées et les modifications validées par build et tests. \\
-        \hline
-        CU-10 & Annuler ou reprendre & L'exécution est arrêtée ou reprise selon les transitions autorisées et persistées. \\
-        \hline
-        CU-11 & Consulter le résultat & Le développeur génère et télécharge les artefacts du rapport final. \\
+        CU-09 & Consulter les résultats & Le développeur accède aux preuves et génère les artefacts du rapport final. \\
         \hline
     \end{tabularx}
     \caption{Principaux cas d'utilisation}
@@ -341,171 +274,104 @@ Les scénarios suivants synthétisent les interactions attendues avec le dévelo
     \arrayrulecolor{black}
 \end{table}
 
-\subsection{Scénario nominal de migration}
+\subsection{Scénario nominal}
 
-Le scénario nominal peut être résumé comme suit :
+Le développeur renseigne l'application source, le répertoire de sortie, les versions et les outils nécessaires. Le système contrôle les prérequis, crée l'exécution puis analyse le projet. Une trajectoire et un plan sont produits et soumis à décision. Après approbation, l'application est copiée dans l'espace isolé, transformée, compilée et testée. Lorsque les validations sont satisfaites, le processus progresse vers l'étape suivante jusqu'à atteindre la cible, puis le rapport final peut être généré.
 
-\begin{enumerate}
-    \item le développeur indique l'application source et le répertoire de sortie ;
-    \item il sélectionne les profils source et cible et fournit les chemins des outils ;
-    \item le système exécute les contrôles de readiness ;
-    \item lorsque les contrôles sont satisfaits, le job est créé et lancé ;
-    \item l'application est analysée et un plan progressif est produit ;
-    \item les résultats sont évalués et soumis à une décision ;
-    \item après approbation, le sandbox est créé et les transformations sont appliquées ;
-    \item le build et les tests sont exécutés ;
-    \item en cas de succès, la trajectoire progresse vers l'étape suivante ;
-    \item lorsque la cible est atteinte, les artefacts sont validés et le rapport final peut être généré.
-\end{enumerate}
+\subsection{Scénario de réparation}
 
-\subsection{Scénario alternatif de réparation}
-
-Lorsqu'une validation échoue, le workflow bascule vers un scénario gouverné : conservation de l'échec, construction du contexte, proposition, révision, décision humaine, application déterministe et revalidation. Si la validation échoue de nouveau, une nouvelle tentative peut être engagée dans la limite définie. Une fois cette limite atteinte, l'échec terminal est conservé et présenté au développeur.
+En cas d'échec, le processus conserve les journaux et construit un contexte de diagnostic. Une première proposition est générée, puis révisée. Le développeur examine le correctif final et décide de l'approuver, de le rejeter ou d'en demander une nouvelle version. Un correctif approuvé est appliqué dans l'espace isolé, puis la compilation et les tests sont relancés. Si la validation échoue de nouveau, le cycle peut être répété dans la limite autorisée.
 
 % ============================================================
-\section{Organisation du backlog et priorisation}
+\section{Organisation du backlog et méthodologie}
 % ============================================================
 
-Le backlog a évolué au rythme de la construction de la solution. Les principaux axes peuvent être regroupés sous forme d'epics :
+\subsection{Organisation du backlog}
 
-\begin{itemize}
-    \item acquisition et configuration de l'application ;
-    \item validation des environnements ;
-    \item analyse et détection des profils ;
-    \item planification et révision ;
-    \item approbations et gates ;
-    \item transformation et gestion des workspaces ;
-    \item build, tests et preuves ;
-    \item réparation gouvernée ;
-    \item alignement des dépendances ;
-    \item assistant de migration ;
-    \item cockpit et expérience utilisateur ;
-    \item reporting ;
-    \item persistance, reprise et concurrence ;
-    \item sécurité et gouvernance.
-\end{itemize}
-
-La priorisation a principalement été influencée par quatre facteurs :
-
-\begin{enumerate}
-    \item \textbf{l'ordre des dépendances techniques}, en construisant d'abord les fondations, la persistance et l'exécution avant les fonctions avancées ;
-    \item \textbf{le niveau de risque}, en sécurisant les opérations privilégiées et les validations avant leur exposition dans l'interface ;
-    \item \textbf{les défauts bloquants}, corrigés lorsqu'ils empêchaient la progression ou compromettaient la fiabilité ;
-    \item \textbf{les jalons de démonstration}, utilisés pour sélectionner les incréments devant être intégrés et présentés.
-\end{enumerate}
-
-Les demandes de la direction, les retours fonctionnels et les observations des experts ont également contribué à l'évolution des priorités. Toutefois, ces décisions relèvent des échanges de l'équipe et ne peuvent pas toutes être reconstituées à partir du dépôt de code.
-
-% ============================================================
-\section{Méthodologie Agile Scrum}
-% ============================================================
-
-Le projet a été conduit selon une démarche Agile fondée sur Scrum. Le travail a été organisé en sprints de deux semaines afin de produire des incréments réguliers, de recueillir rapidement des retours et d'adapter les priorités.
-
-Le Scrum Guide définit Scrum comme un cadre léger permettant de produire de la valeur à travers des solutions adaptatives à des problèmes complexes. Il organise le travail autour du Sprint, du Sprint Planning, du Daily Scrum, de la Sprint Review et de la Sprint Retrospective.\footnote{Ken Schwaber et Jeff Sutherland, \textit{The Scrum Guide}, novembre 2020, \url{https://scrumguides.org/scrum-guide.html}.}
-
-\subsection{Déroulement d'un sprint}
-
-\begin{itemize}
-    \item \textbf{Sprint Planning :} l'équipe détermine les objectifs du sprint, sélectionne les tâches prioritaires et prend en compte les dépendances et risques techniques.
-    \item \textbf{Daily Scrum :} un point quotidien permet de partager le travail réalisé, les actions prévues et les difficultés rencontrées.
-    \item \textbf{Développement et intégration :} les fonctionnalités sont développées par tickets, testées, revues et intégrées progressivement.
-    \item \textbf{Revue et démonstration :} les incréments sont présentés aux experts techniques et aux responsables de CGI afin de recueillir leurs observations et d'ajuster les orientations.
-    \item \textbf{Rétrospective :} l'équipe analyse en interne le déroulement du sprint, les blocages et les améliorations à appliquer au cycle suivant.
-\end{itemize}
-
-Les responsabilités Scrum n'ont pas été formalisées dans le rapport sous la forme de titres individuels non confirmés. Les trois développeurs ont travaillé conjointement sur la solution, tandis que les référents, l'expert technique et la direction ont contribué au suivi et aux validations selon les besoins.
-
-\subsection{Outils de collaboration}
+Le backlog a été structuré autour des capacités nécessaires au déroulement complet d'une migration. Les principaux ensembles de travail sont présentés dans le tableau suivant.
 
 \begin{table}[H]
     \centering
     \small
     \arrayrulecolor{cgigray}
     \rowcolors{2}{cgilight!60}{white}
-    \begin{tabularx}{0.94\textwidth}{|>{\bfseries\RaggedRight\arraybackslash}p{3.4cm}|>{\RaggedRight\arraybackslash}X|}
+    \begin{tabularx}{\textwidth}{|>{\bfseries\RaggedRight\arraybackslash}p{4.2cm}|>{\RaggedRight\arraybackslash}X|}
         \hline
         \rowcolor{cgilight!95}
-        \textbf{Outil} & \textbf{Utilisation dans le projet} \\
+        \textbf{Ensemble fonctionnel} & \textbf{Contenu principal} \\
         \hline
-        Jira & Gestion du backlog, des tickets, des priorités et du suivi de l'avancement. \\
+        Préparation et qualification & Acquisition du projet, profils, environnements, contrôles préalables et création de l'exécution. \\
         \hline
-        Microsoft Teams & Communication, réunions quotidiennes, échanges et démonstrations. \\
+        Analyse et planification & Détection du profil, inventaire, risques, trajectoire, plan et points de validation. \\
         \hline
-        GitHub & Gestion du code source, branches, commits, pull requests et revues. \\
+        Transformation et validation & Espace isolé, règles de transformation, compilation, tests et progression entre versions. \\
         \hline
-        Confluence & Centralisation de la documentation fonctionnelle et technique. \\
+        Réparation gouvernée & Collecte des preuves, proposition, révision, décision humaine, application et revalidation. \\
+        \hline
+        Pilotage et restitution & Cockpit, assistant, événements, artefacts, alignement des dépendances et rapport final. \\
+        \hline
+        Fiabilité et gouvernance & Persistance, reprise, idempotence, sécurité, confidentialité et contrôle de l'autorité. \\
         \hline
     \end{tabularx}
-    \caption{Outils de collaboration et de suivi}
-    \label{tab:outils-methodologie-ch3}
+    \caption{Organisation synthétique du backlog}
+    \label{tab:backlog-ch3}
     \rowcolors{2}{white}{white}
     \arrayrulecolor{black}
 \end{table}
 
-\subsection{Démarche itérative du produit}
+La priorité des travaux a été déterminée principalement par l'ordre des dépendances techniques, le niveau de risque, la présence de défauts bloquants et les jalons de démonstration. Les retours des référents, de l'expert technique et de la direction ont également influencé les ajustements du backlog. Ces décisions ont été traduites en tickets, corrections et changements de priorité au fil des itérations.
 
-L'évolution de la Migration Factory n'a pas suivi une implémentation monolithique. Une première version Java/Spring Boot a permis de valider le cycle principal. Les itérations suivantes ont introduit la persistance, les gates, la flexibilité des profils, la réparation, l'assistant, le reporting et l'amélioration du cockpit. Le système Angular a ensuite été développé dans un dépôt indépendant en reprenant les principes de gouvernance et d'isolation adaptés à son propre écosystème.
+\subsection{Application de Scrum}
 
-La chronologie détaillée des versions, des ajouts techniques et des corrections sera présentée dans le Chapitre V, consacré à la réalisation et à la démonstration.
+Le projet a été conduit selon une démarche Agile inspirée de Scrum, avec des sprints de deux semaines. Le Scrum Guide organise l'inspection et l'adaptation autour du Sprint Planning, du Daily Scrum, de la Sprint Review et de la Sprint Retrospective.\footnote{Ken Schwaber et Jeff Sutherland, \textit{The Scrum Guide}, novembre 2020, \url{https://scrumguides.org/scrum-guide.html}.}
+
+Dans le projet, le Sprint Planning permettait de sélectionner les tâches prioritaires et de tenir compte des dépendances. Le Daily Scrum servait à partager l'avancement et les blocages. Les revues et démonstrations étaient organisées avec les experts techniques et les responsables de CGI afin de présenter les incréments et de recueillir leurs observations. La rétrospective restait interne à l'équipe et visait à améliorer l'organisation du sprint suivant.
+
+Jira a été utilisé pour le backlog et le suivi des tickets, Microsoft Teams pour les échanges et les réunions, GitHub pour le versionnement et les revues, et Confluence pour la documentation. La chronologie détaillée des versions et des évolutions techniques sera présentée au Chapitre V.
 
 % ============================================================
-\section{Critères de validation et définition de terminé}
+\section{Critères de validation}
 % ============================================================
 
-Une fonctionnalité n'est pas considérée comme terminée uniquement parce que son code a été écrit. La définition de terminé utilisée dans le projet repose sur plusieurs niveaux de vérification :
+Une fonctionnalité n'était pas considérée comme terminée sur la seule base de son implémentation. Sa validation reposait sur les éléments suivants :
 
 \begin{itemize}
-    \item implémentation liée à un besoin ou à un ticket identifié ;
+    \item rattachement à un besoin ou à un ticket identifié ;
     \item revue du changement avant intégration ;
-    \item réussite des tests unitaires et des tests d'intégration concernés ;
-    \item réussite du type checking frontend ;
-    \item réussite du build frontend lorsque la modification affecte l'interface ;
-    \item intégration dans le workflow réel et non dans un chemin uniquement simulé ;
-    \item documentation ou mise à jour du runbook lorsque nécessaire ;
+    \item réussite des tests unitaires et d'intégration concernés ;
+    \item vérification statique des types et construction du frontend lorsque celui-ci était modifié ;
+    \item intégration dans le processus réel de migration ;
+    \item mise à jour de la documentation ou du guide d'exploitation lorsque nécessaire ;
     \item démonstration sur un scénario représentatif et prise en compte des retours.
 \end{itemize}
 
-Le dépôt fournit des suites de tests backend et frontend, des tests d'intégration utilisant une base SQLite réelle et un filesystem temporaire, ainsi que des commandes de typecheck et de build. En revanche, aucune chaîne CI GitHub Actions n'est actuellement configurée et aucun outil de lint global n'est formalisé. Le scénario Maven avec outils et modèles réels reste principalement validé au moyen de tests manuels et de procédures UAT.
+Le dépôt contient des suites de tests backend et frontend, des tests d'intégration utilisant une base SQLite réelle et un système de fichiers temporaire, ainsi que des commandes de vérification statique et de construction. En revanche, aucune chaîne d'intégration continue GitHub Actions ni aucun outil global d'analyse statique de conformité n'est actuellement configuré. Les essais Maven utilisant les outils et modèles réels restent principalement conduits au moyen de procédures manuelles et de scénarios d'acceptation.
 
-Il convient donc de distinguer :
-
-\begin{itemize}
-    \item \textbf{les preuves vérifiables dans le dépôt}, telles que les tests, scripts, branches, commits, pull requests, runbooks et documents de démonstration ;
-    \item \textbf{les faits confirmés par l'équipe}, tels que la cadence de deux semaines, la tenue des cérémonies, les démonstrations aux experts et les validations de la direction.
-\end{itemize}
+Il convient donc de distinguer les preuves visibles dans le dépôt, telles que les tests, les scripts, les commits, les demandes de fusion et les guides d'exploitation, des pratiques confirmées par l'équipe, comme la durée des sprints, la tenue des cérémonies et les validations réalisées lors des démonstrations.
 
 % ============================================================
-\section{Contraintes actuelles et évolutions attendues}
+\section{Contraintes du périmètre actuel}
 % ============================================================
 
-L'analyse fait apparaître plusieurs limites qui n'annulent pas la valeur du prototype, mais doivent être considérées avant une industrialisation :
+Le prototype répond aux besoins essentiels de migration et de contrôle, mais son périmètre actuel reste limité sur plusieurs points :
 
 \begin{itemize}
-    \item absence d'authentification, de comptes et de séparation des rôles ;
-    \item attribution encore imprécise de certaines décisions humaines ;
-    \item fonctionnement principalement local et orienté Windows ;
-    \item application Java fournie uniquement par chemin local ;
-    \item absence d'installation automatique des JDK et de Maven ;
-    \item reprise générique d'une phase échouée encore partielle ;
-    \item risques de concurrence sur certains démarrages ou exécutions simultanées ;
-    \item résultats d'alignement des dépendances non intégrés au rapport final ;
-    \item consommation de tokens encore incomplètement exposée ;
-    \item différences déterministes non toujours persistées sous forme de patch ;
-    \item candidat de sandbox non exporté comme livrable applicatif complet ;
-    \item absence de CI, de lint formalisé et de déploiement de production ;
-    \item présence de chemins historiques ou désactivés qui devront être supprimés ou clarifiés ;
-    \item mécanisme de redaction efficace sur les motifs connus, mais ne garantissant pas la détection de tout secret arbitraire présent dans le code.
+    \item il fonctionne comme un outil local sans authentification ni séparation des rôles ;
+    \item l'environnement d'exécution est principalement orienté Windows ;
+    \item l'application Java est fournie uniquement par un chemin local ;
+    \item les JDK et Maven doivent être installés et configurés avant le lancement ;
+    \item la reprise générique d'une phase et la maîtrise de certaines exécutions concurrentes restent partielles ;
+    \item aucune chaîne d'intégration continue ni aucun déploiement de production ne sont inclus dans la version actuelle.
 \end{itemize}
 
-Ces limites permettent de définir les évolutions prioritaires : gestion multi-utilisateur, RBAC, attribution forte des décisions, amélioration de la concurrence, automatisation CI, consolidation du reporting, portabilité, export sécurisé des candidats et renforcement de la confidentialité des contextes LLM.
+Les limites détaillées, leur impact sur les résultats et les perspectives d'industrialisation seront reprises dans le Chapitre VI. Elles concernent notamment la gestion multi-utilisateur, le passage à l'échelle, la consolidation du reporting, l'export des candidats migrés et le renforcement de la confidentialité des contextes transmis aux modèles.
 
 % ============================================================
 \section*{Conclusion}
 \addcontentsline{toc}{section}{Conclusion}
 
-Ce chapitre a transformé la problématique de migration en besoins structurés et vérifiables. L'utilisateur principal est le développeur chargé de la migration, accompagné par les parties prenantes fonctionnelles, techniques et managériales du projet. Les exigences couvrent la configuration, l'analyse, la planification, les transformations, la validation, la réparation, le pilotage et le reporting, tout en imposant des propriétés de sécurité, d'isolation, de traçabilité et de gouvernance.
+Ce chapitre a traduit la problématique de modernisation en exigences fonctionnelles et non fonctionnelles adaptées au contexte de la Migration Factory. L'utilisateur principal est le développeur chargé de la migration, tandis que les référents fonctionnels, l'expert technique et la direction interviennent dans le suivi et les validations du projet.
 
-L'étude montre que l'objectif n'est pas de confier la migration à un modèle autonome. Le système associe une autorité déterministe, des capacités d'assistance intelligente et des décisions humaines liées à des preuves. La démarche Agile Scrum, organisée en sprints de deux semaines et soutenue par Jira, Teams, GitHub et Confluence, a permis de construire et d'ajuster progressivement cette approche.
+Les besoins identifiés couvrent la préparation, l'analyse, la planification, la transformation, la validation, la réparation et la restitution. Ils s'accompagnent de règles de confiance portant sur l'intégrité de la source, l'isolation des modifications, la traçabilité, la limitation de l'autorité des LLM et le maintien d'une décision humaine sur les opérations sensibles.
 
-Les besoins et règles définis dans ce chapitre constituent désormais l'entrée du Chapitre IV, consacré à la conception, aux spécifications, aux diagrammes et à l'architecture détaillée des deux systèmes de migration.
+La démarche Agile Scrum a permis de faire évoluer progressivement la solution à partir de sprints de deux semaines, de démonstrations régulières et de retours successifs. Les exigences et règles présentées constituent désormais la base du Chapitre IV, consacré à la conception, aux spécifications et à l'architecture détaillée des deux systèmes de migration.
