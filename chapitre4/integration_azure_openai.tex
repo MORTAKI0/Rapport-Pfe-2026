@@ -1,0 +1,85 @@
+% ============================================================
+\section{Choix d'Azure OpenAI et configuration des modèles du client}
+% ============================================================
+
+Le choix d'Azure OpenAI répond à l'environnement technologique du client et à un objectif de gouvernance. La Migration Factory ne fournit pas un modèle imposé et ne code pas en dur un déploiement unique. Elle permet à CGI de connecter les modèles déjà déployés dans sa propre ressource Azure, puis d'associer un déploiement à chaque responsabilité agentique.
+
+Cette approche peut être décrite comme un principe d'\textit{apport de ses propres déploiements Azure} (\textit{Bring Your Own Azure Model Deployments}). L'organisation conserve la maîtrise de la ressource, des modèles, des capacités et des autorisations ; la plateforme consomme uniquement l'endpoint, le mécanisme d'authentification et les noms des déploiements configurés. Les appels Azure utilisent le nom du déploiement déclaré dans la ressource, et non uniquement le nom commercial du modèle \cite{azure-foundry-endpoints}.
+
+\subsection{Configuration observée dans la déclinaison Java}
+
+L'audit du dépôt Java confirme une configuration externalisée par variables d'environnement. Les agents ne reçoivent pas directement ces valeurs ; elles sont lues par les composants backend responsables du routage et du transport.
+
+\begin{table}[H]
+    \centering
+    \scriptsize
+    \arrayrulecolor{cgigray}
+    \rowcolors{2}{cgilight!55}{white}
+    \begin{tabularx}{\textwidth}{|>{\bfseries\RaggedRight\arraybackslash}p{4.2cm}|>{\RaggedRight\arraybackslash}p{4.1cm}|>{\RaggedRight\arraybackslash}X|}
+        \hline
+        \rowcolor{cgilight!95}
+        \textbf{Variable} & \textbf{Valeur fournie} & \textbf{Usage} \\
+        \hline
+        \texttt{AZURE\_OPENAI\_ENDPOINT} & URL de la ressource Azure & Point d'accès utilisé par le client backend. \\
+        \hline
+        \texttt{AZURE\_OPENAI\_API\_KEY} & Clé secrète de la ressource & Authentification effectivement utilisée dans le runtime observé. \\
+        \hline
+        \texttt{AZURE\_OPENAI\_PROPOSER\_DEPLOYMENT} & Nom du déploiement proposeur & Génération des propositions ou correctifs candidats. \\
+        \hline
+        \texttt{AZURE\_OPENAI\_REVIEWER\_DEPLOYMENT} & Nom du déploiement réviseur & Évaluation indépendante et consolidation des sorties. \\
+        \hline
+        \texttt{AZURE\_OPENAI\_ASSISTANT\_DEPLOYMENT} & Nom du déploiement assistant & Réponses conversationnelles contextualisées. \\
+        \hline
+        \texttt{AZURE\_OPENAI\_FALLBACK\_DEPLOYMENT} & Nom optionnel d'un déploiement de secours & Continuité contrôlée lorsque le rôle principal n'est pas disponible et que le secours est activé. \\
+        \hline
+    \end{tabularx}
+    \caption{Configuration Azure OpenAI externalisée dans le système Java}
+    \label{tab:configuration-azure-ch4}
+    \rowcolors{2}{white}{white}
+    \arrayrulecolor{black}
+\end{table}
+
+Le routeur sélectionne le déploiement correspondant au rôle demandé. Les tests du dépôt vérifient notamment l'utilisation du déploiement configuré pour le proposeur ou le réviseur, l'absence de sélection silencieuse lorsqu'une valeur manque et le comportement du secours optionnel.
+
+\subsection{Chaîne d'appel et contrôle préalable}
+
+\begin{figure}[H]
+    \centering
+    \resizebox{0.96\textwidth}{!}{%
+    \begin{tikzpicture}[
+        box/.style={draw=cgiblue,rounded corners=3pt,fill=cgilight!55,text width=3.3cm,minimum height=1.15cm,align=center,font=\scriptsize\bfseries},
+        secret/.style={draw=cgired,rounded corners=3pt,fill=white,text width=3.3cm,minimum height=1.15cm,align=center,font=\scriptsize\bfseries},
+        arr/.style={-{Latex[length=2mm]},thick,draw=cgigray}
+    ]
+        \node[secret] (env) {Variables d'environnement\\endpoint, clé et déploiements};
+        \node[box,right=0.35cm of env] (settings) {Configuration backend\\projection non sensible};
+        \node[box,right=0.35cm of settings] (smoke) {Contrôle préalable\\endpoint, clé, déploiement};
+        \node[box,right=0.35cm of smoke] (router) {Routeur par rôle\\proposeur, réviseur, assistant};
+        \node[box,right=0.35cm of router] (client) {Client Azure OpenAI\\transport et reprises};
+        \node[box,below=1.0cm of client] (validation) {Validation de schéma\\redaction et statut};
+        \draw[arr] (env)--(settings);
+        \draw[arr] (settings)--(smoke);
+        \draw[arr] (smoke)--(router);
+        \draw[arr] (router)--(client);
+        \draw[arr] (client)--(validation);
+    \end{tikzpicture}%
+    }
+    \caption{Chaîne d'appel Azure OpenAI dans le backend Java}
+    \label{fig:chaine-appel-azure-ch4}
+\end{figure}
+
+Le client met en œuvre un appel de contrôle réel pour vérifier l'endpoint, la présence de la clé et le déploiement assistant avant d'annoncer que la configuration est disponible. Les appels de production conservent le rôle, le déploiement utilisé, le statut, les informations de reprise et certains identifiants de diagnostic Azure. Les sorties structurées peuvent être validées par schéma ; une incompatibilité entraîne une fermeture contrôlée plutôt qu'une progression silencieuse.
+
+\subsection{Protection des informations sensibles}
+
+La configuration backend est conçue pour ne pas exposer l'URL complète, la clé, les identifiants de déploiement ou les prompts bruts dans les projections publiques. L'interface reçoit des références de variables, des indicateurs de disponibilité, des rôles et des états de santé. Les mécanismes de redaction nettoient également les résumés d'erreur avant leur affichage.
+
+L'authentification par clé API correspond à l'état réellement observé. Pour une industrialisation, Microsoft Entra ID et les identités managées permettraient une connexion sans clé et éviteraient la gestion directe d'un secret applicatif \cite{azure-openai-auth,azure-entra-auth}. Lorsque des secrets restent nécessaires, Azure Key Vault fournit un magasin centralisé et des mécanismes de rotation et de contrôle d'accès \cite{azure-key-vault-secrets}.
+
+Il convient donc de distinguer :
+
+\begin{itemize}
+    \item \textbf{état implémenté :} endpoint, clé API et déploiements nommés externalisés dans le backend Java ;
+    \item \textbf{cible d'industrialisation :} Microsoft Entra ID, identité managée, coffre de secrets, rotation et politiques d'accès ;
+    \item \textbf{cas Angular :} même orientation fonctionnelle envisagée, mais fournisseur effectif à confirmer par l'audit de la version Angular concernée.
+\end{itemize}
