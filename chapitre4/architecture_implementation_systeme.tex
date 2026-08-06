@@ -3,7 +3,7 @@
 \section*{Introduction}
 \addcontentsline{toc}{section}{Introduction}
 
-Le chapitre précédent a défini le modèle multi-agents, les responsabilités et les limites d'autorité. Le présent chapitre décrit la mise en œuvre concrète des deux systèmes de la Migration Factory : environnement technique, organisation des dépôts, agents, orchestrateur, backend, persistance, interface, sécurité et difficultés rencontrées.
+Le chapitre précédent a défini le modèle multi-agents, les responsabilités et les limites d'autorité. Le présent chapitre décrit la mise en œuvre concrète des deux systèmes de la Migration Factory : environnement technique, évolution du prototype Java, organisation des dépôts, agents, orchestrateur, backend, persistance, interface, sécurité et difficultés rencontrées.
 
 Les deux déclinaisons ne possèdent pas le même niveau de maturité. Java/Spring Boot constitue la référence la plus avancée, avec un processus complet, une réparation gouvernée, un assistant et un reporting. Angular est en développement actif : les agents principaux sont implémentés et l'intégration du parcours de bout en bout est en cours. Le texte distingue donc les fonctionnalités validées, partielles et planifiées.
 
@@ -56,7 +56,100 @@ La source Java est fournie par un chemin local. Le système vérifie le projet, 
 
 La chaîne Angular mobilise Node.js, npm, Angular CLI, TypeScript et RxJS. La matrice officielle Angular relie chaque version à des plages compatibles de Node.js, TypeScript et RxJS \cite{angular-versions}. L'installation, la construction et les tests utilisent les cibles du projet \cite{angular-cli-build,angular-cli-test}.
 
-L'entrée prévue est un paquet ZIP contenant l'application source. Le backend crée un snapshot en lecture seule, puis prépare un espace de stage en excluant \texttt{node\_modules}, \texttt{dist}, les caches, les couvertures et les sorties régénérables. Cette formulation remplace l'ancienne ambiguïté entre chemin local et paquet préparé.
+L'entrée prévue est un paquet ZIP contenant l'application source. Le backend crée un snapshot en lecture seule, puis prépare un espace de stage en excluant \texttt{node\_modules}, \texttt{dist}, les caches, les couvertures et les sorties régénérables.
+
+% ============================================================
+\section{Évolution technique de la solution Java/Spring Boot}
+% ============================================================
+
+L'architecture actuelle résulte de plusieurs incréments successifs. Cette évolution permet de relier les choix techniques aux limites constatées lors des démonstrations.
+
+\subsection{Première version : preuve de concept en ligne de commande}
+
+La première version opérationnelle était principalement utilisée en ligne de commande. Elle associait des scripts de lancement, des agents d'analyse et de planification, des transformations, l'exécution de Maven, l'analyse des tests et la génération d'artefacts. Cette version a validé le principe d'une migration progressive exécutée dans un espace isolé.
+
+La démonstration du 25 mai 2026 a confirmé la faisabilité technique du workflow. Ses limites étaient surtout liées au pilotage : l'utilisateur devait suivre plusieurs commandes, parcourir les artefacts et reconstruire mentalement l'état global de la migration.
+
+\subsection{Consolidation du prototype CLI}
+
+Entre le 25 mai et le 3 juin, le workflow a été corrigé et stabilisé. Les sorties ont été enrichies, le scénario de démonstration a été mieux maîtrisé et plusieurs contrôles ont été renforcés. La deuxième démonstration, réalisée le 3 juin devant une audience CGI élargie incluant davantage de responsables et directeurs, a présenté cette version consolidée.
+
+Cette étape n'a pas encore introduit la Control Tower complète. Elle a surtout validé la robustesse croissante du prototype et confirmé l'intérêt de construire une interface de pilotage.
+
+\subsection{Passage à la Control Tower full stack}
+
+La troisième étape a transformé la preuve de concept en plateforme. Un backend FastAPI a centralisé les API, les transitions, la persistance et les projections. SQLite a conservé les migrations, stages, commandes, événements et décisions. Un frontend React/Next.js a fourni un cockpit, tandis qu'un chatbot contextualisé a permis d'expliquer l'état courant.
+
+La démonstration du 19 juin 2026 a présenté cette Control Tower full stack : backend, frontend, persistance, pipeline, points de décision, journaux et assistant. Cette version a déplacé le projet d'une logique d'outil technique vers une logique de plateforme de migration.
+
+\subsection{Consolidation de la V1 gouvernée}
+
+Les travaux engagés à partir du 20 juin préparent une V1 prévue pour septembre 2026. Ils portent sur :
+
+\begin{itemize}
+    \item un nouveau frontend améliorant la visualisation du workflow et des preuves ;
+    \item une boucle de réparation séparant le proposeur et l'agent de révision ;
+    \item une approbation humaine liée à l'empreinte exacte du correctif ;
+    \item une application déterministe dans un espace isolé ;
+    \item une nouvelle compilation et l'exécution des tests après chaque correctif ;
+    \item une amélioration des prompts, du contexte, des sorties structurées et de l'exploitation des LLM ;
+    \item un reporting enrichi et une meilleure observation de la consommation des modèles.
+\end{itemize}
+
+Cette quatrième étape est encore en cours à la date de référence du rapport ; elle ne doit donc pas être présentée comme une démonstration déjà réalisée.
+
+\begin{figure}[H]
+    \centering
+    \resizebox{0.98\textwidth}{!}{%
+    \begin{tikzpicture}[
+        box/.style={draw=cgiblue,rounded corners=3pt,fill=cgilight!55,text width=3.2cm,minimum height=1.25cm,align=center,font=\scriptsize\bfseries},
+        future/.style={draw=cgired,rounded corners=3pt,fill=white,text width=3.2cm,minimum height=1.25cm,align=center,font=\scriptsize\bfseries},
+        arr/.style={-{Latex[length=2mm]},thick,draw=cgigray}
+    ]
+        \node[box] (cli1) {Prototype CLI\\analyse, plan, Maven};
+        \node[box,right=0.35cm of cli1] (cli2) {CLI consolidée\\contrôles et sorties};
+        \node[box,right=0.35cm of cli2] (api) {Backend FastAPI\\SQLite et événements};
+        \node[box,right=0.35cm of api] (ui) {Control Tower\\frontend et chatbot};
+        \node[future,right=0.35cm of ui] (v1) {V1 gouvernée\\nouveau frontend et réparation};
+        \draw[arr] (cli1)--(cli2);
+        \draw[arr] (cli2)--(api);
+        \draw[arr] (api)--(ui);
+        \draw[arr] (ui)--(v1);
+    \end{tikzpicture}%
+    }
+    \caption{Évolution technique de la solution Java/Spring Boot}
+    \label{fig:evolution-technique-java-ch4}
+\end{figure}
+
+\scriptsize
+\begin{table}[H]
+    \centering
+    \arrayrulecolor{cgigray}
+    \begin{tabularx}{\textwidth}{|>{\bfseries\RaggedRight\arraybackslash}p{2.4cm}|>{\RaggedRight\arraybackslash}p{3cm}|>{\RaggedRight\arraybackslash}p{3cm}|>{\RaggedRight\arraybackslash}p{3cm}|>{\RaggedRight\arraybackslash}X|}
+        \hline
+        \rowcolor{cgilight!95}
+        \textbf{Dimension} & \textbf{J1 -- 25 mai} & \textbf{J2 -- 3 juin} & \textbf{J3 -- 19 juin} & \textbf{J4 -- septembre} \\
+        \hline
+        Interface & Ligne de commande & CLI améliorée & Frontend web & Nouveau frontend \\
+        \hline
+        Backend & Workflow local & Workflow stabilisé & FastAPI et SQLite & Services consolidés \\
+        \hline
+        Assistant & Non intégré & Assistance limitée & Chatbot contextualisé & Assistant enrichi \\
+        \hline
+        Réparation & Correction manuelle & Diagnostic amélioré & Premiers composants & Boucle gouvernée complète \\
+        \hline
+        LLM & Premiers agents & Agents consolidés & Agents intégrés à la plateforme & Contexte et sorties renforcés \\
+        \hline
+        Validation & Maven et tests & Scénario consolidé & Pilotage full stack & Revalidation après correctif \\
+        \hline
+        Statut & Réalisé & Réalisé & Réalisé & Planifié \\
+        \hline
+    \end{tabularx}
+    \caption{Comparaison des principaux incréments Java/Spring Boot}
+    \label{tab:comparaison-demos-java-ch4}
+    \arrayrulecolor{black}
+\end{table}
+\normalsize
 
 % ============================================================
 \section{Structure simplifiée des dépôts}
@@ -429,38 +522,60 @@ Le cockpit présente le résumé, le pipeline, le stage sélectionné, l'analyse
 
 \begin{figure}[H]
     \centering
-    \IfFileExists{figures/chapitre4/cockpit-java.png}{%
-        \includegraphics[width=0.96\textwidth]{figures/chapitre4/cockpit-java.png}%
+    \IfFileExists{figures/chapitre4/java-demo1-cli.png}{%
+        \includegraphics[width=0.96\textwidth]{figures/chapitre4/java-demo1-cli.png}%
     }{%
-        \fbox{\parbox[c][5.2cm][c]{0.9\textwidth}{\centering\bfseries Capture réelle à intégrer : cockpit Java/Spring Boot\\\normalfont Vue d'ensemble, pipeline, blocage actif et action suivante.}}%
+        \fbox{\parbox[c][4.6cm][c]{0.9\textwidth}{\centering\bfseries Capture historique à intégrer : Java J1\\\normalfont Première démonstration de la solution CLI du 25 mai 2026.}}%
     }
-    \caption{Cockpit Java/Spring Boot}
-    \label{fig:capture-cockpit-java-ch4}
+    \caption{Première version Java/Spring Boot utilisée en ligne de commande}
+    \label{fig:capture-java-demo1-ch4}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \IfFileExists{figures/chapitre4/reparation-java.png}{%
-        \includegraphics[width=0.96\textwidth]{figures/chapitre4/reparation-java.png}%
+    \IfFileExists{figures/chapitre4/java-demo3-control-tower.png}{%
+        \includegraphics[width=0.96\textwidth]{figures/chapitre4/java-demo3-control-tower.png}%
     }{%
-        \fbox{\parbox[c][5.2cm][c]{0.9\textwidth}{\centering\bfseries Capture réelle à intégrer : réparation gouvernée\\\normalfont Erreur, proposition, révision, décision et résultat de revalidation.}}%
+        \fbox{\parbox[c][5cm][c]{0.9\textwidth}{\centering\bfseries Capture réelle à intégrer : Java J3\\\normalfont Control Tower full stack présentée le 19 juin 2026.}}%
     }
-    \caption{Écran de réparation gouvernée}
+    \caption{Control Tower Java/Spring Boot}
+    \label{fig:capture-control-tower-java-ch4}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \IfFileExists{figures/chapitre4/java-demo3-chatbot.png}{%
+        \includegraphics[width=0.96\textwidth]{figures/chapitre4/java-demo3-chatbot.png}%
+    }{%
+        \fbox{\parbox[c][5cm][c]{0.9\textwidth}{\centering\bfseries Capture réelle à intégrer : chatbot Java\\\normalfont Assistant contextualisé présenté dans la plateforme full stack.}}%
+    }
+    \caption{Assistant conversationnel de la Control Tower}
+    \label{fig:capture-chatbot-java-ch4}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \IfFileExists{figures/chapitre4/java-v1-reparation.png}{%
+        \includegraphics[width=0.96\textwidth]{figures/chapitre4/java-v1-reparation.png}%
+    }{%
+        \fbox{\parbox[c][5cm][c]{0.9\textwidth}{\centering\bfseries Capture future à intégrer : réparation gouvernée\\\normalfont Proposition, révision, décision et résultat de revalidation de la V1.}}%
+    }
+    \caption{Écran de réparation gouvernée de la V1 Java}
     \label{fig:capture-reparation-java-ch4}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \IfFileExists{figures/chapitre4/cockpit-angular.png}{%
-        \includegraphics[width=0.96\textwidth]{figures/chapitre4/cockpit-angular.png}%
+    \IfFileExists{figures/chapitre4/angular-demo-a1.png}{%
+        \includegraphics[width=0.96\textwidth]{figures/chapitre4/angular-demo-a1.png}%
     }{%
-        \fbox{\parbox[c][5.2cm][c]{0.9\textwidth}{\centering\bfseries Capture réelle à intégrer : cockpit Angular\\\normalfont Analyse, planification, stage, commandes et événements disponibles.}}%
+        \fbox{\parbox[c][5cm][c]{0.9\textwidth}{\centering\bfseries Capture planifiée : démonstration Angular A1\\\normalfont Première version Angular 18--21 prévue le 11 août 2026.}}%
     }
-    \caption{Cockpit Angular en cours d'intégration}
-    \label{fig:capture-cockpit-angular-ch4}
+    \caption{Première démonstration d'avancement Angular}
+    \label{fig:capture-angular-a1-ch4}
 \end{figure}
 
-Ces emplacements compilent sans image et rendent explicites les preuves visuelles encore à fournir. Aucune capture fictive n'est présentée comme résultat.
+Ces emplacements rendent explicites les preuves visuelles encore à fournir. Aucune capture fictive n'est présentée comme résultat.
 
 % ============================================================
 \section{Authentification, sécurité et limites d'exploitation}
@@ -470,7 +585,7 @@ Les prototypes ne comportent pas d'authentification, de comptes ou de contrôle 
 
 Une industrialisation devra ajouter authentification forte, rôles, autorisation par action, sessions, révocation et journal d'audit attribuable. Ces évolutions sont cohérentes avec les principes de gestion de la sécurité d'ISO/IEC 27001 \cite{iso27001}.
 
-Les contextes LLM sont bornés et nettoyés. La redaction demeure fondée sur des règles et ne garantit pas la détection de toute valeur sensible intégrée arbitrairement dans le code.
+Les contextes LLM sont bornés et nettoyés. La rédaction demeure fondée sur des règles et ne garantit pas la détection de toute valeur sensible intégrée arbitrairement dans le code.
 
 % ============================================================
 \section{Difficultés techniques et corrections}
@@ -518,6 +633,6 @@ Aucun des deux prototypes ne dispose actuellement d'une chaîne CI commune dans 
 \section*{Conclusion}
 \addcontentsline{toc}{section}{Conclusion}
 
-Ce chapitre a décrit l'implémentation en distinguant les agents intelligents des services déterministes. Les fiches uniformes précisent les entrées, traitements, sorties, exemples, autorités et limites. Les contrats simplifiés, les preuves d'intégration et les difficultés techniques renforcent le caractère concret de la réalisation.
+Ce chapitre a décrit l'implémentation en distinguant les agents intelligents des services déterministes. Il a également montré que l'architecture actuelle résulte d'une évolution progressive : prototype CLI, consolidation, passage à la Control Tower full stack et préparation d'une V1 gouvernée.
 
-Les captures réelles doivent encore être déposées dans les chemins indiqués ; le rapport ne les remplace pas par des illustrations fictives. Le chapitre suivant évalue les résultats disponibles, la qualité du système, les limites de mesure et les perspectives.
+Les fiches uniformes précisent les entrées, traitements, sorties, exemples, autorités et limites. Les contrats simplifiés, les preuves d'intégration et les difficultés techniques renforcent le caractère concret de la réalisation. Le chapitre suivant formalise les démonstrations réalisées ou planifiées et évalue les résultats disponibles, la qualité du système, les limites de mesure et les perspectives.
