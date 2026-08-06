@@ -1,0 +1,523 @@
+\chapter{Architecture et implémentation du système}
+
+\section*{Introduction}
+\addcontentsline{toc}{section}{Introduction}
+
+Le chapitre précédent a défini le modèle multi-agents, les responsabilités et les limites d'autorité. Le présent chapitre décrit la mise en œuvre concrète des deux systèmes de la Migration Factory : environnement technique, organisation des dépôts, agents, orchestrateur, backend, persistance, interface, sécurité et difficultés rencontrées.
+
+Les deux déclinaisons ne possèdent pas le même niveau de maturité. Java/Spring Boot constitue la référence la plus avancée, avec un processus complet, une réparation gouvernée, un assistant et un reporting. Angular est en développement actif : les agents principaux sont implémentés et l'intégration du parcours de bout en bout est en cours. Le texte distingue donc les fonctionnalités validées, partielles et planifiées.
+
+% ============================================================
+\section{Environnement technique}
+% ============================================================
+
+\subsection{Technologies communes}
+
+\begin{table}[H]
+    \centering
+    \small
+    \arrayrulecolor{cgigray}
+    \rowcolors{2}{cgilight!55}{white}
+    \begin{tabularx}{\textwidth}{|>{\bfseries\RaggedRight\arraybackslash}p{3.7cm}|>{\RaggedRight\arraybackslash}p{4.3cm}|>{\RaggedRight\arraybackslash}X|}
+        \hline
+        \rowcolor{cgilight!95}
+        \textbf{Couche} & \textbf{Technologies} & \textbf{Rôle} \\
+        \hline
+        Interface & React et Next.js & Configuration, cockpit, décisions, assistant et rapports. \\
+        \hline
+        Backend & Python et FastAPI & API HTTP, schémas, services applicatifs et projections. \\
+        \hline
+        Orchestration & LangGraph & Graphe d'exécution, interruptions, reprises et routage. \\
+        \hline
+        Persistance & SQLite et artefacts sur disque & États, événements, décisions, commandes, journaux et rapports. \\
+        \hline
+        Intelligence & Modèles et fournisseurs configurés selon le dépôt et le rôle & Analyse, planification, révision, réparation et assistance. \\
+        \hline
+        Collaboration & GitHub, Jira, Teams et Confluence & Versionnement, backlog, échanges et documentation. \\
+        \hline
+    \end{tabularx}
+    \caption{Technologies communes aux deux systèmes}
+    \label{tab:technologies-communes-ch4}
+    \rowcolors{2}{white}{white}
+    \arrayrulecolor{black}
+\end{table}
+
+Le rapport ne présente pas Azure OpenAI comme fournisseur commun aux deux dépôts. L'audit Java a confirmé son utilisation dans le runtime observé ; la configuration Angular reste décrite de manière générique tant que son fournisseur courant n'est pas établi par une preuve de code récente.
+
+FastAPI fournit les routes, la validation et l'injection de dépendances \cite{fastapi-dependencies}. LangGraph coordonne les étapes avec état et checkpoints \cite{langgraph-persistence}. SQLite reste adapté au périmètre local ; le mode WAL réduit certains blocages entre lecteurs et écrivain \cite{sqlite-wal}.
+
+\subsection{Environnement Java/Spring Boot}
+
+La chaîne Java mobilise JDK 11, 17 et 21, Maven, des profils Spring Boot et OpenRewrite. Les recettes OpenRewrite sont composables et doivent s'abstenir lorsqu'elles ne peuvent pas établir la sûreté d'une transformation \cite{openrewrite-recipes,openrewrite-best-practices}. Plusieurs scripts PowerShell facilitent le lancement et le diagnostic sous Windows.
+
+La source Java est fournie par un chemin local. Le système vérifie le projet, les JDK, Maven, le profil de migration et le répertoire de sortie avant la création de l'exécution.
+
+\subsection{Environnement Angular}
+
+La chaîne Angular mobilise Node.js, npm, Angular CLI, TypeScript et RxJS. La matrice officielle Angular relie chaque version à des plages compatibles de Node.js, TypeScript et RxJS \cite{angular-versions}. L'installation, la construction et les tests utilisent les cibles du projet \cite{angular-cli-build,angular-cli-test}.
+
+L'entrée prévue est un paquet ZIP contenant l'application source. Le backend crée un snapshot en lecture seule, puis prépare un espace de stage en excluant \texttt{node\_modules}, \texttt{dist}, les caches, les couvertures et les sorties régénérables. Cette formulation remplace l'ancienne ambiguïté entre chemin local et paquet préparé.
+
+% ============================================================
+\section{Structure simplifiée des dépôts}
+% ============================================================
+
+Les arbres suivants représentent une vue simplifiée, et non la liste exhaustive de tous les dossiers.
+
+\subsection{Dépôt Java/Spring Boot}
+
+\begin{verbatim}
+migration-factory-java/
+|-- migration_factory/
+|   |-- control_tower/
+|   |   |-- adapters/fastapi/
+|   |   |-- application/
+|   |   |-- domain/
+|   |   `-- infrastructure/sqlite/
+|   |-- orchestrator/
+|   `-- agents/
+|-- web/control-tower/
+|-- tests/control_tower/
+|-- scripts/
+`-- docs/
+\end{verbatim}
+
+Le domaine et les services applicatifs sont séparés des adaptateurs HTTP et SQLite. Les agents sont isolés des composants d'exécution et ne pilotent pas directement le frontend.
+
+\subsection{Dépôt Angular}
+
+\begin{verbatim}
+angular-migration/
+|-- backend/
+|   |-- app/
+|   |   |-- domain/
+|   |   |-- services/
+|   |   |-- api/
+|   |   |-- infrastructure/
+|   |   `-- orchestration/
+|   `-- tests/
+|-- frontend/
+|-- goals/
+|-- artifacts/
+|-- scripts/
+`-- tests/
+\end{verbatim}
+
+Les deux dépôts partagent des principes et une terminologie, mais pas leurs services d'exécution. Cette séparation réduit le couplage entre Maven/JDK et npm/Node.js.
+
+\subsection{Déploiement local}
+
+\begin{figure}[H]
+    \centering
+    \resizebox{0.94\textwidth}{!}{%
+    \begin{tikzpicture}[
+        node/.style={draw=cgiblue,rounded corners=3pt,fill=cgilight!55,minimum width=4cm,minimum height=1.15cm,align=center,font=\small\bfseries},
+        store/.style={draw=cgigray,rounded corners=3pt,fill=white,minimum width=4cm,minimum height=1.15cm,align=center,font=\small\bfseries},
+        arr/.style={-{Latex[length=2mm]},thick,draw=cgigray}
+    ]
+        \node[node] (browser) {Navigateur\\cockpit local};
+        \node[node,right=1cm of browser] (frontend) {Serveur frontend\\Next.js};
+        \node[node,right=1cm of frontend] (backend) {Backend local\\FastAPI};
+        \node[store,below=1.1cm of backend] (db) {SQLite et artefacts};
+        \node[store,left=1cm of db] (workspace) {Espaces isolés\\et outils};
+        \node[store,right=1cm of db] (llm) {Fournisseur LLM\\externe};
+        \draw[arr] (browser)--(frontend);
+        \draw[arr] (frontend)--(backend);
+        \draw[arr] (backend)--(db);
+        \draw[arr] (backend)--(workspace);
+        \draw[arr] (backend)--(llm);
+    \end{tikzpicture}%
+    }
+    \caption{Déploiement local des prototypes}
+    \label{fig:deploiement-local-ch4}
+\end{figure}
+
+% ============================================================
+\section{Implémentation des agents}
+% ============================================================
+
+Chaque véritable agent est présenté selon le même format : objectif, entrées, traitement, sorties, scénario, autorité et limitations.
+
+\subsection{Agent d'analyse}
+
+\begin{table}[H]
+    \centering
+    \small
+    \begin{tabularx}{\textwidth}{|>{\bfseries\RaggedRight\arraybackslash}p{3.1cm}|>{\RaggedRight\arraybackslash}X|}
+        \hline
+        Objectif & Construire une représentation exploitable de l'application sans modifier la source. \\
+        \hline
+        Entrées & Snapshot, versions, manifestes, structure, configurations et profil. \\
+        \hline
+        Traitement & Inventaire déterministe, sélection d'extraits, raisonnement contextualisé et validation de schéma. \\
+        \hline
+        Sorties & Rapport d'analyse, risques, références et preuves. \\
+        \hline
+        Exemple & Détecter une version Spring Boot ancienne ou une incompatibilité Angular--Node.js. \\
+        \hline
+        Autorité & Lecture uniquement ; aucune commande ni écriture sur la source. \\
+        \hline
+        Limitations & Dépendances privées et configurations dynamiques peuvent nécessiter une information humaine. \\
+        \hline
+    \end{tabularx}
+    \caption{Fiche de l'agent d'analyse}
+    \label{tab:agent-analyse-ch4}
+\end{table}
+
+\subsection{Agent de révision de l'analyse}
+
+\begin{table}[H]
+    \centering
+    \small
+    \begin{tabularx}{\textwidth}{|>{\bfseries\RaggedRight\arraybackslash}p{3.1cm}|>{\RaggedRight\arraybackslash}X|}
+        \hline
+        Objectif & Vérifier couverture, cohérence et exploitabilité du rapport. \\
+        \hline
+        Entrées & Analyse, preuves, profil et règles d'acceptation. \\
+        \hline
+        Traitement & Comparaison des affirmations avec les preuves et détection des omissions. \\
+        \hline
+        Sorties & Acceptation, demande de révision ou rejet motivé. \\
+        \hline
+        Exemple & Refuser un rapport Angular qui ne relie pas Angular à Node.js et TypeScript. \\
+        \hline
+        Autorité & Ne lance aucune commande et ne modifie pas l'application. \\
+        \hline
+        Limitations & Sa qualité dépend des preuves disponibles et du schéma d'analyse. \\
+        \hline
+    \end{tabularx}
+    \caption{Fiche de l'agent de révision de l'analyse}
+    \label{tab:agent-review-analyse-ch4}
+\end{table}
+
+\subsection{Agent de planification}
+
+\begin{table}[H]
+    \centering
+    \small
+    \begin{tabularx}{\textwidth}{|>{\bfseries\RaggedRight\arraybackslash}p{3.1cm}|>{\RaggedRight\arraybackslash}X|}
+        \hline
+        Objectif & Décomposer la cible en stages, unités de travail et validations. \\
+        \hline
+        Entrées & Analyse validée, cible, catalogue de compatibilité et politiques. \\
+        \hline
+        Traitement & Sélection d'une trajectoire, ordonnancement et définition des critères de sortie. \\
+        \hline
+        Sorties & Plan versionné, dépendances, risques et points de validation. \\
+        \hline
+        Exemple & Construire Spring Boot 2.1 $\rightarrow$ 2.7 $\rightarrow$ 3.5 $\rightarrow$ 4.0. \\
+        \hline
+        Autorité & Ne transforme pas le projet ; le plan doit être révisé et approuvé. \\
+        \hline
+        Limitations & Dépend de la qualité de l'analyse et des profils disponibles. \\
+        \hline
+    \end{tabularx}
+    \caption{Fiche de l'agent de planification}
+    \label{tab:agent-planification-ch4}
+\end{table}
+
+\subsection{Agent de révision du plan}
+
+\begin{table}[H]
+    \centering
+    \small
+    \begin{tabularx}{\textwidth}{|>{\bfseries\RaggedRight\arraybackslash}p{3.1cm}|>{\RaggedRight\arraybackslash}X|}
+        \hline
+        Objectif & Contrôler l'ordre, les dépendances et les validations. \\
+        \hline
+        Entrées & Plan, analyse, trajectoire et contraintes. \\
+        \hline
+        Traitement & Vérification des prérequis et de la couverture des risques. \\
+        \hline
+        Sorties & Acceptation ou demande de nouvelle version. \\
+        \hline
+        Exemple & Refuser un saut Angular majeur non autorisé par la trajectoire. \\
+        \hline
+        Autorité & Aucune écriture sur le projet et aucune approbation humaine implicite. \\
+        \hline
+        Limitations & Ne peut pas prouver la réussite future d'une compilation. \\
+        \hline
+    \end{tabularx}
+    \caption{Fiche de l'agent de révision du plan}
+    \label{tab:agent-review-plan-ch4}
+\end{table}
+
+\subsection{Agent de transformation}
+
+\begin{table}[H]
+    \centering
+    \small
+    \begin{tabularx}{\textwidth}{|>{\bfseries\RaggedRight\arraybackslash}p{3.1cm}|>{\RaggedRight\arraybackslash}X|}
+        \hline
+        Objectif & Produire les changements candidats décrits par un plan approuvé. \\
+        \hline
+        Entrées & Plan, espace isolé, profil et règles de transformation. \\
+        \hline
+        Traitement & Transformations déterministes et génération de changements contextualisés. \\
+        \hline
+        Sorties & Fichiers modifiés, diff, métadonnées et preuves. \\
+        \hline
+        Exemple & Adapter dépendances, configuration Spring ou code TypeScript. \\
+        \hline
+        Autorité & Écriture limitée à l'espace isolé fourni par le backend. \\
+        \hline
+        Limitations & Les modifications restent candidates tant que compilation et tests ne réussissent pas. \\
+        \hline
+    \end{tabularx}
+    \caption{Fiche de l'agent de transformation}
+    \label{tab:agent-transformation-ch4}
+\end{table}
+
+\subsection{Proposeur de réparation}
+
+\begin{table}[H]
+    \centering
+    \small
+    \begin{tabularx}{\textwidth}{|>{\bfseries\RaggedRight\arraybackslash}p{3.1cm}|>{\RaggedRight\arraybackslash}X|}
+        \hline
+        Objectif & Générer un correctif candidat à partir d'un échec vérifié. \\
+        \hline
+        Entrées & Erreurs, commande, extraits, profil et état de l'espace isolé. \\
+        \hline
+        Traitement & Diagnostic, sélection des fichiers et production d'un diff structuré. \\
+        \hline
+        Sorties & Diff candidat, justification et fichiers concernés. \\
+        \hline
+        Exemple & Corriger une incompatibilité de compilation Java. \\
+        \hline
+        Autorité & Ne peut ni approuver ni appliquer. \\
+        \hline
+        Limitations & Le contexte borné peut omettre une dépendance indirecte. \\
+        \hline
+    \end{tabularx}
+    \caption{Fiche du proposeur de réparation}
+    \label{tab:agent-proposeur-reparation-ch4}
+\end{table}
+
+\subsection{Agent de révision de la réparation}
+
+\begin{table}[H]
+    \centering
+    \small
+    \begin{tabularx}{\textwidth}{|>{\bfseries\RaggedRight\arraybackslash}p{3.1cm}|>{\RaggedRight\arraybackslash}X|}
+        \hline
+        Objectif & Évaluer la proposition et produire, si nécessaire, un diff consolidé. \\
+        \hline
+        Entrées & Proposition, erreur, politiques et preuves. \\
+        \hline
+        Traitement & Contrôle de cohérence, risque, portée et applicabilité. \\
+        \hline
+        Sorties & Acceptation, rejet ou diff consolidé. \\
+        \hline
+        Exemple & Réduire un correctif trop large à la cause de l'échec. \\
+        \hline
+        Autorité & Ne peut pas appliquer ; l'humain décide sur la version exacte. \\
+        \hline
+        Limitations & Une sortie correcte en apparence peut encore échouer à la compilation. \\
+        \hline
+    \end{tabularx}
+    \caption{Fiche de l'agent de révision de la réparation}
+    \label{tab:agent-review-reparation-ch4}
+\end{table}
+
+\subsection{Assistant de migration}
+
+\begin{table}[H]
+    \centering
+    \small
+    \begin{tabularx}{\textwidth}{|>{\bfseries\RaggedRight\arraybackslash}p{3.1cm}|>{\RaggedRight\arraybackslash}X|}
+        \hline
+        Objectif & Expliquer l'état, les blocages et les actions possibles. \\
+        \hline
+        Entrées & Projection, événements, preuves autorisées et historique borné. \\
+        \hline
+        Traitement & Synthèse et réponse contextualisée en lecture seule. \\
+        \hline
+        Sorties & Explication, résumé ou recommandation d'action. \\
+        \hline
+        Exemple & Expliquer pourquoi une migration attend une approbation. \\
+        \hline
+        Autorité & Ne peut ni exécuter, ni approuver, ni modifier des fichiers. \\
+        \hline
+        Limitations & Une information absente de l'état ne doit pas être inventée. \\
+        \hline
+    \end{tabularx}
+    \caption{Fiche de l'assistant de migration}
+    \label{tab:agent-assistant-ch4}
+\end{table}
+
+% ============================================================
+\section{Services déterministes et orchestrateur}
+% ============================================================
+
+Le résolveur de profils, le service de transitions, l'exécuteur, les services de compilation et de tests, le stockage et le reporting ne sont pas des agents. Ils implémentent des règles vérifiables.
+
+Le frontend transmet une intention à l'API. Le backend valide le schéma, charge l'état et vérifie l'action. L'orchestrateur choisit ensuite le nœud autorisé. Les résultats sont persistés avant toute projection vers le cockpit.
+
+\begin{figure}[H]
+    \centering
+    \resizebox{\textwidth}{!}{%
+    \begin{tikzpicture}[
+        step/.style={draw=cgiblue,rounded corners=3pt,fill=cgilight!55,minimum width=2.75cm,minimum height=1cm,align=center,font=\small\bfseries},
+        gate/.style={draw=cgired,rounded corners=3pt,fill=white,minimum width=2.75cm,minimum height=1cm,align=center,font=\small\bfseries},
+        arr/.style={-{Latex[length=2mm]},thick,draw=cgigray}
+    ]
+        \node[step] (qualify) {Qualification};
+        \node[step,right=0.4cm of qualify] (analyse) {Analyse};
+        \node[step,right=0.4cm of analyse] (review) {Révision};
+        \node[step,right=0.4cm of review] (plan) {Planification};
+        \node[gate,right=0.4cm of plan] (approval) {Décision};
+        \node[step,right=0.4cm of approval] (transform) {Transformation};
+        \node[step,right=0.4cm of transform] (validate) {Validation};
+        \draw[arr] (qualify)--(analyse);
+        \draw[arr] (analyse)--(review);
+        \draw[arr] (review)--(plan);
+        \draw[arr] (plan)--(approval);
+        \draw[arr] (approval)--(transform);
+        \draw[arr] (transform)--(validate);
+    \end{tikzpicture}%
+    }
+    \caption{Séquencement principal implémenté par l'orchestrateur}
+    \label{fig:sequencement-orchestrateur-ch4}
+\end{figure}
+
+\subsection{Contrats techniques simplifiés}
+
+La représentation suivante illustre le contrat logique d'une décision. Les noms sont simplifiés pour le rapport ; ils ne constituent pas une copie exhaustive d'une route.
+
+\begin{verbatim}
+{
+  "run_id": "...",
+  "gate_id": "...",
+  "decision": "approve | reject | revise",
+  "expected_checksum": "sha256:...",
+  "idempotency_key": "..."
+}
+\end{verbatim}
+
+Un manifeste de commande contient de manière analogue l'exécutable, les arguments validés, le répertoire de travail, l'environnement matérialisé, le délai maximal et les identifiants de corrélation. L'interface ou un LLM ne transmet jamais une commande shell libre.
+
+% ============================================================
+\section{Backend, persistance et preuves}
+% ============================================================
+
+Les API couvrent configurations, prérequis, migrations, stages, décisions, réparations, événements, artefacts, assistant et rapports. Les schémas typés détectent les sorties incomplètes.
+
+Les entités principales sont Migration, Stage, Commande, Événement, Artefact, Point de validation, Décision, Proposition, Révision et Rapport. Les événements sont séquencés ; les artefacts conservent type, producteur, chemin et empreinte ; les commandes conservent état, durée, code de sortie et journaux.
+
+\begin{verbatim}
+run_<id>/
+|-- source_snapshot/
+|-- stages/
+|   |-- stage_01/workspace/
+|   |-- stage_01/analysis/
+|   |-- stage_01/planning/
+|   `-- stage_01/validation/
+|-- repairs/
+|-- logs/
+|-- evidence/
+`-- reports/
+\end{verbatim}
+
+La source externe n'est pas utilisée comme répertoire d'écriture. Le candidat validé d'un stage devient la base du suivant. Les décisions sensibles sont liées par SHA-256 à l'artefact examiné.
+
+% ============================================================
+\section{Interface, cockpit et captures}
+% ============================================================
+
+Le cockpit présente le résumé, le pipeline, le stage sélectionné, l'analyse, le plan, les points de validation, les commandes, les journaux, les événements, la réparation, l'assistant et les rapports. Le frontend projette l'état fourni par le backend ; il ne maintient pas une vérité parallèle.
+
+\begin{figure}[H]
+    \centering
+    \IfFileExists{figures/chapitre4/cockpit-java.png}{%
+        \includegraphics[width=0.96\textwidth]{figures/chapitre4/cockpit-java.png}%
+    }{%
+        \fbox{\parbox[c][5.2cm][c]{0.9\textwidth}{\centering\bfseries Capture réelle à intégrer : cockpit Java/Spring Boot\\\normalfont Vue d'ensemble, pipeline, blocage actif et action suivante.}}%
+    }
+    \caption{Cockpit Java/Spring Boot}
+    \label{fig:capture-cockpit-java-ch4}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \IfFileExists{figures/chapitre4/reparation-java.png}{%
+        \includegraphics[width=0.96\textwidth]{figures/chapitre4/reparation-java.png}%
+    }{%
+        \fbox{\parbox[c][5.2cm][c]{0.9\textwidth}{\centering\bfseries Capture réelle à intégrer : réparation gouvernée\\\normalfont Erreur, proposition, révision, décision et résultat de revalidation.}}%
+    }
+    \caption{Écran de réparation gouvernée}
+    \label{fig:capture-reparation-java-ch4}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \IfFileExists{figures/chapitre4/cockpit-angular.png}{%
+        \includegraphics[width=0.96\textwidth]{figures/chapitre4/cockpit-angular.png}%
+    }{%
+        \fbox{\parbox[c][5.2cm][c]{0.9\textwidth}{\centering\bfseries Capture réelle à intégrer : cockpit Angular\\\normalfont Analyse, planification, stage, commandes et événements disponibles.}}%
+    }
+    \caption{Cockpit Angular en cours d'intégration}
+    \label{fig:capture-cockpit-angular-ch4}
+\end{figure}
+
+Ces emplacements compilent sans image et rendent explicites les preuves visuelles encore à fournir. Aucune capture fictive n'est présentée comme résultat.
+
+% ============================================================
+\section{Authentification, sécurité et limites d'exploitation}
+% ============================================================
+
+Les prototypes ne comportent pas d'authentification, de comptes ou de contrôle d'accès par rôle. Le système Java limite l'API au poste local, contrôle l'origine de requêtes mutatives et utilise un identifiant client statique ; ces mécanismes ne constituent pas une identité fiable.
+
+Une industrialisation devra ajouter authentification forte, rôles, autorisation par action, sessions, révocation et journal d'audit attribuable. Ces évolutions sont cohérentes avec les principes de gestion de la sécurité d'ISO/IEC 27001 \cite{iso27001}.
+
+Les contextes LLM sont bornés et nettoyés. La redaction demeure fondée sur des règles et ne garantit pas la détection de toute valeur sensible intégrée arbitrairement dans le code.
+
+% ============================================================
+\section{Difficultés techniques et corrections}
+% ============================================================
+
+\begin{table}[H]
+    \centering
+    \small
+    \arrayrulecolor{cgigray}
+    \rowcolors{2}{cgilight!55}{white}
+    \begin{tabularx}{\textwidth}{|>{\bfseries\RaggedRight\arraybackslash}p{3.6cm}|>{\RaggedRight\arraybackslash}p{4.5cm}|>{\RaggedRight\arraybackslash}X|}
+        \hline
+        \rowcolor{cgilight!95}
+        \textbf{Difficulté} & \textbf{Cause} & \textbf{Correction} \\
+        \hline
+        Correctif non applicable & Fins de ligne, hunk ou état obsolète. & Diff structuré, normalisation, empreinte et contrôle d'applicabilité. \\
+        \hline
+        Autorité de commande ambiguë & Plusieurs composants pouvaient influencer l'exécution. & Manifeste autoritaire construit par le backend. \\
+        \hline
+        Profil Angular rejeté & Catalogue initial incompatible avec Node 22.23.1/npm 10.9.8. & Catalogue versionné et paire explicitement validée. \\
+        \hline
+        Base SQLite incohérente & Plusieurs têtes de migration ou mauvaise base active. & Identification de la base autoritaire et réconciliation Alembic. \\
+        \hline
+        Intégration frontend & Fusion de nouvelles vues et fonctions existantes. & Intégration progressive et comparaison au baseline. \\
+        \hline
+    \end{tabularx}
+    \caption{Principales difficultés et corrections}
+    \label{tab:difficultes-corrections-ch4}
+    \rowcolors{2}{white}{white}
+    \arrayrulecolor{black}
+\end{table}
+
+% ============================================================
+\section{Preuves techniques disponibles}
+% ============================================================
+
+Une campagne d'intégration Java liée au nouveau frontend et à l'assistant a produit 607 tests backend réussis et 4 ignorés. La vérification statique des types, l'analyse de conformité et la construction du frontend ont réussi. Les tests frontend comportaient 12 échecs au baseline et 11 après intégration ; cette comparaison a été utilisée pour distinguer les défauts préexistants d'une régression introduite.
+
+Ces valeurs ne représentent pas un benchmark global de la Migration Factory. Elles constituent une preuve ponctuelle d'intégration. Les scénarios Maven réels restent principalement exécutés manuellement ou en recette utilisateur.
+
+Pour Angular, une migration manuelle d'Angular 18 vers 20 a été réalisée afin de comprendre les transformations. Les agents d'analyse, de révision, de planification et de transformation sont développés. Le processus complet et ses métriques quantitatives restent en cours de validation.
+
+Aucun des deux prototypes ne dispose actuellement d'une chaîne CI commune dans le dépôt du produit. Il n'existe pas non plus de politique globale unique de lint couvrant toutes les couches. Ces limites sont reprises au Chapitre V.
+
+\section*{Conclusion}
+\addcontentsline{toc}{section}{Conclusion}
+
+Ce chapitre a décrit l'implémentation en distinguant les agents intelligents des services déterministes. Les fiches uniformes précisent les entrées, traitements, sorties, exemples, autorités et limites. Les contrats simplifiés, les preuves d'intégration et les difficultés techniques renforcent le caractère concret de la réalisation.
+
+Les captures réelles doivent encore être déposées dans les chemins indiqués ; le rapport ne les remplace pas par des illustrations fictives. Le chapitre suivant évalue les résultats disponibles, la qualité du système, les limites de mesure et les perspectives.
