@@ -1,0 +1,17 @@
+\chapter*{Conclusion générale}
+\addcontentsline{toc}{chapter}{Conclusion générale}
+\markboth{Conclusion générale}{Conclusion générale}
+
+Ce projet de fin d'études avait pour objectif de concevoir et de développer une Migration Factory capable d'assister des migrations logicielles complexes sans déléguer entièrement l'autorité à des modèles probabilistes. La solution retenue combine une orchestration persistante, des agents spécialisés, des services déterministes, des espaces de travail isolés, des preuves techniques et une supervision humaine.
+
+L'étude du processus manuel a montré que la difficulté d'une migration ne réside pas uniquement dans la modification du code. Elle concerne également la préparation des environnements, la compatibilité des versions, l'enchaînement des validations, le diagnostic des échecs et la conservation des décisions. Ces constats ont conduit à une architecture multi-agents hybride et centralement orchestrée.
+
+Le travail réalisé distingue clairement les agents intelligents des services déterministes. Les agents analysent, planifient, révisent, transforment ou proposent des réparations. Les services déterministes conservent l'autorité sur les états, les transitions, les profils, les commandes, les chemins, les écritures, les validations et les rapports. Le développeur reste responsable des décisions sensibles.
+
+La déclinaison Java/Spring Boot constitue le système le plus mature. Elle valide les principaux mécanismes du projet : trajectoires progressives, points de validation, isolation, compilation et tests, réparation gouvernée, cockpit, assistant et reporting. La déclinaison Angular montre que les principes peuvent être adaptés à un second écosystème, avec des profils Node.js/npm/TypeScript et des transformations propres au frontend. Son intégration complète et sa réparation restent toutefois à consolider.
+
+Les résultats disponibles confirment l'intérêt de la séparation entre raisonnement et exécution. Les états et preuves rendent le parcours plus observable, tandis que les empreintes et l'approbation humaine limitent l'application de résultats obsolètes ou non examinés. Néanmoins, l'évaluation quantitative demeure partielle. Les gains de temps, les taux de réussite, la consommation des modèles et le comportement sur un ensemble représentatif d'applications doivent encore être mesurés de manière reproductible.
+
+Les perspectives prioritaires concernent la finalisation du workflow Angular, l'instrumentation des métriques, l'ajout d'une authentification et de rôles, la mise en place d'une chaîne d'intégration continue, l'amélioration de la portabilité et la constitution d'un corpus de projets de test. À plus long terme, les réparations validées pourraient être capitalisées sous forme de règles déterministes réutilisables, et de nouveaux profils pourraient étendre la démarche à d'autres frameworks.
+
+La contribution principale du projet réside ainsi dans une approche gouvernée de l'automatisation : les agents accélèrent l'analyse et la proposition, mais les mécanismes déterministes et le développeur conservent le contrôle de l'exécution. Cette organisation constitue une base crédible pour poursuivre l'industrialisation d'une plateforme générale de migration logicielle.
