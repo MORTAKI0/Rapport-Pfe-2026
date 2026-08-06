@@ -6,15 +6,15 @@ Les systèmes logiciels constituent un patrimoine stratégique pour les organisa
 
 Une migration logicielle ne se limite pas à modifier un numéro de version. Elle exige d'identifier le profil technique de l'application, de définir une trajectoire compatible, d'adapter les dépendances, la configuration et le code source, puis d'exécuter les installations, les compilations et les tests. Chaque échec ouvre un nouveau cycle de diagnostic, de correction et de validation. Réalisée manuellement, cette démarche mobilise des compétences spécialisées, nécessite un temps important et produit des résultats difficiles à reproduire à grande échelle.
 
-Les outils déterministes automatisent efficacement les transformations connues et les contrôles reproductibles. Ils restent toutefois limités lorsque le problème dépend fortement du contexte d'une application. Les grands modèles de langage peuvent, à l'inverse, interpréter des journaux, analyser des extraits de code et proposer des adaptations. Leur fonctionnement probabiliste ne permet cependant pas de leur déléguer sans contrôle les commandes, les modifications et les décisions sensibles.
+Les outils déterministes automatisent efficacement les transformations connues et les contrôles reproductibles. Ils restent toutefois limités lorsque le problème dépend fortement du contexte d'une application. Les grands modèles de langage peuvent interpréter des journaux, analyser du code et proposer des adaptations. Leur fonctionnement probabiliste ne permet cependant pas de leur déléguer sans contrôle les commandes, les écritures et les décisions sensibles.
 
 Le projet de fin d'études réalisé au sein de \textbf{CGI Technologies et Solutions Maroc} répond à cette tension par la conception et le développement d'une \textbf{Migration Factory intelligente, extensible et gouvernée}. La solution combine des services déterministes, des agents spécialisés, un orchestrateur persistant et une supervision humaine. Elle prend en charge la préparation de l'environnement, l'analyse, la planification, la transformation, la validation, la gestion des échecs, la réparation et la production de preuves.
 
-La solution est conçue comme une \textbf{architecture multi-agents hybride et centralement orchestrée}. Les agents possèdent des responsabilités limitées : analyse, review, planification, transformation, réparation et assistance. Ils communiquent au moyen de contrats et d'artefacts. Le backend conserve l'autorité sur l'état, les transitions, les chemins, les commandes et l'application des changements. Le développeur intervient aux points de décision où une approbation, un rejet ou une révision est nécessaire.
+La solution est conçue comme une \textbf{architecture multi-agents hybride et centralement orchestrée}. Les agents disposent de responsabilités limitées : analyse, révision, planification, transformation agentique, réparation et assistance. Les services déterministes conservent l'autorité sur les profils, les transitions, les chemins, les commandes, les validations et l'application des changements. Le développeur intervient aux points où une approbation, un rejet ou une révision est nécessaire.
 
-La mise en œuvre est déclinée dans deux systèmes et deux dépôts indépendants. Le premier traite les migrations Java/Spring Boot, avec une trajectoire progressive entre Spring Boot 2.1, 2.7, 3.5 et 4.0 ainsi que plusieurs versions de Java. Le second traite Angular 18 à 21 et prépare une extension vers des applications plus anciennes. Les deux systèmes partagent les mêmes principes de gouvernance, d'isolation et de traçabilité, tout en conservant leurs outils, profils, agents et workflows propres.
+La mise en œuvre est déclinée dans deux systèmes et deux dépôts indépendants. Le premier traite les migrations Java/Spring Boot, avec une trajectoire progressive entre Spring Boot 2.1, 2.7, 3.5 et 4.0 ainsi que plusieurs versions de Java. Le second traite Angular 18 à 21 et prépare une extension vers des applications plus anciennes. Les deux systèmes partagent les mêmes principes de gouvernance, d'isolation et de traçabilité, tout en conservant leurs outils, profils et workflows propres.
 
-L'utilisateur principal est le développeur chargé de la migration. L'objectif n'est pas de le remplacer, mais de réduire les opérations répétitives, d'accélérer le diagnostic et de lui fournir un environnement de pilotage capable de présenter l'état, les preuves, les blocages et les actions autorisées.
+L'utilisateur principal est le développeur chargé de la migration. L'objectif n'est pas de le remplacer, mais de réduire les opérations répétitives, d'accélérer le diagnostic et de lui fournir un environnement de pilotage présentant l'état, les preuves, les blocages et les actions autorisées.
 
 La problématique générale peut être formulée comme suit :
 
@@ -23,15 +23,16 @@ La problématique générale peut être formulée comme suit :
 Comment concevoir et mettre en œuvre une architecture multi-agents hybride capable de coordonner l'analyse, la planification, la transformation, la validation et la réparation de migrations Java/Spring Boot et Angular, tout en préservant l'intégrité du code source, la traçabilité des décisions, la reproductibilité des opérations et le contrôle du développeur ?
 \end{quote}
 
-Pour répondre à cette problématique, le projet poursuit plusieurs objectifs : identifier les agents nécessaires, définir leurs rôles et limites d'autorité, concevoir l'orchestrateur, formaliser les contrats d'échange, intégrer les services déterministes propres à chaque écosystème, mettre en œuvre une réparation gouvernée et vérifier les résultats sur des scénarios représentatifs.
+Pour répondre à cette problématique, le projet poursuit plusieurs objectifs : identifier les agents nécessaires, distinguer les services déterministes, définir les rôles et limites d'autorité, concevoir l'orchestrateur, formaliser les contrats d'échange, intégrer les outils propres à chaque écosystème, mettre en œuvre une réparation gouvernée et évaluer les résultats disponibles.
 
-Le rapport est organisé en quatre chapitres :
+Le rapport est organisé en cinq chapitres :
 
 \begin{itemize}
-    \item le \textbf{Chapitre I} présente CGI, le projet, les utilisateurs, les acteurs, les problèmes observés, les besoins fonctionnels et non fonctionnels, les objectifs et la méthodologie ;
-    \item le \textbf{Chapitre II} expose les notions d'agent intelligent, de système multi-agents, d'orchestration et de migration, puis compare les principaux travaux et plateformes proches ;
-    \item le \textbf{Chapitre III} décrit la conception de l'architecture SMA, les agents, les mécanismes de coordination, l'orchestrateur, les états, les workflows et la supervision humaine ;
-    \item le \textbf{Chapitre IV} présente l'architecture technique et l'implémentation effective des deux systèmes, ainsi que les agents, le backend, le cockpit, la persistance, la sécurité et les principales difficultés rencontrées.
+    \item le \textbf{Chapitre I} présente CGI, le projet, les utilisateurs, les catégories de composants, les problèmes observés, les besoins fonctionnels et non fonctionnels, les objectifs et la méthodologie ;
+    \item le \textbf{Chapitre II} expose les notions d'agent intelligent, de système multi-agents, d'orchestration et de migration, puis compare les principaux travaux, plateformes et standards proches ;
+    \item le \textbf{Chapitre III} décrit la conception de l'architecture SMA, l'autonomie des agents, les services déterministes, les mécanismes de coordination, les états et la réparation gouvernée ;
+    \item le \textbf{Chapitre IV} présente l'implémentation effective des deux systèmes, les technologies, les fiches d'agents, l'orchestrateur, le backend, le cockpit, les preuves et les difficultés techniques ;
+    \item le \textbf{Chapitre V} évalue les résultats disponibles, les caractéristiques de qualité, les limites de mesure et les perspectives d'industrialisation.
 \end{itemize}
 
-Une conclusion générale synthétisera les apports, les limites et les perspectives d'industrialisation de la Migration Factory.
+Une conclusion générale synthétisera les apports, les limites et les perspectives de la Migration Factory.
