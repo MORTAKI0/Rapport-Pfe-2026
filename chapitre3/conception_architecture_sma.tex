@@ -1,0 +1,370 @@
+\chapter{Conception de l'architecture multi-agents}
+
+\section*{Introduction}
+\addcontentsline{toc}{section}{Introduction}
+
+Le chapitre précédent a montré que la Migration Factory se situe à l'intersection de la migration déterministe, de l'assistance intelligente et de l'orchestration multi-agents. Le présent chapitre décrit la conception du système multi-agents (SMA) retenu pour coordonner ces capacités.
+
+La description suit plusieurs points de vue conformément à ISO/IEC/IEEE 42010 : contexte, fonctions, comportement, information, déploiement et gouvernance \cite{iso42010}. Les diagrammes utilisent les principes d'UML 2.5.1 \cite{omguml}. L'objectif est de montrer les décisions structurantes, sans reproduire toutes les classes du code.
+
+% ============================================================
+\section{Points de vue architecturaux}
+% ============================================================
+
+\begin{table}[H]
+    \centering
+    \small
+    \arrayrulecolor{cgigray}
+    \rowcolors{2}{cgilight!55}{white}
+    \begin{tabularx}{\textwidth}{|>{\bfseries\RaggedRight\arraybackslash}p{3.2cm}|>{\RaggedRight\arraybackslash}p{4.4cm}|>{\RaggedRight\arraybackslash}X|}
+        \hline
+        \rowcolor{cgilight!95}
+        \textbf{Point de vue} & \textbf{Préoccupation} & \textbf{Modèles utilisés} \\
+        \hline
+        Contexte & Frontières, acteurs et services externes. & Diagramme de contexte du Chapitre I. \\
+        \hline
+        Fonctionnel & Responsabilités des agents et services. & Classification, matrice de responsabilités. \\
+        \hline
+        Comportemental & Ordre des tâches, décisions et reprises. & Séquences, activités et machine à états. \\
+        \hline
+        Information & États, messages, artefacts et preuves. & Modèle de contrats et mémoire. \\
+        \hline
+        Déploiement & Processus locaux, outils et stockage. & Vue de déploiement du Chapitre IV. \\
+        \hline
+        Gouvernance & Autorité, approbation et risques. & Matrice d'autonomie et boucle de réparation. \\
+        \hline
+    \end{tabularx}
+    \caption{Points de vue retenus pour la description de l'architecture}
+    \label{tab:viewpoints-ch3}
+    \rowcolors{2}{white}{white}
+    \arrayrulecolor{black}
+\end{table}
+
+% ============================================================
+\section{Choix du modèle SMA}
+% ============================================================
+
+\subsection{Architecture hybride et centralement orchestrée}
+
+La Migration Factory adopte une architecture \textbf{hybride, spécialisée et centralement orchestrée}. Elle est hybride parce qu'elle associe agents fondés sur des LLM, services déterministes, outils externes et supervision humaine. Elle est spécialisée parce que chaque agent possède un objectif limité. Elle est centralement orchestrée parce que la progression dépend d'un état persistant et de transitions contrôlées.
+
+Ce choix répond à quatre contraintes :
+
+\begin{itemize}
+    \item l'ordre des étapes de migration ne peut pas dépendre d'une conversation libre ;
+    \item les commandes et écritures doivent rester vérifiables ;
+    \item les décisions sensibles doivent pouvoir interrompre le processus ;
+    \item les résultats intermédiaires doivent être persistés et reliés aux preuves.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \resizebox{0.96\textwidth}{!}{%
+    \begin{tikzpicture}[
+        core/.style={draw=cgired,rounded corners=4pt,fill=white,minimum width=5.4cm,minimum height=1.35cm,align=center,font=\bfseries},
+        agent/.style={draw=emsigreen!70!black,rounded corners=3pt,fill=emsigreen!8,text width=4.6cm,minimum height=1.3cm,align=center,font=\small},
+        service/.style={draw=cgiblue,rounded corners=3pt,fill=cgilight!55,text width=4.6cm,minimum height=1.3cm,align=center,font=\small},
+        ext/.style={draw=cgigray,rounded corners=3pt,fill=white,text width=4.6cm,minimum height=1.3cm,align=center,font=\small},
+        arr/.style={<->,thick,draw=cgigray}
+    ]
+        \node[core] (orch) {Orchestrateur central\\état, routage, interruptions et reprise};
+        \node[agent,above left=1.25cm and 1.2cm of orch] (agents) {\textbf{Agents intelligents}\\analyse, planification, révision, transformation, réparation, assistant};
+        \node[service,above right=1.25cm and 1.2cm of orch] (human) {\textbf{Supervision humaine}\\approbation, rejet, révision et annulation};
+        \node[service,below left=1.25cm and 1.2cm of orch] (services) {\textbf{Services déterministes}\\profils, transitions, exécution, validation, rapports};
+        \node[ext,below right=1.25cm and 1.2cm of orch] (stores) {\textbf{État et preuves}\\base, événements, artefacts et checkpoints};
+        \draw[arr] (agents)--(orch);
+        \draw[arr] (human)--(orch);
+        \draw[arr] (services)--(orch);
+        \draw[arr] (stores)--(orch);
+    \end{tikzpicture}%
+    }
+    \caption{Modèle hybride retenu pour la Migration Factory}
+    \label{fig:modele-sma-ch3}
+\end{figure}
+
+\subsection{Deux dépôts spécialisés}
+
+Le modèle est décliné dans deux systèmes indépendants. Java/Spring Boot utilise JDK, Maven, \texttt{pom.xml} et OpenRewrite. Angular utilise Node.js, npm, Angular CLI, \texttt{package.json} et TypeScript. Les principes de gouvernance sont partagés, mais ni les services d'exécution ni les agents spécialisés ne sont imposés comme une base de code commune.
+
+% ============================================================
+\section{Agents et services déterministes}
+% ============================================================
+
+\subsection{Agents intelligents retenus}
+
+Les véritables agents du système sont ceux qui disposent d'une responsabilité de raisonnement ou d'interaction contextualisée :
+
+\begin{itemize}
+    \item agent d'analyse ;
+    \item agent de révision de l'analyse ;
+    \item agent de planification ;
+    \item agent de révision du plan ;
+    \item agent de transformation lorsque la production des changements est agentique ;
+    \item proposeur de réparation ;
+    \item agent de révision de la réparation ;
+    \item assistant conversationnel.
+\end{itemize}
+
+\subsection{Services déterministes}
+
+Les composants suivants restent volontairement déterministes :
+
+\begin{itemize}
+    \item résolveur de profils et catalogues de compatibilité ;
+    \item service de transitions et de points de validation ;
+    \item exécuteur de commandes ;
+    \item services Maven, npm, compilation, construction et tests ;
+    \item gestion des espaces de travail ;
+    \item stockage des événements et artefacts ;
+    \item projection du cockpit ;
+    \item génération du rapport final.
+\end{itemize}
+
+Cette distinction évite de qualifier d'agent tout composant participant au workflow. Elle préserve également l'autorité des mécanismes vérifiables.
+
+\subsection{Matrice des rôles et de l'autonomie}
+
+\scriptsize
+\begin{longtable}{|>{\bfseries\RaggedRight\arraybackslash}p{2.7cm}|>{\RaggedRight\arraybackslash}p{3.2cm}|>{\centering\arraybackslash}p{2.2cm}|>{\centering\arraybackslash}p{2.2cm}|>{\centering\arraybackslash}p{2.2cm}|>{\RaggedRight\arraybackslash}p{2.7cm}|}
+    \caption{Autonomie et limites des agents}\label{tab:autonomie-agents-ch3}\\
+    \hline
+    \rowcolor{cgilight!95}
+    \textbf{Agent} & \textbf{Objectif} & \textbf{Raisonnement} & \textbf{Accès outils} & \textbf{Écriture} & \textbf{Approbation requise} \\
+    \hline
+    \endfirsthead
+    \hline
+    \rowcolor{cgilight!95}
+    \textbf{Agent} & \textbf{Objectif} & \textbf{Raisonnement} & \textbf{Accès outils} & \textbf{Écriture} & \textbf{Approbation requise} \\
+    \hline
+    \endhead
+    Analyseur & Comprendre le projet et les risques. & Élevé & Lecture bornée & Aucune sur la source & Révision de la sortie \\
+    \hline
+    Révision d'analyse & Contrôler couverture et cohérence. & Moyen à élevé & Artefacts uniquement & Aucune & Décision humaine selon le point \\
+    \hline
+    Planificateur & Construire trajectoire et unités. & Élevé & Catalogues en lecture & Aucune & Révision et approbation du plan \\
+    \hline
+    Révision du plan & Vérifier ordre et prérequis. & Moyen à élevé & Artefacts uniquement & Aucune & Approbation humaine \\
+    \hline
+    Transformateur & Produire des changements candidats. & Élevé & Espace isolé borné & Espace isolé uniquement & Plan approuvé et contrôles \\
+    \hline
+    Proposeur de réparation & Générer un diff candidat. & Élevé & Contexte d'échec borné & Aucune application directe & Révision obligatoire \\
+    \hline
+    Révision de réparation & Évaluer ou consolider le diff. & Élevé & Preuves et proposition & Aucune application directe & Approbation humaine \\
+    \hline
+    Assistant & Expliquer l'état et les actions. & Moyen & Projection en lecture & Aucune & Aucune action sensible \\
+    \hline
+\end{longtable}
+\normalsize
+
+% ============================================================
+\section{Architecture globale}
+% ============================================================
+
+\begin{figure}[H]
+    \centering
+    \resizebox{\textwidth}{!}{%
+    \begin{tikzpicture}[
+        comp/.style={draw=cgiblue,rounded corners=3pt,fill=cgilight!50,minimum width=3.5cm,minimum height=1.05cm,align=center,font=\small},
+        agent/.style={draw=emsigreen!70!black,rounded corners=3pt,fill=emsigreen!8,minimum width=3.5cm,minimum height=1.05cm,align=center,font=\small},
+        store/.style={draw=cgigray,rounded corners=3pt,fill=white,minimum width=3.5cm,minimum height=1.05cm,align=center,font=\small},
+        arr/.style={-{Latex[length=2mm]},thick,draw=cgigray}
+    ]
+        \node[comp] (ui) {Cockpit et assistant};
+        \node[comp,right=0.65cm of ui] (api) {API et services\\applicatifs};
+        \node[comp,right=0.65cm of api] (state) {Service d'état et\\transitions};
+        \node[comp,right=0.65cm of state] (orch) {Orchestrateur\\LangGraph};
+        \node[agent,below=1cm of api] (agents) {Agents intelligents};
+        \node[comp,below=1cm of state] (executor) {Services déterministes\\et exécuteur};
+        \node[store,below=1cm of ui] (db) {SQLite\\état autoritaire};
+        \node[store,below=1cm of orch] (artifacts) {Artefacts, journaux\\et espaces isolés};
+        \draw[arr] (ui)--(api);
+        \draw[arr] (api)--(state);
+        \draw[arr] (state)--(orch);
+        \draw[arr] (orch)--(agents);
+        \draw[arr] (agents)--(executor);
+        \draw[arr] (executor)--(artifacts);
+        \draw[arr] (state)--(db);
+        \draw[arr,bend right=20] (db) to (api);
+        \draw[arr,bend left=20] (artifacts) to (state);
+    \end{tikzpicture}%
+    }
+    \caption{Architecture globale du système multi-agents}
+    \label{fig:architecture-sma-ch3}
+\end{figure}
+
+La base de données conserve l'état métier autoritaire. LangGraph coordonne les nœuds et les interruptions, mais ne remplace pas les règles métier. Les agents produisent des artefacts ; les services déterministes vérifient, appliquent et exécutent.
+
+% ============================================================
+\section{Communication et contrats}
+% ============================================================
+
+Les agents ne maintiennent pas une conversation libre comme source de vérité. Ils échangent indirectement par des artefacts orchestrés. Un contrat logique contient : identifiant de migration, tâche, producteur, consommateur, référence de contexte, schéma attendu, empreintes, statut et erreurs.
+
+\begin{figure}[H]
+    \centering
+    \resizebox{\textwidth}{!}{%
+    \begin{tikzpicture}[
+        actor/.style={font=\small\bfseries,align=center},
+        msg/.style={-{Latex[length=2mm]},thick,draw=cgigray},
+        ret/.style={-{Latex[length=2mm]},dashed,draw=cgigray}
+    ]
+        \node[actor] (dev) at (0,0) {Développeur};
+        \node[actor] (orch) at (3.3,0) {Orchestrateur};
+        \node[actor] (analyse) at (6.6,0) {Analyseur};
+        \node[actor] (review) at (9.9,0) {Révision};
+        \node[actor] (plan) at (13.2,0) {Planificateur};
+        \node[actor] (exec) at (16.5,0) {Services\\déterministes};
+        \foreach \x in {0,3.3,6.6,9.9,13.2,16.5} {\draw[dashed,cgigray] (\x,-0.35)--(\x,-6.8);}
+        \draw[msg] (0,-0.9)--node[above,font=\scriptsize]{Lancer} (3.3,-0.9);
+        \draw[msg] (3.3,-1.6)--node[above,font=\scriptsize]{Contexte borné} (6.6,-1.6);
+        \draw[ret] (6.6,-2.3)--node[above,font=\scriptsize]{Analyse structurée} (3.3,-2.3);
+        \draw[msg] (3.3,-3.0)--node[above,font=\scriptsize]{Analyse et preuves} (9.9,-3.0);
+        \draw[ret] (9.9,-3.7)--node[above,font=\scriptsize]{Décision de révision} (3.3,-3.7);
+        \draw[msg] (3.3,-4.4)--node[above,font=\scriptsize]{Analyse validée} (13.2,-4.4);
+        \draw[ret] (13.2,-5.1)--node[above,font=\scriptsize]{Plan versionné} (3.3,-5.1);
+        \draw[msg] (0,-5.8)--node[above,font=\scriptsize]{Approuver} (3.3,-5.8);
+        \draw[msg] (3.3,-6.5)--node[above,font=\scriptsize]{Exécuter le plan approuvé} (16.5,-6.5);
+    \end{tikzpicture}%
+    }
+    \caption{Séquence simplifiée entre agents, orchestrateur et services}
+    \label{fig:sequence-sma-ch3}
+\end{figure}
+
+% ============================================================
+\section{Conception de l'orchestrateur}
+% ============================================================
+
+L'orchestrateur reçoit une intention validée par l'API, charge l'état persistant, sélectionne le nœud autorisé, prépare son contexte, enregistre la sortie, ouvre éventuellement un point de validation et détermine la suite.
+
+\begin{figure}[H]
+    \centering
+    \resizebox{0.95\textwidth}{!}{%
+    \begin{tikzpicture}[
+        step/.style={draw=cgiblue,rounded corners=3pt,fill=cgilight!55,minimum width=3cm,minimum height=1cm,align=center,font=\small\bfseries},
+        decision/.style={diamond,draw=cgired,fill=white,aspect=2.2,align=center,font=\small\bfseries},
+        arr/.style={-{Latex[length=2mm]},thick,draw=cgigray}
+    ]
+        \node[step] (load) {Charger l'état};
+        \node[decision,right=1cm of load] (allowed) {Action\\autorisée ?};
+        \node[step,right=1cm of allowed] (route) {Sélectionner le nœud};
+        \node[step,right=1cm of route] (invoke) {Invoquer agent ou service};
+        \node[step,below=1.25cm of invoke] (persist) {Persister résultat et événement};
+        \node[decision,left=1cm of persist] (gate) {Décision\\humaine ?};
+        \node[step,left=1cm of gate] (next) {Reprendre ou terminer};
+        \draw[arr] (load)--(allowed);
+        \draw[arr] (allowed)--node[above,font=\scriptsize]{oui} (route);
+        \draw[arr] (route)--(invoke);
+        \draw[arr] (invoke)--(persist);
+        \draw[arr] (persist)--(gate);
+        \draw[arr] (gate)--(next);
+        \draw[arr,rounded corners=4pt] (next.west)--++(-0.6,0)|-(load.south);
+    \end{tikzpicture}%
+    }
+    \caption{Logique générale de l'orchestrateur}
+    \label{fig:orchestrateur-ch3}
+\end{figure}
+
+% ============================================================
+\section{États, mémoire et contexte}
+% ============================================================
+
+Une migration possède un état global et des états locaux pour les stages, commandes, points de validation et réparations. Le frontend présente une projection ; il ne décide pas de l'état.
+
+\begin{figure}[H]
+    \centering
+    \resizebox{0.92\textwidth}{!}{%
+    \begin{tikzpicture}[
+        state/.style={draw=cgiblue,rounded corners=3pt,fill=cgilight!55,minimum width=2.7cm,minimum height=0.95cm,align=center,font=\small\bfseries},
+        terminal/.style={draw=cgired,rounded corners=3pt,fill=white,minimum width=2.7cm,minimum height=0.95cm,align=center,font=\small\bfseries},
+        arr/.style={-{Latex[length=2mm]},thick,draw=cgigray}
+    ]
+        \node[state] (created) {CREATED};
+        \node[state,right=0.55cm of created] (ready) {READY};
+        \node[state,right=0.55cm of ready] (running) {RUNNING};
+        \node[state,right=0.55cm of running] (paused) {PAUSED};
+        \node[terminal,right=0.55cm of paused] (complete) {COMPLETED};
+        \node[state,below=1.2cm of running] (recovery) {RECOVERY\\REQUIRED};
+        \node[terminal,below=1.2cm of paused] (cancelled) {CANCELLED};
+        \node[terminal,below=1.2cm of ready] (failed) {FAILED};
+        \draw[arr] (created)--(ready);
+        \draw[arr] (ready)--(running);
+        \draw[arr] (running)--(paused);
+        \draw[arr] (paused)--(complete);
+        \draw[arr,bend left=25] (paused) to (running);
+        \draw[arr] (running)--(recovery);
+        \draw[arr] (recovery)--(paused);
+        \draw[arr] (paused)--(cancelled);
+        \draw[arr] (running)--(failed);
+    \end{tikzpicture}%
+    }
+    \caption{Machine à états simplifiée d'une migration}
+    \label{fig:machine-etats-sma-ch3}
+\end{figure}
+
+Trois formes de mémoire sont distinguées : mémoire métier persistante, mémoire documentaire des artefacts et contexte agentique temporaire. Le contexte transmis à un agent est borné, nettoyé et relié à des références persistées. Cette approche soutient la confidentialité et la gestion des risques recommandées par ISO/IEC 23894 et le NIST AI RMF \cite{iso23894,nist-airmf,nist-genai}.
+
+% ============================================================
+\section{Workflows spécialisés}
+% ============================================================
+
+\subsection{Java/Spring Boot}
+
+Pour chaque transition, le système qualifie JDK et Maven, analyse le projet, révise l'analyse, planifie, révise le plan, ouvre une décision humaine, prépare l'espace isolé, transforme, compile et teste. Un échec peut ouvrir la réparation gouvernée avant le passage au stage suivant.
+
+\subsection{Angular}
+
+Le workflow Angular détecte Angular, Node.js, npm, TypeScript et RxJS, résout un profil compatible, prépare un espace de stage propre, analyse manifestes et sources, produit et révise un plan, applique les transformations, installe les dépendances, construit et teste. L'intégration complète, la réparation et le reporting restent en consolidation.
+
+% ============================================================
+\section{Supervision et réparation gouvernée}
+% ============================================================
+
+Les points de validation permettent d'approuver, rejeter, demander une révision ou annuler. Une décision est liée à l'état courant et à l'empreinte de l'artefact examiné.
+
+\begin{figure}[H]
+    \centering
+    \resizebox{0.98\textwidth}{!}{%
+    \begin{tikzpicture}[
+        step/.style={draw=cgiblue,rounded corners=3pt,fill=cgilight!55,minimum width=3cm,minimum height=1cm,align=center,font=\small\bfseries},
+        human/.style={draw=cgired,rounded corners=3pt,fill=white,minimum width=3cm,minimum height=1cm,align=center,font=\small\bfseries},
+        arr/.style={-{Latex[length=2mm]},thick,draw=cgigray}
+    ]
+        \node[step] (failure) {Conserver l'échec};
+        \node[step,right=0.4cm of failure] (context) {Construire le contexte};
+        \node[step,right=0.4cm of context] (propose) {Proposer un diff};
+        \node[step,right=0.4cm of propose] (review) {Réviser le diff};
+        \node[human,right=0.4cm of review] (approve) {Décision humaine};
+        \node[step,below=1.15cm of approve] (apply) {Appliquer};
+        \node[step,left=0.4cm of apply] (test) {Recompiler et tester};
+        \node[step,left=0.4cm of test] (result) {Valider ou réessayer};
+        \draw[arr] (failure)--(context);
+        \draw[arr] (context)--(propose);
+        \draw[arr] (propose)--(review);
+        \draw[arr] (review)--(approve);
+        \draw[arr] (approve)--(apply);
+        \draw[arr] (apply)--(test);
+        \draw[arr] (test)--(result);
+        \draw[arr,bend left=28] (result.north) to (context.south);
+        \draw[arr,bend left=25] (approve.north) to (propose.north);
+    \end{tikzpicture}%
+    }
+    \caption{Boucle de réparation gouvernée}
+    \label{fig:reparation-sma-ch3}
+\end{figure}
+
+Le reviewer de réparation peut consolider la proposition, mais ne peut pas l'appliquer. Le diff final est soumis à des contrôles déterministes, à une approbation humaine et à une revalidation obligatoire. Le nombre de tentatives est limité.
+
+% ============================================================
+\section{Gestion des erreurs et replanification}
+% ============================================================
+
+Les erreurs sont classées en précondition invalide, erreur transitoire, échec de transformation ou validation, et incohérence d'analyse ou de plan. Selon la catégorie, l'orchestrateur bloque, réessaie, ouvre la réparation, demande une décision ou renvoie vers la planification.
+
+La replanification ne modifie pas silencieusement un plan approuvé : elle crée une nouvelle version qui doit être révisée et décidée.
+
+\section*{Conclusion}
+\addcontentsline{toc}{section}{Conclusion}
+
+Ce chapitre a défini une architecture SMA où les agents sont réservés aux tâches de raisonnement et d'interaction contextualisée, tandis que les opérations vérifiables restent confiées à des services déterministes. La matrice d'autonomie précise les droits de chaque agent, et les points de vue architecturaux relient les préoccupations aux modèles utilisés.
+
+Le chapitre suivant présente la mise en œuvre concrète : technologies, structure des dépôts, fiches d'agents, orchestrateur, contrats, interface, sécurité, preuves techniques et limitations observées.
