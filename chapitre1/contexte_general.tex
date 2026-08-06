@@ -1,446 +1,361 @@
-\chapter{Contexte général du projet}
+\chapter{Contexte général du projet, analyse des besoins et spécification du système}
 
 \section*{Introduction}
 \addcontentsline{toc}{section}{Introduction}
 
-Ce chapitre a pour vocation de situer le projet dans son contexte global. Il présente tout d'abord l'organisme d'accueil et son domaine d'activité, puis détaille le contexte, les enjeux et les objectifs du projet. Il se conclut par la présentation de la méthodologie de travail et de l'approche mise en œuvre pour assurer le bon déroulement des différentes phases du projet.
+Ce chapitre situe le projet dans son environnement professionnel et précise le problème auquel il répond. Il présente l'organisme d'accueil, le domaine de la modernisation applicative, les utilisateurs visés, les acteurs logiciels et les services techniques mobilisés. Il formalise ensuite la problématique, les besoins fonctionnels et non fonctionnels, les objectifs ainsi que la méthodologie suivie.
 
-\section{Organisme d'accueil}
+L'analyse des besoins est organisée conformément aux principes d'ISO/IEC/IEEE 29148, qui recommande de relier les attentes des parties prenantes à des exigences compréhensibles, vérifiables et traçables \cite{iso29148}. Dans ce rapport, la spécification distingue systématiquement ce qui est attendu du système, ce qui est déjà présent dans les prototypes et ce qui relève encore de l'industrialisation.
 
-\subsection{Groupe CGI}
+% ============================================================
+\section{Présentation de l'organisme d'accueil}
+% ============================================================
 
-CGI, acronyme de \textit{Conseillers en gestion et informatique}, a été fondée en 1976 à Montréal par Serge Godin et André Imbeau, avec pour ambition d'offrir des services de qualité en technologie et en gestion. Aujourd'hui, CGI est reconnue comme l'une des principales entreprises mondiales de services-conseils en management et en technologies de l'information. Son expertise, son envergure internationale et sa capacité à accompagner durablement la transformation numérique de ses clients lui permettent d'intervenir sur des programmes complexes de modernisation, d'intégration et d'exploitation des systèmes d'information.
+\subsection{Le groupe CGI}
+
+Fondée en 1976 au Québec, CGI figure parmi les principales entreprises mondiales de conseil en technologies de l'information et en management. À l'occasion de son cinquantième anniversaire en 2026, le groupe indique compter environ 94\,000 professionnels, être présent dans plus de 400 implantations et avoir réalisé un chiffre d'affaires de 15,9 milliards de dollars canadiens pour l'exercice 2025 \cite{cgi-at-glance,cgi-history}.
 
 \begin{figure}[H]
     \centering
     \IfFileExists{logos/cgi.png}{%
-        \includegraphics[width=4.2cm]{logos/cgi.png}%
+        \includegraphics[width=4.3cm]{logos/cgi.png}%
     }{%
-        \fbox{\parbox[c][1.7cm][c]{4cm}{\centering\bfseries CGI}}%
+        \fbox{\parbox[c][1.8cm][c]{4.2cm}{\centering\bfseries CGI}}%
     }
     \caption{Logo de CGI}
-    \label{fig:logo-cgi}
+    \label{fig:logo-cgi-ch1}
 \end{figure}
 
-CGI compte plus de 90\,000 professionnels répartis à l'échelle mondiale et a réalisé un chiffre d'affaires de 14,3 milliards de dollars canadiens au titre de l'exercice 2024. En 2012, le groupe a renforcé de manière significative sa position sur le marché international à travers l'acquisition de Logica, une société anglo-néerlandaise spécialisée dans les services technologiques. Cette opération stratégique, l'une des plus importantes de l'histoire de CGI, a permis au groupe d'étendre son empreinte géographique, d'élargir ses capacités opérationnelles et de consolider son expertise métier.
+L'offre de CGI couvre notamment le conseil, l'intégration de systèmes, le développement et la maintenance d'applications, les services managés, le cloud, la cybersécurité, les données et l'intelligence artificielle. Cette diversité place l'évolution des systèmes existants et la modernisation des applications parmi les enjeux récurrents de ses activités.
 
-CGI est présente dans plus de 40 pays et intervient sur une grande diversité de marchés, allant du secteur public aux industries privées les plus complexes. Son approche orientée client, associée à une maîtrise approfondie des processus métiers et des systèmes d'information, lui permet de proposer des solutions adaptées aux exigences propres à chaque organisation, à son secteur d'activité et à son contexte géographique.
+\subsection{CGI Technologies et Solutions Maroc}
 
-Sa philosophie centrée sur le client constitue l'un des piliers de sa stratégie. En combinant une proximité locale avec une envergure mondiale, CGI peut mobiliser des expertises internationales tout en maintenant une relation de proximité avec ses clients. Son offre couvre l'ensemble du cycle de vie des projets : conseil stratégique, conception, intégration de systèmes, développement applicatif, gestion des infrastructures, maintenance et infogérance.
+CGI dispose au Maroc de centres implantés à Rabat, Casablanca et Fès. Le site officiel de l'entreprise indique que ces centres regroupent plus de 1\,300 professionnels et fournissent des services applicatifs, d'infrastructure et de support sur des technologies modernes et historiques \cite{cgi-maroc}. Le stage s'est déroulé au centre de Rabat, situé à Technopolis, Sala Al Jadida.
 
-Enfin, CGI se distingue par un modèle de gestion participatif fondé sur une culture d'actionnariat et de responsabilité partagée. Une partie importante de ses professionnels participe au capital de l'entreprise, ce qui renforce l'engagement, l'esprit entrepreneurial et la volonté de contribuer durablement à la réussite des clients et de l'organisation.
+Cet environnement constitue un cadre pertinent pour le projet. Les équipes peuvent être amenées à maintenir des applications reposant sur des générations différentes de langages, de frameworks et d'outils. La migration ne représente donc pas uniquement une opération ponctuelle : elle s'inscrit dans une démarche plus large de maintien en condition opérationnelle, de réduction de la dette technique et de préparation des applications à de nouveaux environnements.
 
-\subsection{Fiche signalétique de CGI Technologies et Solutions}
+\subsection{Cadre du stage}
+
+Le projet est une initiative interne de CGI Technologies et Solutions Maroc. L'équipe opérationnelle est composée de trois développeurs. Elle est accompagnée par deux référents fonctionnels, un expert technique et les responsables intervenant lors des revues et démonstrations.
 
 \begin{table}[H]
     \centering
     \small
     \arrayrulecolor{cgigray}
-    \rowcolors{2}{cgilight!80}{white}
-    \begin{tabularx}{0.98\textwidth}{|>{\bfseries\RaggedRight\arraybackslash}p{4.1cm}|>{\RaggedRight\arraybackslash}X|}
-        \hline
-        Raison sociale & CGI Technologies et Solutions \\
-        \hline
-        Forme juridique & Incorporation \\
-        \hline
-        Actionnaires majoritaires &
-        \begin{minipage}[t]{\linewidth}
-            \begin{itemize}[leftmargin=1.3em,itemsep=0.1em,topsep=0.1em]
-                \item Serge Godin : fondateur et coprésident du conseil d'administration ;
-                \item Julie Godin : présidente exécutive du conseil d'administration ;
-                \item François Boulanger : président et chef de la direction.
-            \end{itemize}
-        \end{minipage} \\
-        \hline
-        Actionnaires institutionnels &
-        \begin{minipage}[t]{\linewidth}
-            \begin{itemize}[leftmargin=1.3em,itemsep=0.1em,topsep=0.1em]
-                \item La Caisse de dépôt et placement du Québec (CDPQ) ;
-                \item Fidelity Investments Canada ULC ;
-                \item Mawer Investment Management Ltd.
-            \end{itemize}
-        \end{minipage} \\
-        \hline
-        Activités principales & Services-conseils en technologies de l'information et gestion des processus d'affaires \\
-        \hline
-        Directeur général & François Boulanger -- Président et chef de la direction \\
-        \hline
-        Siège social & Montréal, Québec, Canada \\
-        \hline
-        Date et lieu de création & 1976, Québec, Canada \\
-        \hline
-        Effectif du personnel & Plus de 90\,000 professionnels \\
-        \hline
-        Chiffre d'affaires & 14,3 milliards CAD (exercice 2024) \\
-        \hline
-        Site Web & \url{https://www.cgi.com/fr} \\
-        \hline
-    \end{tabularx}
-    \caption{Fiche signalétique de CGI Technologies et Solutions}
-    \label{tab:fiche-signaletique-cgi}
-    \rowcolors{2}{white}{white}
-    \arrayrulecolor{black}
-\end{table}
-
-\subsection{Historique}
-
-Pour présenter l'historique de CGI, seules les principales étapes de son développement sont retenues.
-
-\begin{table}[H]
-    \centering
-    \small
-    \arrayrulecolor{cgigray}
-    \rowcolors{2}{cgilight!65}{white}
-    \begin{tabularx}{0.94\textwidth}{|>{\bfseries\centering\arraybackslash}p{2.3cm}|>{\RaggedRight\arraybackslash}X|}
-        \hline
-        1976 & Création de CGI à Québec par Serge Godin et André Imbeau. \\
-        \hline
-        Années 1980--2000 & Développement progressif au Canada, diversification de l'offre et expansion internationale par croissance organique et acquisitions. \\
-        \hline
-        1998 & Renforcement des activités canadiennes par l'acquisition de Bell Sygma. \\
-        \hline
-        2001 & Acquisition d'IMRglobal, qui contribue à élargir la présence internationale et les capacités de services du groupe. \\
-        \hline
-        2012 & Acquisition de Logica, étape majeure dans l'expansion internationale de CGI. \\
-        \hline
-        2012 à aujourd'hui & Développement continu des capacités mondiales, consolidation des expertises sectorielles et élargissement de l'offre en services numériques. \\
-        \hline
-        Avenir & Poursuite de l'expansion internationale, renforcement des capacités d'innovation et accompagnement des clients dans leurs programmes de transformation numérique. \\
-        \hline
-    \end{tabularx}
-    \caption{Principales étapes de l'histoire de CGI}
-    \label{tab:historique-cgi}
-    \rowcolors{2}{white}{white}
-    \arrayrulecolor{black}
-\end{table}
-
-Depuis 2012, CGI poursuit une stratégie de croissance fondée sur la proximité client, la solidité de ses unités d'affaires et le développement de capacités internationales. Cette organisation lui permet de disposer d'une expertise approfondie sur ses marchés cibles et d'une gamme complète de services en technologies de l'information.
-
-À l'avenir, le groupe entend maintenir une croissance durable et renforcer son implantation internationale. Cette orientation répond à la mondialisation des marchés et à l'évolution des besoins de ses clients, qui recherchent des partenaires capables de les accompagner à la fois localement et à grande échelle.
-
-\begin{figure}[H]
-    \centering
-    \IfFileExists{logos/Historique du groupe CGI.png}{%
-        \includegraphics[width=0.92\textwidth]{logos/Historique du groupe CGI.png}%
-    }{%
-        \fbox{\parbox[c][5cm][c]{0.88\textwidth}{\centering Historique du groupe CGI}}%
-    }
-    \caption{Historique du groupe CGI}
-    \label{fig:historique-groupe-cgi}
-\end{figure}
-
-Le groupe CGI s'appuie sur une organisation structurée en unités d'affaires géographiques. Ce modèle vise à préserver la proximité avec les clients, à renforcer la cohérence entre les équipes locales et à mobiliser les expertises disponibles au sein du réseau mondial du groupe.
-
-\begin{figure}[H]
-    \centering
-    \IfFileExists{logos/Organigramme du groupe CGI.png}{%
-        \includegraphics[width=0.94\textwidth]{logos/Organigramme du groupe CGI.png}%
-    }{%
-        \fbox{\parbox[c][5cm][c]{0.9\textwidth}{\centering Organigramme du groupe CGI}}%
-    }
-    \caption{Organigramme du groupe CGI}
-    \label{fig:organigramme-groupe-cgi}
-\end{figure}
-
-CGI Maroc est une filiale du groupe CGI, intégrée à l'organisation regroupant notamment la France, le Luxembourg et le Maroc. Elle applique les processus, méthodologies et cadres de gestion définis à l'échelle mondiale, ce qui garantit son alignement avec les standards internationaux du groupe.
-
-Le stage s'est déroulé au sein du centre de services de Rabat, situé à Technopolis, à Sala Al Jadida. Ce site constitue l'un des centres d'excellence de CGI au Maroc, aux côtés de Casablanca et de Fès. Créé en 2004, le centre de Rabat joue un rôle important dans la fourniture de services de proximité et de services \textit{nearshore} à destination de clients internationaux, en particulier en Europe francophone.
-
-Le site bénéficie d'une infrastructure moderne et d'un environnement favorable à l'innovation. Il accueille des projets dans des domaines variés tels que le développement logiciel, l'intelligence artificielle, la gestion d'infrastructures, les progiciels de gestion intégrés, la gestion de la relation client et la cybersécurité. Cette implantation a constitué un cadre adapté à la réalisation du projet et à l'intégration dans une organisation industrielle mature.
-
-\subsection{Les partenaires de CGI}
-
-CGI accompagne de nombreux clients publics et privés dans leurs programmes de transformation. Le groupe intervient notamment auprès d'organisations actives dans les services publics, l'énergie, la finance, l'industrie, la santé, le transport et les télécommunications. Cette diversité lui permet de capitaliser sur une connaissance approfondie des environnements métiers et des systèmes critiques.
-
-\begin{figure}[H]
-    \centering
-    \IfFileExists{logos/Les partenaires de CGI.png}{%
-        \includegraphics[width=0.90\textwidth]{logos/Les partenaires de CGI.png}%
-    }{%
-        \fbox{\parbox[c][5cm][c]{0.86\textwidth}{\centering Les partenaires de CGI}}%
-    }
-    \caption{Les partenaires de CGI}
-    \label{fig:partenaires-cgi}
-\end{figure}
-
-\subsection{Les services et les secteurs d'activité de CGI Technologies et Solutions}
-
-CGI propose une gamme étendue de services et de solutions visant à améliorer la performance des organisations et à accélérer la réalisation de leurs objectifs de transformation. Son offre couvre notamment le conseil, l'intégration, le développement et la maintenance d'applications, l'exploitation des infrastructures, les services managés, la cybersécurité, les données, le cloud et l'intelligence artificielle.
-
-\begin{figure}[H]
-    \centering
-    \IfFileExists{logos/Les services de CGI.png}{%
-        \includegraphics[width=0.90\textwidth]{logos/Les services de CGI.png}%
-    }{%
-        \fbox{\parbox[c][5cm][c]{0.86\textwidth}{\centering Les services de CGI}}%
-    }
-    \caption{Les services de CGI}
-    \label{fig:services-cgi}
-\end{figure}
-
-Les principaux secteurs servis par CGI comprennent notamment :
-
-\begin{itemize}
-    \item \textbf{Services bancaires :} accompagnement des banques dans la modernisation de leurs systèmes, la gestion des paiements, la conformité et l'amélioration de l'expérience client.
-    \item \textbf{Communications :} transformation des systèmes de facturation, d'orchestration des commandes, d'assurance des revenus et de gestion de la relation client.
-    \item \textbf{Gouvernements :} conception et exploitation de services numériques destinés aux administrations nationales, régionales et locales.
-    \item \textbf{Santé :} amélioration des systèmes d'information des établissements de santé, des organismes d'assurance et des acteurs de l'écosystème médical.
-    \item \textbf{Assurance :} modernisation des plateformes, gestion des contrats, automatisation des processus et exploitation des données.
-    \item \textbf{Secteur manufacturier :} accompagnement des entreprises de l'automobile, de l'aéronautique, de la haute technologie, de l'industrie minière et des industries de transformation.
-    \item \textbf{Pétrole, gaz et énergie :} services couvrant différentes étapes de la chaîne de valeur, de la production jusqu'à la distribution.
-    \item \textbf{Transport, services postaux et logistique :} transformation des systèmes utilisés dans le transport aérien, ferroviaire, maritime, routier et les activités logistiques.
-\end{itemize}
-
-\begin{figure}[H]
-    \centering
-    \IfFileExists{logos/Client et Secteurs CGI.png}{%
-        \includegraphics[width=0.94\textwidth]{logos/Client et Secteurs CGI.png}%
-    }{%
-        \fbox{\parbox[c][5cm][c]{0.9\textwidth}{\centering Clients et secteurs d'activité de CGI}}%
-    }
-    \caption{Clients et secteurs d'activité du groupe CGI}
-    \label{fig:clients-secteurs-cgi}
-\end{figure}
-
-\subsection{CGI Maroc}
-
-Le premier centre de services au Maroc a été créé à Rabat en 2004 par Unilog, en alliance avec Sofrecom. Cette implantation a permis de développer une capacité de prestation dans les domaines du développement, de la maintenance des systèmes d'information et de l'externalisation informatique. Afin de répondre à la croissance des besoins, d'autres sites ont ensuite été ouverts à Casablanca en 2006 et à Fès en 2017.
-
-Les équipes marocaines interviennent sur plusieurs environnements technologiques, parmi lesquels les progiciels de gestion, Java/JEE, .NET, les systèmes historiques, les bases de données Oracle et les technologies de développement modernes. Cette diversité technologique place la modernisation applicative au cœur de nombreux enjeux opérationnels.
-
-À l'instar du groupe, CGI Maroc fournit des prestations dans plusieurs domaines :
-
-\begin{itemize}
-    \item \textbf{Tierce maintenance applicative :} maintenance corrective, évolutive et préventive d'applications confiées à un prestataire externe.
-    \item \textbf{Intégration de systèmes :} conception, réalisation et interfaçage de systèmes et d'applications au sein du système d'information.
-    \item \textbf{Externalisation des processus d'affaires :} prise en charge de processus opérationnels ou de fonctions de support pour le compte des clients.
-    \item \textbf{Développement et modernisation :} conception de nouvelles applications, évolution de solutions existantes et migration vers des versions technologiques plus récentes.
-    \item \textbf{Services d'infrastructure et de support :} exploitation, supervision et assistance sur les environnements techniques.
-\end{itemize}
-
-\subsection{Formation chez CGI}
-
-L'intégration chez CGI commence par une phase de découverte de l'organisation, de ses valeurs, de ses pratiques et de ses règles en matière de sécurité. Les stagiaires suivent des formations obligatoires afin de se familiariser avec l'environnement de travail, les politiques internes et les standards applicables aux activités réalisées pour les clients.
-
-Ces formations sont accessibles à travers les plateformes internes de formation du groupe. Elles permettent d'acquérir les connaissances nécessaires pour évoluer dans un environnement professionnel structuré et pour respecter les exigences de qualité, de confidentialité et de sécurité.
-
-Le parcours de stage a également débuté par une période de formation intensive de cinq semaines. Cette phase a permis d'échanger avec des ingénieurs expérimentés, de renforcer les compétences techniques et de se familiariser avec les pratiques de développement et d'exploitation utilisées dans l'entreprise.
-
-Les formations et certifications suivies ont porté sur le développement logiciel assisté par l'intelligence artificielle, le cloud computing et l'intelligence artificielle générative.
-
-\begin{table}[H]
-    \centering
-    \small
-    \arrayrulecolor{cgigray}
-    \rowcolors{2}{cgilight!70}{white}
-    \begin{tabularx}{0.98\textwidth}{|>{\RaggedRight\arraybackslash}p{6.3cm}|>{\RaggedRight\arraybackslash}p{3.6cm}|>{\RaggedRight\arraybackslash}X|}
+    \rowcolors{2}{cgilight!60}{white}
+    \begin{tabularx}{\textwidth}{|>{\bfseries\RaggedRight\arraybackslash}p{4cm}|>{\RaggedRight\arraybackslash}X|}
         \hline
         \rowcolor{cgilight!95}
-        \textbf{Certification ou formation} & \textbf{Organisme} & \textbf{Domaine} \\
+        \textbf{Partie prenante} & \textbf{Contribution au projet} \\
         \hline
-        GitHub Copilot Fundamentals & GitHub & Développement assisté par l'IA \\
+        Trois développeurs & Analyse, conception, développement, intégration, tests et expérimentation des deux systèmes. \\
         \hline
-        Microsoft Azure Fundamentals (AZ-900) & Microsoft & Cloud computing \\
+        Deux référents fonctionnels & Clarification des attentes, suivi du backlog et retour sur les incréments. \\
         \hline
-        Microsoft Azure Developer Associate (AZ-204) & Microsoft & Développement cloud Azure \\
+        Expert technique & Examen des orientations, des risques et de la cohérence de l'architecture. \\
         \hline
-        Generative AI Fundamentals & Formation interne / Oracle & Intelligence artificielle générative \\
-        \hline
-        Formation sur les grands modèles de langage & Formation interne & Intelligence artificielle générative \\
+        Direction et responsables CGI & Priorisation, suivi de l'avancement et évaluation des démonstrations. \\
         \hline
     \end{tabularx}
-    \caption{Principales formations suivies}
-    \label{tab:formations-cgi}
+    \caption{Parties prenantes du projet}
+    \label{tab:parties-prenantes-ch1}
     \rowcolors{2}{white}{white}
     \arrayrulecolor{black}
 \end{table}
 
-\section{Cadre général du projet}
+% ============================================================
+\section{Présentation du projet}
+% ============================================================
 
-\subsection{Présentation du projet}
+\subsection{Domaine d'application}
 
-Le projet vise à concevoir et à développer une \textbf{Migration Factory intelligente, extensible et gouvernée} destinée à industrialiser la modernisation d'applications. La solution combine une orchestration déterministe, des agents spécialisés et des grands modèles de langage afin d'automatiser les opérations reproductibles, d'accélérer les activités nécessitant une analyse approfondie et de maintenir un contrôle humain explicite sur les décisions sensibles.
+Le projet relève de la \textbf{modernisation logicielle}, de l'\textbf{intelligence artificielle appliquée au génie logiciel} et de l'\textbf{orchestration de systèmes multi-agents}. Il vise à assister la migration progressive d'applications anciennes vers des versions plus récentes de leurs langages, frameworks et dépendances.
 
-La partie déterministe encapsule les outils, les commandes, les règles, les transitions et les validations propres à chaque écosystème. Elle contrôle l'état du workflow, prépare des espaces de travail isolés, applique les transformations autorisées, exécute les installations, les compilations et les tests, puis collecte les journaux et les preuves techniques. Les agents et les LLM interviennent à l'intérieur de ce cadre pour analyser le projet, enrichir le plan de migration, interpréter les résultats, assister le suivi et proposer des adaptations lorsqu'un problème imprévu est rencontré.
+La solution, appelée \textbf{Migration Factory}, combine trois catégories de mécanismes :
 
-Lorsqu'un échec d'installation, de compilation ou de test survient, la plateforme construit un contexte de réparation à partir des erreurs, des fichiers concernés et de l'état du pipeline. Un modèle peut alors proposer un correctif, soumis à une révision indépendante et à l'approbation du développeur avant toute application dans un workspace isolé. Le système relance ensuite les opérations de validation afin de vérifier l'efficacité de la correction.
+\begin{itemize}
+    \item des services déterministes chargés des commandes, des transformations connues, des validations et de la persistance ;
+    \item des agents spécialisés intervenant sur l'analyse, la planification, la transformation, la révision, le diagnostic et l'assistance ;
+    \item un contrôle humain conservé aux points où une décision peut modifier le code ou engager la suite du processus.
+\end{itemize}
 
-La mise en œuvre est organisée en deux systèmes spécialisés et deux dépôts distincts : un système consacré aux migrations Java/Spring Boot et un système consacré aux migrations Angular. Cette séparation permet de préserver les spécificités de chaque écosystème, d'éviter une orchestration monolithique trop complexe et de faciliter les tests, l'évolution et la maintenance. Les deux systèmes partagent néanmoins les mêmes principes de gouvernance, de traçabilité, d'isolation et de collaboration entre automatisation déterministe, LLM et expertise humaine.
+La première déclinaison concerne Java et Spring Boot. La seconde concerne Angular. Les deux systèmes reposent sur des principes similaires, mais sont développés dans des dépôts indépendants afin de conserver les outils, règles de compatibilité et cycles d'évolution propres à chaque écosystème.
 
-\subsection{Présentation du client}
+\subsection{Utilisateurs cibles}
 
-Le client du projet est \textbf{CGI Technologies et Solutions Maroc}. La Migration Factory est actuellement développée comme une initiative interne destinée à structurer, expérimenter et industrialiser une nouvelle approche de la migration logicielle. Elle constitue également une vision susceptible d'être présentée et adaptée ultérieurement aux clients de CGI confrontés à des enjeux similaires de modernisation applicative.
+L'utilisateur opérationnel actuel est le \textbf{développeur chargé de la migration}. Il fournit l'application, configure les versions, contrôle les prérequis, lance l'exécution, suit les étapes, examine les preuves et prend les décisions nécessaires.
 
-Dans ce cadre, CGI occupe plusieurs positions complémentaires : commanditaire interne, environnement d'expérimentation, source d'expertise technique et futur intégrateur de la solution. Les attentes portent à la fois sur la réduction de l'effort nécessaire pour réaliser une migration, l'amélioration de la qualité des résultats, la maîtrise des risques et la capacité à démontrer une approche reproductible à des clients opérant dans différents secteurs.
+Les prototypes sont encore utilisés en interne pour des essais sur des applications réelles. Ils ne sont pas déployés auprès d'utilisateurs externes et ne comportent actuellement ni comptes, ni authentification, ni séparation de rôles. Cette absence est acceptable pour une expérimentation locale, mais elle devra être corrigée avant toute utilisation partagée.
 
-\subsection{Contexte du projet}
+\subsection{Acteurs humains, agents et services externes}
 
-De nombreuses organisations exploitent encore des applications reposant sur des versions anciennes de langages, de frameworks et de dépendances. La modernisation de ces applications reste souvent longue et largement manuelle. Elle nécessite des profils expérimentés capables de comprendre le patrimoine existant, de choisir une trajectoire de migration, d'adapter le code, puis de résoudre les erreurs successives de compilation, d'installation ou de test.
+La vue de contexte distingue cinq catégories. Cette séparation évite de confondre un utilisateur, un agent logiciel, un service interne et un outil externe.
 
-Cette situation engendre plusieurs difficultés : un nombre important d'applications à traiter, des cycles de migration et de débogage prolongés, des coûts élevés, une dépendance à des expertises Java/Spring Boot ou Angular parfois limitées, ainsi qu'une capacité insuffisante à conduire plusieurs migrations en parallèle. L'absence d'un processus homogène rend également le suivi, la comparaison et la capitalisation sur les migrations précédentes plus difficiles.
+\begin{figure}[H]
+    \centering
+    \resizebox{0.96\textwidth}{!}{%
+    \begin{tikzpicture}[
+        center/.style={draw=cgired,rounded corners=4pt,fill=white,minimum width=5.2cm,minimum height=1.4cm,align=center,font=\bfseries},
+        actor/.style={draw=cgiblue,rounded corners=3pt,fill=cgilight!55,text width=4.4cm,minimum height=1.4cm,align=center,font=\small},
+        agent/.style={draw=emsigreen!70!black,rounded corners=3pt,fill=emsigreen!8,text width=4.4cm,minimum height=1.4cm,align=center,font=\small},
+        service/.style={draw=cgigray,rounded corners=3pt,fill=white,text width=4.4cm,minimum height=1.4cm,align=center,font=\small},
+        arr/.style={<->,thick,draw=cgigray}
+    ]
+        \node[center] (mf) {Migration Factory\\Java/Spring Boot et Angular};
+        \node[actor,above left=1.2cm and 1.1cm of mf] (human) {\textbf{Acteur humain}\\Développeur chargé de la migration};
+        \node[agent,above right=1.2cm and 1.1cm of mf] (agents) {\textbf{Agents logiciels}\\Analyse, planification, transformation, révision, réparation et assistant};
+        \node[service,below left=1.2cm and 1.1cm of mf] (tools) {\textbf{Outils techniques}\\Maven, OpenRewrite, JDK, npm, Angular CLI et outils de tests};
+        \node[service,below right=1.2cm and 1.1cm of mf] (external) {\textbf{Services externes}\\Fournisseur LLM, dépôts de dépendances et système de fichiers local};
+        \draw[arr] (human) -- (mf);
+        \draw[arr] (agents) -- (mf);
+        \draw[arr] (tools) -- (mf);
+        \draw[arr] (external) -- (mf);
+    \end{tikzpicture}%
+    }
+    \caption{Vue de contexte des acteurs et services du système}
+    \label{fig:contexte-acteurs-services-ch1}
+\end{figure}
 
-La modernisation est aussi liée aux exigences des environnements de déploiement modernes. Les plateformes cloud et les services managés s'appuient sur des versions de runtimes officiellement prises en charge. Une application utilisant une version arrivée en fin de support peut perdre l'accès aux correctifs de sécurité, rencontrer des contraintes de compatibilité ou ne plus bénéficier du niveau d'assistance attendu. Les politiques de support d'Azure App Service précisent notamment qu'une application utilisant une version de langage non prise en charge doit évoluer vers une version supportée pour bénéficier du support du service.\footnote{Microsoft, \textit{Language Runtime Support Policy for Azure App Service}, \url{https://learn.microsoft.com/en-us/azure/app-service/language-support-policy}.}
+Les agents sont internes à la plateforme. Ils n'accèdent pas directement à l'environnement sans médiation : les commandes, écritures et transitions restent contrôlées par le backend et par des services déterministes. Les fournisseurs LLM, gestionnaires de dépendances et outils de construction sont considérés comme des services techniques externes à la logique métier.
 
-Le projet a d'abord été lancé sous la forme d'une première version dédiée aux migrations \textbf{Java/Spring Boot}, conformément à la priorité définie par l'équipe et la direction de CGI. Le parcours actuellement étudié couvre les transitions Spring Boot 2.1 vers 2.7, 2.7 vers 3.5 et 3.5 vers 4.0, avec une évolution progressive entre Java 11, Java 17 et Java 21. Cette trajectoire doit rester extensible afin d'intégrer ultérieurement d'autres versions et scénarios.
+\subsection{Fonctionnalités existantes}
 
-Un second système consacré à \textbf{Angular} a ensuite été demandé afin d'appliquer la même vision de gouvernance et d'industrialisation à un autre écosystème. Le périmètre actuel couvre les migrations Angular 18 vers 19, 19 vers 20 et 20 vers 21. La vision d'évolution consiste à étendre progressivement cette couverture depuis Angular 11 jusqu'aux versions récentes du framework.
+Le système Java/Spring Boot est le plus mature. Il prend déjà en charge une trajectoire progressive allant de Spring Boot 2.1 vers 2.7, puis 3.5 et 4.0, avec l'utilisation de Java 11, 17 et 21 selon les étapes. Il comprend notamment :
 
-Les deux solutions disposent chacune de leur propre backend, de leur propre frontend, de leur propre orchestration, de leurs propres agents et de leurs propres workflows de validation. Aucun service d'exécution n'est actuellement partagé entre les deux dépôts. Ce découpage réduit le couplage, maintient la spécificité des chaînes d'outillage et permet une évolution indépendante des deux systèmes.
+\begin{itemize}
+    \item la configuration d'une migration à partir d'un chemin local ;
+    \item la vérification des profils Java et Maven ;
+    \item l'analyse de l'application et la production d'un plan ;
+    \item des points de décision humaine ;
+    \item la préparation d'un espace de travail isolé ;
+    \item l'application de transformations déterministes ;
+    \item la compilation et l'exécution des tests ;
+    \item une boucle de réparation avec proposition, révision, approbation et revalidation ;
+    \item un cockpit de suivi, un assistant et un rapport final.
+\end{itemize}
 
-\subsection{Problématique}
+Le système Angular est en développement actif. Son périmètre initial couvre Angular 18 vers 19, 19 vers 20 et 20 vers 21. Les agents d'analyse, de révision, de planification et de transformation ont été développés. L'intégration du processus complet, les validations d'exécution, l'assistant et la boucle de réparation sont en cours de consolidation.
 
-Les migrations logicielles combinent des opérations répétitives, des décisions techniques dépendantes du contexte, des exécutions longues et des cycles fréquents de débogage. Les outils classiques automatisent certaines transformations connues, mais ne couvrent pas tous les cas particuliers. Les LLM peuvent accélérer l'analyse et proposer des solutions, mais leurs résultats ne doivent pas être appliqués sans contrôle dans une base de code réelle.
+\subsection{Problèmes observés et besoins d'automatisation}
 
-Le défi consiste donc à automatiser davantage le processus sans perdre la maîtrise des commandes, des modifications et des décisions. La solution doit être capable de traiter plusieurs migrations, de conserver des preuves vérifiables, de sécuriser les changements proposés et de maintenir le développeur au centre des validations importantes.
+Avant la Migration Factory, la migration repose principalement sur un développeur expérimenté qui consulte les guides, modifie les dépendances, adapte le code, relance les commandes et corrige successivement les erreurs. Cette approche présente plusieurs limites :
 
-La problématique centrale du projet est formulée comme suit :
+\begin{itemize}
+    \item temps important consacré aux opérations répétitives ;
+    \item dépendance à une expertise rare et difficile à mobiliser sur plusieurs projets ;
+    \item difficulté à reproduire exactement les commandes et décisions ;
+    \item dispersion des preuves entre terminal, tickets, documentation et historique Git ;
+    \item risques de modification directe de la source ;
+    \item faible visibilité sur l'état réel d'une migration ;
+    \item cycles de diagnostic et de correction difficiles à capitaliser.
+\end{itemize}
+
+Le besoin d'intelligence apparaît lorsque les règles connues ne suffisent plus : interprétation d'un journal complexe, rapprochement de plusieurs erreurs, proposition d'un plan ou adaptation à un contexte applicatif particulier. L'intelligence ne remplace toutefois pas les validations déterministes ; elle complète les opérations reproductibles et reste soumise à des limites d'autorité.
+
+% ============================================================
+\section{Problématique traitée}
+% ============================================================
+
+\subsection{Complexité des tâches et besoin de coordination}
+
+Une migration combine des tâches hétérogènes et interdépendantes : inventaire, détection de versions, résolution de compatibilités, planification, transformation, gestion des dépendances, compilation, tests, diagnostic, réparation et production de preuves. Chaque étape consomme les résultats de la précédente et peut imposer un retour en arrière.
+
+La complexité ne provient donc pas uniquement de chaque tâche prise séparément. Elle provient de leur coordination :
+
+\begin{itemize}
+    \item sélectionner le bon agent ou service selon l'état courant ;
+    \item transmettre un contexte suffisant sans exposer tout le projet ;
+    \item conserver l'ordre des opérations et leurs résultats ;
+    \item suspendre le processus lorsqu'une décision humaine est requise ;
+    \item reprendre après approbation, interruption ou erreur ;
+    \item empêcher qu'un résultat obsolète soit appliqué ;
+    \item replanifier lorsqu'une hypothèse ou une compatibilité est invalidée.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \resizebox{0.97\textwidth}{!}{%
+    \begin{tikzpicture}[
+        box/.style={draw=cgiblue,rounded corners=3pt,fill=cgilight!55,minimum width=3.2cm,minimum height=1.05cm,align=center,font=\small\bfseries},
+        risk/.style={draw=cgired,rounded corners=3pt,fill=white,minimum width=3.2cm,minimum height=1.05cm,align=center,font=\small\bfseries},
+        arr/.style={-{Latex[length=2mm]},thick,draw=cgigray}
+    ]
+        \node[box] (analyse) {Analyse};
+        \node[box,right=0.5cm of analyse] (plan) {Planification};
+        \node[box,right=0.5cm of plan] (transform) {Transformation};
+        \node[box,right=0.5cm of transform] (validate) {Compilation et tests};
+        \node[risk,right=0.5cm of validate] (failure) {Échec ou décision};
+        \node[box,right=0.5cm of failure] (repair) {Réparation ou reprise};
+        \draw[arr] (analyse) -- (plan);
+        \draw[arr] (plan) -- (transform);
+        \draw[arr] (transform) -- (validate);
+        \draw[arr] (validate) -- (failure);
+        \draw[arr] (failure) -- (repair);
+        \draw[arr,rounded corners=4pt] (repair.south) -- ++(0,-0.7) -| (plan.south);
+    \end{tikzpicture}%
+    }
+    \caption{Dépendances et boucles de coordination d'une migration}
+    \label{fig:complexite-coordination-ch1}
+\end{figure}
+
+\subsection{Limites d'une architecture monolithique ou d'un agent unique}
+
+Une architecture monolithique concentrant toutes les responsabilités dans un seul module ou un seul agent simplifierait l'apparence initiale du système, mais créerait plusieurs difficultés :
+
+\begin{itemize}
+    \item un contexte trop large mélangeant code, dépendances, journaux, règles et objectifs ;
+    \item des responsabilités difficiles à isoler et à tester ;
+    \item une concentration excessive de l'autorité entre analyse, décision et exécution ;
+    \item une faible capacité à remplacer un modèle, un agent ou une politique ;
+    \item une propagation plus importante des erreurs ;
+    \item une traçabilité insuffisante des contributions intermédiaires ;
+    \item une évolution plus difficile lorsque Java et Angular nécessitent des outils différents.
+\end{itemize}
+
+La solution retient donc une architecture multi-agents \textbf{hybride, spécialisée et centralement orchestrée}. Les agents possèdent des objectifs limités et des contrats explicites. L'orchestrateur organise leur séquence, tandis que les services déterministes conservent l'autorité sur l'exécution.
+
+\subsection{Problématique générale}
 
 \begin{quote}
 \itshape
-Comment concevoir des systèmes de migration intelligents, spécialisés et gouvernés capables d'automatiser, d'accélérer et de suivre la modernisation d'applications Java/Spring Boot et Angular, tout en réduisant l'effort manuel et les cycles de débogage, en facilitant l'exécution de plusieurs migrations et en garantissant la reproductibilité, la traçabilité, l'isolation des modifications et le contrôle du développeur ?
+Comment concevoir et mettre en œuvre une architecture multi-agents hybride capable de coordonner l'analyse, la planification, la transformation, la validation et la réparation de migrations Java/Spring Boot et Angular, tout en préservant l'intégrité du code source, la traçabilité des décisions, la reproductibilité des opérations et le contrôle du développeur ?
 \end{quote}
 
-\subsection{Conduite du projet}
+\subsection{Besoins fonctionnels}
 
-La conduite du projet repose sur une démarche structurée combinant définition des objectifs, priorisation des besoins, développement incrémental, validation technique et collecte régulière des retours. Cette organisation permet d'adapter progressivement la solution aux problèmes observés pendant les expérimentations et d'éviter la construction d'une architecture figée avant la validation des principaux choix techniques.
+\scriptsize
+\begin{longtable}{|>{\bfseries\RaggedRight\arraybackslash}p{1.25cm}|>{\RaggedRight\arraybackslash}p{8.2cm}|>{\centering\arraybackslash}p{2.3cm}|>{\centering\arraybackslash}p{2.4cm}|}
+    \caption{Besoins fonctionnels du système}\label{tab:bf-ch1}\\
+    \hline
+    \rowcolor{cgilight!95}
+    \textbf{ID} & \textbf{Besoin} & \textbf{Portée} & \textbf{État global} \\
+    \hline
+    \endfirsthead
+    \hline
+    \rowcolor{cgilight!95}
+    \textbf{ID} & \textbf{Besoin} & \textbf{Portée} & \textbf{État global} \\
+    \hline
+    \endhead
+    BF-01 & Configurer l'application source, la cible, les versions et les profils d'exécution. & Commun & Java avancé ; Angular en intégration \\
+    \hline
+    BF-02 & Vérifier les chemins, runtimes, outils et compatibilités avant le lancement. & Commun & Implémenté avec niveaux de maturité différents \\
+    \hline
+    BF-03 & Analyser la structure, les dépendances, la configuration, les tests et les risques. & Commun & Implémenté \\
+    \hline
+    BF-04 & Construire une trajectoire progressive et un plan de migration vérifiable. & Commun & Implémenté \\
+    \hline
+    BF-05 & Permettre au développeur d'approuver, rejeter ou demander une révision. & Commun & Java avancé ; Angular en intégration \\
+    \hline
+    BF-06 & Créer un espace isolé et préserver l'application source. & Commun & Implémenté \\
+    \hline
+    BF-07 & Appliquer les transformations propres à l'écosystème. & Spécifique & Java avancé ; Angular en validation \\
+    \hline
+    BF-08 & Exécuter l'installation, la compilation ou la construction et les tests. & Commun & Java avancé ; Angular en validation \\
+    \hline
+    BF-09 & Conserver les échecs et produire un contexte de diagnostic borné. & Commun & Java implémenté ; Angular planifié \\
+    \hline
+    BF-10 & Générer, réviser, approuver et revalider une réparation. & Commun & Java implémenté ; Angular planifié \\
+    \hline
+    BF-11 & Afficher les étapes, événements, preuves, décisions et blocages. & Commun & Java avancé ; Angular en intégration \\
+    \hline
+    BF-12 & Annuler ou reprendre une exécution selon les transitions autorisées. & Commun & Partiel \\
+    \hline
+    BF-13 & Produire un rapport final relié aux preuves techniques. & Commun & Java implémenté ; Angular en développement \\
+    \hline
+    BF-14 & Gérer ultérieurement les identités, rôles et autorisations. & Industrialisation & Non implémenté \\
+    \hline
+\end{longtable}
+\normalsize
 
-Le travail a été organisé selon une approche \textbf{Agile Scrum}. Celle-ci favorise la livraison régulière d'incréments fonctionnels, la communication entre les participants et l'ajustement des priorités en fonction des résultats obtenus. Le cadre a été adapté au contexte du projet afin d'associer les développeurs, les référents fonctionnels, l'expert technique et la direction aux moments de validation appropriés.
+\subsection{Besoins non fonctionnels}
 
-\begin{figure}[H]
-    \centering
-    \IfFileExists{logos/agile.png}{%
-        \includegraphics[width=0.78\textwidth]{logos/agile.png}%
-    }{%
-        \fbox{\parbox[c][4.5cm][c]{0.74\textwidth}{\centering Méthodologie Agile}}%
-    }
-    \caption{Principes de la méthodologie Agile}
-    \label{fig:methodologie-agile}
-\end{figure}
+\begin{longtable}{|>{\bfseries\RaggedRight\arraybackslash}p{1.5cm}|>{\RaggedRight\arraybackslash}p{3.6cm}|>{\RaggedRight\arraybackslash}p{8.0cm}|}
+    \caption{Besoins non fonctionnels du système}\label{tab:bnf-ch1}\\
+    \hline
+    \rowcolor{cgilight!95}
+    \textbf{ID} & \textbf{Caractéristique} & \textbf{Exigence} \\
+    \hline
+    \endfirsthead
+    \hline
+    \rowcolor{cgilight!95}
+    \textbf{ID} & \textbf{Caractéristique} & \textbf{Exigence} \\
+    \hline
+    \endhead
+    BNF-01 & Intégrité & Le projet source ne doit pas être modifié par le processus de migration. \\
+    \hline
+    BNF-02 & Isolation & Les écritures et commandes doivent rester limitées à l'espace de travail autorisé. \\
+    \hline
+    BNF-03 & Traçabilité & Chaque état, action, décision, artefact et résultat doit être rattaché à une exécution. \\
+    \hline
+    BNF-04 & Reproductibilité & Les profils, commandes et paramètres essentiels doivent être persistés. \\
+    \hline
+    BNF-05 & Fiabilité & Une étape ne doit progresser qu'après validation de ses préconditions et résultats. \\
+    \hline
+    BNF-06 & Reprise & Une interruption ne doit pas entraîner la perte de l'état validé. \\
+    \hline
+    BNF-07 & Idempotence & La répétition d'une requête protégée ne doit pas appliquer deux fois la même action. \\
+    \hline
+    BNF-08 & Confidentialité & Les secrets et chemins sensibles doivent être exclus ou masqués avant un appel LLM. \\
+    \hline
+    BNF-09 & Gouvernance & Un modèle ne doit pas exécuter directement une commande ou appliquer seul un correctif sensible. \\
+    \hline
+    BNF-10 & Maintenabilité & Les agents, contrats et profils doivent pouvoir évoluer indépendamment. \\
+    \hline
+    BNF-11 & Utilisabilité & L'interface doit indiquer l'état courant, le blocage et la prochaine action autorisée. \\
+    \hline
+    BNF-12 & Évolutivité & L'architecture doit permettre l'ajout de nouveaux profils, agents et écosystèmes sans refonte complète. \\
+    \hline
+\end{longtable}
 
-\subsection{Méthodologie Scrum}
+% ============================================================
+\section{Objectifs du projet}
+% ============================================================
 
-Le projet est découpé en \textbf{sprints de deux semaines}. Chaque sprint vise à produire un ensemble cohérent de fonctionnalités, de corrections ou de validations pouvant être présenté et évalué. Cette cadence permet de conserver des objectifs suffisamment courts pour être mesurables, tout en laissant le temps nécessaire à l'implémentation et aux expérimentations techniques.
+\subsection{Objectif général}
 
-Les principales cérémonies mises en œuvre sont les suivantes :
+L'objectif général consiste à concevoir, implémenter et évaluer une architecture multi-agents gouvernée permettant d'automatiser une part importante des migrations logicielles, tout en maintenant des validations déterministes et une supervision humaine.
 
-\begin{itemize}
-    \item \textbf{Sprint Planning :} définition des objectifs du sprint, sélection et priorisation des éléments du backlog, puis répartition des travaux à réaliser ;
-    \item \textbf{Daily Scrum :} point quotidien consacré à l'avancement, aux prochaines actions, aux dépendances et aux obstacles rencontrés ;
-    \item \textbf{Revue et démonstration :} présentation des incréments réalisés aux experts techniques et aux responsables de CGI afin de recueillir leurs observations, de valider les orientations et d'ajuster les priorités ;
-    \item \textbf{Rétrospective :} réunion interne de l'équipe destinée à analyser le déroulement du sprint, identifier les difficultés et définir les améliorations applicables au cycle suivant.
-\end{itemize}
+\subsection{Objectifs spécifiques}
 
-Cette organisation soutient une amélioration continue du produit et du mode de collaboration. Les démonstrations permettent de confronter rapidement les développements aux attentes du projet, tandis que les rétrospectives réduisent la répétition des difficultés techniques ou organisationnelles.
-
-\subsection{Organisation de l'équipe projet}
-
-L'équipe opérationnelle comprend \textbf{trois développeurs} travaillant conjointement sur la conception, l'implémentation, l'intégration et la validation des deux systèmes. Afin de ne pas fragmenter artificiellement les responsabilités, le rapport présente leur contribution comme un travail collectif portant sur les différentes composantes de la solution.
-
-Deux référents fonctionnels accompagnent l'équipe dans le suivi des besoins, la clarification des attentes et la cohérence des fonctionnalités avec la vision du projet. Un expert technique assure le suivi global des choix d'architecture, des orientations d'implémentation et des principaux risques techniques. La direction de CGI intervient principalement lors des revues et des démonstrations afin d'évaluer les résultats, de confirmer les priorités et d'assurer l'alignement avec la vision interne.
-
-\begin{table}[H]
-    \centering
-    \small
-    \arrayrulecolor{cgigray}
-    \rowcolors{2}{cgilight!70}{white}
-    \begin{tabularx}{0.96\textwidth}{|>{\bfseries\RaggedRight\arraybackslash}p{4cm}|>{\RaggedRight\arraybackslash}X|}
-        \hline
-        \rowcolor{cgilight!95}
-        \textbf{Intervenants} & \textbf{Contribution au projet} \\
-        \hline
-        Trois développeurs & Conception, développement, intégration, expérimentation et validation de la solution. \\
-        \hline
-        Deux référents fonctionnels & Suivi des besoins, clarification fonctionnelle et accompagnement de l'équipe. \\
-        \hline
-        Expert technique & Suivi global de l'architecture, des choix techniques et des risques majeurs. \\
-        \hline
-        Direction de CGI & Validation des orientations, priorisation et évaluation des démonstrations. \\
-        \hline
-    \end{tabularx}
-    \caption{Organisation des intervenants du projet}
-    \label{tab:organisation-equipe-projet}
-    \rowcolors{2}{white}{white}
-    \arrayrulecolor{black}
-\end{table}
-
-\subsection{Outils de collaboration et de suivi}
-
-La gestion du projet s'appuie sur plusieurs outils complémentaires. \textbf{Jira} est utilisé pour structurer le backlog, planifier les fonctionnalités et suivre l'avancement des tâches. \textbf{Microsoft Teams} assure la communication quotidienne, les réunions de coordination et les démonstrations à distance. \textbf{GitHub} centralise le versionnement du code, le travail collaboratif et le suivi des évolutions techniques. Enfin, \textbf{Confluence} est utilisé pour conserver les éléments de documentation, les décisions et les informations de référence du projet.
-
-\begin{figure}[H]
-    \centering
-    \begin{minipage}[c]{0.29\textwidth}
-        \centering
-        \IfFileExists{logos/jira.png}{\includegraphics[height=1.65cm]{logos/jira.png}}{\fbox{Jira}}\\[1mm]
-        \small Jira
-    \end{minipage}
-    \hfill
-    \begin{minipage}[c]{0.29\textwidth}
-        \centering
-        \IfFileExists{logos/teams-logo.png}{\includegraphics[height=1.65cm]{logos/teams-logo.png}}{\fbox{Teams}}\\[1mm]
-        \small Microsoft Teams
-    \end{minipage}
-    \hfill
-    \begin{minipage}[c]{0.29\textwidth}
-        \centering
-        \IfFileExists{logos/github.png}{\includegraphics[height=1.65cm]{logos/github.png}}{\fbox{GitHub}}\\[1mm]
-        \small GitHub
-    \end{minipage}
-    \caption{Principaux outils de collaboration et de suivi}
-    \label{fig:outils-collaboration}
-\end{figure}
-
-\subsection{Objectifs fonctionnels et techniques}
-
-Pour répondre à la problématique identifiée, le projet poursuit les objectifs fonctionnels suivants :
-
-\begin{itemize}
-    \item configurer les environnements et les versions source et cible d'une migration ;
-    \item analyser automatiquement le projet et identifier les incompatibilités principales ;
-    \item construire et présenter un chemin de migration progressif ;
-    \item préparer des espaces de travail isolés sans modifier la source originale ;
-    \item exécuter les transformations, installations, compilations et tests nécessaires ;
-    \item suivre l'état des phases, les événements, les blocages, les journaux et les preuves ;
-    \item proposer des réparations lorsque les mécanismes déterministes ne suffisent pas ;
-    \item permettre au développeur d'approuver, de refuser ou de demander la révision d'un correctif ;
-    \item produire un résultat et un rapport de migration traçables.
-\end{itemize}
-
-Les objectifs techniques associés sont les suivants :
+Les objectifs spécifiques sont les suivants :
 
 \begin{itemize}
-    \item garantir une orchestration déterministe et vérifiable des opérations ;
-    \item isoler les transformations et préserver l'intégrité du projet source ;
-    \item encadrer strictement l'intervention des agents et des LLM ;
-    \item conserver l'historique des commandes, états, preuves et décisions ;
-    \item appliquer les correctifs uniquement après contrôle et autorisation ;
-    \item valider les résultats par l'exécution réelle des installations, compilations et tests ;
-    \item permettre la reprise, le suivi et le diagnostic des migrations interrompues ou bloquées ;
-    \item maintenir deux architectures spécialisées, testables et évolutives pour Java/Spring Boot et Angular.
+    \item identifier les types d'agents nécessaires aux différentes phases ;
+    \item définir pour chaque agent son objectif, ses entrées, ses sorties et ses limites d'autorité ;
+    \item concevoir une architecture SMA hybride et centralement orchestrée ;
+    \item formaliser les contrats de communication entre agents, services et orchestrateur ;
+    \item mettre en œuvre la gestion des états, des priorités, des interruptions et des reprises ;
+    \item intégrer les outils déterministes propres à Java/Spring Boot et Angular ;
+    \item construire une boucle de réparation fondée sur la proposition, la révision, l'approbation et la revalidation ;
+    \item fournir un cockpit permettant de superviser le système et d'examiner les preuves ;
+    \item évaluer la qualité du processus à partir de scénarios, de résultats de build et de tests, du nombre d'interventions et des cycles de correction ;
+    \item préparer l'extension de la démarche à d'autres versions, frameworks et contextes d'exploitation.
 \end{itemize}
 
-Ces objectifs orientent les choix d'architecture, l'organisation des workflows, la conception des agents et les mécanismes de gouvernance développés dans la suite du projet.
+% ============================================================
+\section{Méthodologie générale}
+% ============================================================
 
-\subsection{Missions et participation au niveau du projet}
+Le projet a été conduit selon une démarche Agile inspirée de Scrum. Le travail est organisé en sprints de deux semaines comprenant la sélection des éléments du backlog, des points quotidiens, une revue ou démonstration et une rétrospective interne. Le Scrum Guide formalise ces événements comme des mécanismes d'inspection et d'adaptation \cite{scrum-guide}.
 
-Les principales missions réalisées dans le cadre du projet comprennent :
+La démarche technique suit un cycle court :
 
-\begin{itemize}
-    \item l'analyse des besoins fonctionnels et techniques liés à la modernisation d'applications ;
-    \item la définition des workflows de migration Java/Spring Boot et Angular ;
-    \item la conception de l'architecture d'orchestration et des contrats d'échange entre les différents composants ;
-    \item l'implémentation d'agents spécialisés pour l'analyse, la planification, la transformation, la validation et la réparation ;
-    \item la mise en place de workspaces isolés et de mécanismes déterministes pour l'exécution des commandes ;
-    \item le développement d'une boucle de réparation gouvernée intégrant proposition, révision, approbation, application et revalidation ;
-    \item la conception d'interfaces de configuration, de suivi et de pilotage de la migration ;
-    \item l'intégration de journaux, d'événements, de preuves techniques et de rapports permettant d'assurer la traçabilité ;
-    \item la réalisation de tests fonctionnels et techniques sur des scénarios représentatifs ;
-    \item l'amélioration continue de la solution à partir des résultats de validation, des erreurs observées et des retours de l'équipe.
-\end{itemize}
+\begin{enumerate}
+    \item observer un problème de migration réel ;
+    \item formaliser le besoin et les critères d'acceptation ;
+    \item concevoir le composant, l'agent ou le contrat nécessaire ;
+    \item implémenter la fonctionnalité dans le dépôt concerné ;
+    \item vérifier les tests unitaires et d'intégration ;
+    \item exécuter un scénario représentatif ;
+    \item présenter le résultat et intégrer les retours ;
+    \item documenter les décisions et limites observées.
+\end{enumerate}
 
-La démarche suivie repose sur des cycles courts de conception, d'implémentation, d'expérimentation et de correction. Les fonctionnalités sont développées progressivement, testées sur des applications représentatives, puis améliorées avant leur intégration dans le workflow global. Cette approche permet de maîtriser les risques techniques, de valider les choix d'architecture et de maintenir une progression cohérente du projet.
+Jira est utilisé pour le backlog et les tickets, Microsoft Teams pour les échanges et réunions, GitHub pour le versionnement et les revues, et Confluence pour la documentation. Le développement de Java/Spring Boot a servi de premier terrain de validation. Angular a ensuite été introduit dans un dépôt indépendant afin de vérifier que les principes pouvaient être adaptés à un second écosystème sans imposer une base de code universelle.
 
 \section*{Conclusion}
 \addcontentsline{toc}{section}{Conclusion}
 
-Ce chapitre a présenté CGI Technologies et Solutions, sa présence au Maroc, ses principales activités ainsi que l'environnement professionnel dans lequel le projet a été réalisé. Il a également exposé le client interne, le contexte et la problématique de la Migration Factory, les deux systèmes spécialisés Java/Spring Boot et Angular, les objectifs poursuivis, l'organisation de l'équipe et la démarche Agile Scrum adoptée. Le chapitre suivant sera consacré à l'état de l'art de la migration logicielle, des outils de transformation et des approches d'assistance fondées sur l'intelligence artificielle.
+Ce chapitre a présenté CGI Technologies et Solutions Maroc, le domaine de la modernisation applicative et le contexte dans lequel la Migration Factory a été développée. Il a distingué les utilisateurs, les agents internes, les services déterministes et les outils externes. L'analyse a montré que le problème ne réside pas seulement dans la transformation du code, mais dans la coordination d'activités interdépendantes, la gestion des états, la maîtrise des erreurs et la séparation de l'autorité.
+
+Les besoins et objectifs définis conduisent à retenir une architecture multi-agents hybride, spécialisée, centralement orchestrée et gouvernée par le développeur. Le chapitre suivant présente les fondements théoriques relatifs aux agents, aux systèmes multi-agents, à l'orchestration et à la migration, puis compare les principaux travaux et outils proches du projet.
