@@ -1,0 +1,34 @@
+% ============================================================
+\section{Modèles managés et déploiements d'entreprise}
+% ============================================================
+
+L'intégration d'un LLM dans une plateforme d'entreprise peut suivre plusieurs modèles. Une application peut appeler directement un service public à l'aide d'une clé propre au projet, ou consommer un modèle déployé dans une ressource contrôlée par l'organisation. Dans le second cas, la ressource, l'endpoint, les identités et les déploiements sont gouvernés par l'entreprise, tandis que l'application conserve uniquement les références nécessaires à l'appel.
+
+Azure OpenAI et Microsoft Foundry utilisent des déploiements nommés. L'application adresse le nom du déploiement configuré, et non seulement le nom générique du modèle sous-jacent. Cette séparation permet à l'organisation de remplacer un modèle, de modifier sa capacité ou d'attribuer des déploiements différents à plusieurs responsabilités sans modifier la logique fonctionnelle des agents \cite{azure-foundry-endpoints}.
+
+\begin{table}[H]
+    \centering
+    \small
+    \arrayrulecolor{cgigray}
+    \rowcolors{2}{cgilight!55}{white}
+    \begin{tabularx}{\textwidth}{|>{\bfseries\RaggedRight\arraybackslash}p{3.8cm}|>{\RaggedRight\arraybackslash}p{5cm}|>{\RaggedRight\arraybackslash}X|}
+        \hline
+        \rowcolor{cgilight!95}
+        \textbf{Approche} & \textbf{Principe} & \textbf{Conséquence architecturale} \\
+        \hline
+        Appel direct d'un modèle public & L'application contient la configuration d'un fournisseur et d'un modèle donné. & Couplage plus fort entre le code, le fournisseur et le modèle sélectionné. \\
+        \hline
+        Modèle managé par l'organisation & Le modèle est déployé dans une ressource appartenant à l'entreprise. & Gouvernance des accès, des déploiements, des quotas et des politiques par l'organisation. \\
+        \hline
+        Routage par rôle & Plusieurs déploiements sont associés aux rôles de proposition, de révision ou d'assistance. & Spécialisation des modèles et remplacement indépendant de chaque déploiement. \\
+        \hline
+        Configuration externalisée & Endpoint, authentification et noms de déploiement sont fournis au runtime. & Réduction des valeurs codées en dur et meilleure adaptation aux environnements client. \\
+        \hline
+    \end{tabularx}
+    \caption{Modes d'intégration des modèles dans une plateforme d'entreprise}
+    \label{tab:modeles-manages-entreprise-ch2}
+    \rowcolors{2}{white}{white}
+    \arrayrulecolor{black}
+\end{table}
+
+Cette organisation ne supprime pas les risques. Elle exige une gestion rigoureuse des secrets, des permissions, des journaux et des indisponibilités. Microsoft recommande l'authentification par Microsoft Entra ID pour les connexions sans clé, tout en maintenant la prise en charge des clés API selon le contexte d'exécution \cite{azure-openai-auth,azure-entra-auth}.
