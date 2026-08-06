@@ -3,9 +3,9 @@
 \section*{Introduction}
 \addcontentsline{toc}{section}{Introduction}
 
-Ce chapitre situe le projet dans son environnement professionnel et précise le besoin auquel il répond. Il présente l'organisme d'accueil, le domaine de la modernisation applicative, les utilisateurs visés, les catégories de composants mobilisées, la problématique, les exigences, les objectifs et la méthodologie suivie.
+Ce chapitre situe le projet dans son environnement professionnel et précise le besoin auquel il répond. Il présente l'organisme d'accueil, le domaine de la modernisation applicative, les utilisateurs visés, les catégories de composants mobilisées, la genèse du produit, la problématique, les exigences, les objectifs et la méthodologie suivie.
 
-La spécification s'appuie sur les principes d'ISO/IEC/IEEE 29148 : une exigence doit être compréhensible, reliée à une partie prenante et associée à un moyen de vérification \cite{iso29148}. Le rapport distingue donc l'objectif du produit, l'état observé dans les deux prototypes et les évolutions d'industrialisation.
+La spécification s'appuie sur les principes d'ISO/IEC/IEEE 29148 : une exigence doit être compréhensible, reliée à une partie prenante et associée à un moyen de vérification \cite{iso29148}. Le rapport distingue donc l'objectif du produit, l'état observé dans les deux prototypes et les évolutions d'industrialisation. L'état d'avancement décrit dans cette version est arrêté au \textbf{6 août 2026}.
 
 % ============================================================
 \section{Présentation de l'organisme d'accueil}
@@ -76,7 +76,7 @@ La première déclinaison concerne Java/Spring Boot. La seconde concerne Angular
 
 L'utilisateur opérationnel actuel est le \textbf{développeur chargé de la migration}. Il fournit l'application, configure les versions, contrôle les prérequis, lance l'exécution, examine les preuves et prend les décisions nécessaires.
 
-Dans une version industrialisée, d'autres rôles pourraient être distingués : reviewer technique, responsable de migration, administrateur de plateforme et lecteur de rapports. Ces rôles constituent une cible d'évolution ; ils ne sont pas implémentés dans les prototypes locaux actuels, qui ne possèdent ni comptes, ni authentification, ni contrôle d'accès par rôle.
+Dans une version industrialisée, d'autres rôles pourraient être distingués : agent de révision technique, responsable de migration, administrateur de plateforme et lecteur de rapports. Ces rôles constituent une cible d'évolution ; ils ne sont pas implémentés dans les prototypes locaux actuels, qui ne possèdent ni comptes, ni authentification, ni contrôle d'accès par rôle.
 
 \subsection{Classification des acteurs et composants}
 
@@ -115,7 +115,44 @@ Le système de fichiers local appartient à l'infrastructure d'exécution ; il n
 
 Le système Java/Spring Boot est le plus mature. Il prend en charge une trajectoire progressive Spring Boot 2.1 $\rightarrow$ 2.7 $\rightarrow$ 3.5 $\rightarrow$ 4.0, avec Java 11, 17 et 21 selon les étapes. Il comprend la qualification, l'analyse, la planification, les décisions humaines, les espaces de travail isolés, les transformations, Maven, les tests, une boucle de réparation, un cockpit, un assistant et un rapport final.
 
-Le système Angular est en développement actif autour d'Angular 18 $\rightarrow$ 19 $\rightarrow$ 20 $\rightarrow$ 21. Les agents principaux d'analyse, de révision, de planification et de transformation sont développés. L'intégration du processus complet, les validations d'exécution, l'assistant, la réparation et le reporting sont encore consolidés.
+Le système Angular est en développement actif autour d'Angular 18 $\rightarrow$ 19 $\rightarrow$ 20 $\rightarrow$ 21. Les agents principaux d'analyse, de révision, de planification et de transformation sont développés. L'intégration du processus complet, les validations d'exécution, l'assistant, la réparation et le reporting sont encore consolidés. Une extension progressive d'Angular 11 vers Angular 21 constitue l'objectif du jalon de septembre 2026.
+
+\subsection{Genèse et évolution générale du projet}
+
+Le produit n'a pas été construit comme une architecture complète dès le premier jour. Il a évolué par incréments successifs, chacun répondant à un besoin observé ou à une limite de la version précédente.
+
+La première phase, menée pendant environ trois semaines à partir du début du mois de mai 2026, a regroupé l'analyse du besoin, l'étude des trajectoires Spring Boot, la préparation des environnements et le développement du premier workflow en ligne de commande. Cette preuve de concept a été présentée le 25 mai 2026. Une deuxième version CLI, corrigée et enrichie, a ensuite été présentée le 3 juin à une audience CGI plus large. Le 19 juin, la troisième démonstration a marqué le passage à une plateforme full stack comprenant backend, frontend, cockpit et chatbot.
+
+À partir du 20 juin, les travaux ont porté sur la consolidation d'une V1 : nouveau frontend, amélioration du travail des agents LLM, reporting enrichi et boucle de réparation gouvernée. La déclinaison Angular a commencé à la mi-juillet 2026. Une première démonstration Angular 18--21 est planifiée pour le 11 août, avant une extension visée d'Angular 11 vers Angular 21 en septembre.
+
+\begin{figure}[H]
+    \centering
+    \resizebox{0.98\textwidth}{!}{%
+    \begin{tikzpicture}[
+        milestone/.style={draw=cgired,rounded corners=3pt,fill=white,text width=3.2cm,minimum height=1.35cm,align=center,font=\scriptsize},
+        phase/.style={draw=cgiblue,rounded corners=3pt,fill=cgilight!55,text width=3.2cm,minimum height=1.35cm,align=center,font=\scriptsize},
+        arr/.style={-{Latex[length=2mm]},thick,draw=cgigray}
+    ]
+        \node[phase] (start) {\textbf{Début mai}\\Cadrage, analyse et prototype CLI};
+        \node[milestone,right=0.35cm of start] (j1) {\textbf{25 mai -- J1}\\Première démonstration Java CLI};
+        \node[milestone,right=0.35cm of j1] (j2) {\textbf{3 juin -- J2}\\CLI consolidée et audience élargie};
+        \node[milestone,right=0.35cm of j2] (j3) {\textbf{19 juin -- J3}\\Control Tower full stack et chatbot};
+        \node[phase,below=1.0cm of j2] (v1) {\textbf{Depuis le 20 juin}\\V1 Java : frontend, réparation et LLM};
+        \node[phase,right=0.35cm of v1] (ang) {\textbf{Mi-juillet}\\Démarrage du système Angular};
+        \node[milestone,right=0.35cm of ang] (a1) {\textbf{11 août -- A1}\\Angular 18--21, démonstration planifiée};
+        \node[milestone,right=0.35cm of a1] (sep) {\textbf{Septembre}\\Java J4 et Angular A2 11--21};
+        \draw[arr] (start)--(j1);
+        \draw[arr] (j1)--(j2);
+        \draw[arr] (j2)--(j3);
+        \draw[arr] (j3.south)--++(0,-0.45)-|(v1.north);
+        \draw[arr] (v1)--(ang);
+        \draw[arr] (ang)--(a1);
+        \draw[arr] (a1)--(sep);
+    \end{tikzpicture}%
+    }
+    \caption{Frise chronologique générale du projet}
+    \label{fig:chronologie-generale-ch1}
+\end{figure}
 
 % ============================================================
 \section{Problématique traitée}
@@ -275,21 +312,113 @@ L'objectif général consiste à concevoir, implémenter et évaluer une archite
     \item intégrer les outils propres à Java/Spring Boot et Angular ;
     \item construire une boucle de réparation gouvernée ;
     \item fournir un cockpit de supervision ;
-    \item évaluer le processus à partir de preuves, de tests et de métriques disponibles ;
-    \item préparer l'extension à d'autres écosystèmes.
+    \item évaluer le processus à partir de preuves, de tests, de démonstrations et de métriques disponibles ;
+    \item préparer l'extension à d'autres versions et écosystèmes.
 \end{itemize}
 
 % ============================================================
 \section{Méthodologie générale}
 % ============================================================
 
+\subsection{Organisation Agile du projet}
+
 Le projet a été conduit selon une démarche Agile inspirée de Scrum, avec des sprints de deux semaines, des points quotidiens, des revues ou démonstrations et une rétrospective interne \cite{scrum-guide}. Jira est utilisé pour le backlog, Microsoft Teams pour les échanges, GitHub pour le versionnement et les revues, et Confluence pour la documentation.
 
-La démarche technique suit un cycle court : observer un problème, formuler l'exigence, concevoir le composant, l'implémenter, vérifier les tests, exécuter un scénario, présenter le résultat et intégrer les retours. Java/Spring Boot a servi de premier terrain de validation ; Angular a ensuite permis de vérifier l'adaptation du modèle à un second écosystème.
+Le cycle de travail associe backlog, sélection d'un périmètre, conception, implémentation, tests, démonstration et adaptation. Les présentations réalisées devant les parties prenantes sont qualifiées dans ce rapport de \textbf{jalons de démonstration et de validation}. Elles ne sont assimilées à une Sprint Review que lorsque l'équipe et les parties prenantes ont effectivement inspecté le résultat et ajusté la suite du backlog.
+
+\subsection{Planification rétrospective}
+
+Le diagramme de Gantt est rétrospectif : il décrit l'évolution réellement observée ou, pour les éléments futurs, les objectifs explicitement planifiés. Cette représentation macroscopique est compatible avec une conduite itérative ; ISO 21502 reconnaît les approches prédictives, incrémentales, itératives, adaptatives et hybrides, y compris les approches agiles \cite{iso21502}.
+
+\scriptsize
+\begin{table}[H]
+    \centering
+    \arrayrulecolor{cgigray}
+    \begin{tabularx}{\textwidth}{|>{\RaggedRight\arraybackslash}p{4.6cm}|c|c|c|c|c|>{\RaggedRight\arraybackslash}X|}
+        \hline
+        \rowcolor{cgilight!95}
+        \textbf{Activité ou jalon} & \textbf{Mai} & \textbf{Juin} & \textbf{Juil.} & \textbf{Août} & \textbf{Sept.} & \textbf{Statut} \\
+        \hline
+        Cadrage, étude et environnement Java & \cellcolor{cgiblue!50} & & & & & Réalisé \\
+        \hline
+        Prototype Java CLI & \cellcolor{cgiblue!50} & & & & & Réalisé \\
+        \hline
+        Java J1 -- 25 mai & \cellcolor{cgired!25}\textbf{◆} & & & & & Réalisé \\
+        \hline
+        Consolidation CLI et Java J2 -- 3 juin & \cellcolor{cgiblue!35} & \cellcolor{cgired!25}\textbf{◆} & & & & Réalisé \\
+        \hline
+        Backend, frontend et chatbot & & \cellcolor{cgiblue!50} & & & & Réalisé \\
+        \hline
+        Java J3 -- 19 juin & & \cellcolor{cgired!25}\textbf{◆} & & & & Réalisé \\
+        \hline
+        Nouveau frontend et consolidation V1 & & \cellcolor{cgiblue!35} & \cellcolor{cgiblue!50} & \cellcolor{cgiblue!50} & \cellcolor{cgiblue!25} & En cours \\
+        \hline
+        Réparation gouvernée et amélioration LLM & & \cellcolor{cgiblue!35} & \cellcolor{cgiblue!50} & \cellcolor{cgiblue!50} & \cellcolor{cgiblue!25} & En cours \\
+        \hline
+        Étude et agents Angular & & & \cellcolor{emsigreen!35} & \cellcolor{emsigreen!35} & & En cours \\
+        \hline
+        Angular A1 -- 11 août, périmètre 18--21 & & & & \cellcolor{cgired!25}\textbf{◆} & & Planifié \\
+        \hline
+        Extension Angular 11--21 & & & & \cellcolor{emsigreen!25} & \cellcolor{emsigreen!35} & Planifié \\
+        \hline
+        Java J4 et Angular A2 & & & & & \cellcolor{cgired!25}\textbf{◆} & Planifié \\
+        \hline
+        Rédaction, validation et soutenance & & & \cellcolor{cgigray!20} & \cellcolor{cgigray!30} & \cellcolor{cgigray!20} & En cours \\
+        \hline
+    \end{tabularx}
+    \caption{Diagramme de Gantt rétrospectif du projet Migration Factory}
+    \label{tab:gantt-retrospectif-ch1}
+    \arrayrulecolor{black}
+\end{table}
+\normalsize
+
+La légende du tableau est la suivante : les cellules bleues représentent les activités Java, les cellules vertes les activités Angular, les cellules grises la rédaction, et le symbole \textbf{◆} un jalon de démonstration.
+
+\subsection{Itérations, incréments et jalons de validation}
+
+\scriptsize
+\begin{longtable}{|>{\bfseries\RaggedRight\arraybackslash}p{2.8cm}|>{\RaggedRight\arraybackslash}p{4.0cm}|>{\RaggedRight\arraybackslash}p{5.2cm}|>{\RaggedRight\arraybackslash}p{2.8cm}|}
+    \caption{Synthèse des principales itérations et des incréments}\label{tab:iterations-increments-ch1}\\
+    \hline
+    \rowcolor{cgilight!95}
+    \textbf{Période} & \textbf{Objectif} & \textbf{Incrément produit} & \textbf{Jalon} \\
+    \hline
+    \endfirsthead
+    \hline
+    \rowcolor{cgilight!95}
+    \textbf{Période} & \textbf{Objectif} & \textbf{Incrément produit} & \textbf{Jalon} \\
+    \hline
+    \endhead
+    Début mai--24 mai & Cadrer le besoin et valider la faisabilité technique. & Environnement, trajectoire Java et première chaîne de migration CLI. & Préparation J1 \\
+    \hline
+    25 mai & Présenter la première version opérationnelle. & Analyse, planification, transformation, Maven et artefacts en CLI. & Java J1 réalisé \\
+    \hline
+    26 mai--2 juin & Corriger et stabiliser le prototype. & Workflow CLI enrichi, sorties améliorées et scénario consolidé. & Préparation J2 \\
+    \hline
+    3 juin & Élargir la validation auprès de CGI. & Version CLI améliorée présentée à davantage de responsables et directeurs. & Java J2 réalisé \\
+    \hline
+    4--18 juin & Passer du prototype à une plateforme intégrée. & Backend FastAPI, SQLite, frontend, cockpit, événements et chatbot. & Préparation J3 \\
+    \hline
+    19 juin & Présenter la Control Tower full stack. & Plateforme intégrée avec backend, frontend et assistant. & Java J3 réalisé \\
+    \hline
+    Depuis le 20 juin & Consolider une V1 gouvernée. & Nouveau frontend, réparation proposeur/réviseur, reporting et amélioration LLM. & Java J4 planifié \\
+    \hline
+    Depuis mi-juillet & Adapter les principes à Angular. & Migration manuelle d'étude, agents et workflow Angular 18--21. & Angular A1 planifié \\
+    \hline
+    Août--septembre & Étendre le périmètre Angular. & Trajectoire progressive d'Angular 11 vers Angular 21. & Angular A2 planifié \\
+    \hline
+\end{longtable}
+\normalsize
+
+Les numéros détaillés des sprints et les tickets associés restent disponibles dans Jira. Le rapport privilégie une synthèse des incréments plutôt qu'une reproduction exhaustive des tableaux de suivi.
+
+\subsection{Cycle technique}
+
+La démarche technique suit un cycle court : observer un problème, formuler l'exigence, concevoir le composant, l'implémenter, vérifier les tests, exécuter un scénario, présenter le résultat et intégrer les retours. Java/Spring Boot a servi de premier terrain de validation ; Angular permet ensuite de vérifier l'adaptation du modèle à un second écosystème sans imposer une base de code commune.
 
 \section*{Conclusion}
 \addcontentsline{toc}{section}{Conclusion}
 
-Ce chapitre a présenté le contexte professionnel, les utilisateurs, les catégories de composants, les problèmes observés et les besoins de la Migration Factory. La distinction entre agents intelligents, services déterministes, outils d'exécution et services externes clarifie les frontières du système. Les exigences sont désormais associées à la maturité de chaque dépôt et, pour les qualités critiques, à un critère de vérification.
+Ce chapitre a présenté le contexte professionnel, les utilisateurs, les catégories de composants, la problématique et les besoins de la Migration Factory. La distinction entre agents intelligents, services déterministes, outils d'exécution et services externes clarifie les frontières du système. Les exigences sont associées à la maturité de chaque dépôt et, pour les qualités critiques, à un critère de vérification.
 
-Le chapitre suivant présente les fondements théoriques relatifs aux agents, aux systèmes multi-agents, à l'orchestration et à la migration, puis compare les travaux et plateformes proches du projet.
+La chronologie, le Gantt rétrospectif et les jalons montrent que l'architecture résulte d'une progression expérimentale : première faisabilité CLI, consolidation, transformation en plateforme full stack, préparation d'une V1 gouvernée et extension à Angular. Le chapitre suivant présente les fondements théoriques relatifs aux agents, aux systèmes multi-agents, à l'orchestration et à la migration, puis compare les travaux et plateformes proches du projet.
