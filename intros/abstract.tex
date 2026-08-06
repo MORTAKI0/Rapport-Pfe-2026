@@ -7,9 +7,11 @@ This final-year engineering project, conducted at \textbf{CGI Technologies and S
 
 Agents and large language models complement this foundation by accelerating activities that require deeper analysis and adaptation. They support project analysis, migration-plan enrichment, result interpretation, and execution monitoring, while having no direct authority to apply changes. When an installation, build, or test failure occurs, the system constructs a repair context from the detected errors and the current pipeline state. A model then proposes a corrective change, which is independently reviewed and submitted to the developer for approval before application and revalidation.
 
+To align with the client's enterprise environment, the Java implementation uses Azure OpenAI through externalized configuration. CGI can provide the endpoint, authentication credentials, and the names of its own model deployments for proposal, review, assistance, and optional fallback roles. Secrets remain on the backend and are not exposed through the user interface.
+
 The implementation is organized into two separate software repositories: one dedicated to \textbf{Java/Spring Boot} migration and the other to \textbf{Angular} migration. This separation preserves the technical specificities of each ecosystem, avoids unnecessarily complex orchestration, and facilitates the evolution, testing, and long-term maintenance of each solution. Both repositories nevertheless share the same principles of governance, traceability, isolation, and controlled collaboration between deterministic automation, large language models, and human expertise.
 
 The main contribution is therefore a controlled approach that aims to reduce manual effort, accelerate migration and repair cycles, improve operational reproducibility, and make every decision auditable, without pursuing full autonomy at the expense of safety and human oversight.
 
 \vspace{0.5cm}
-\noindent\textbf{Keywords:} Software migration, application modernization, Migration Factory, deterministic automation, generative artificial intelligence, software agents, large language models, Java, Spring Boot, Angular, orchestration, traceability, human-in-the-loop . 
+\noindent\textbf{Keywords:} Software migration, application modernization, Migration Factory, deterministic automation, generative artificial intelligence, software agents, large language models, Azure OpenAI, Microsoft Azure, Java, Spring Boot, Angular, orchestration, traceability, human-in-the-loop.
