@@ -10,6 +10,7 @@
 \usepackage{microtype}
 \usepackage{setspace}
 \usepackage{ragged2e}
+\usepackage{etoolbox}
 
 % ============================================================
 % MISE EN PAGE
@@ -126,6 +127,24 @@
 \newcommand{\academicsupervisor}{À compléter}
 
 % ============================================================
+% INSERTION DES COMPLÉMENTS AVANT LA CONCLUSION D'UN CHAPITRE
+% ============================================================
+\newcommand{\inputchapterwithsupplement}[2]{%
+    \begingroup
+    \let\mfOriginalSection\section
+    \RenewDocumentCommand{\section}{s m}{%
+        \IfBooleanTF{##1}{%
+            \ifstrequal{##2}{Conclusion}{\input{#2}}{}%
+            \mfOriginalSection*{##2}%
+        }{%
+            \mfOriginalSection{##2}%
+        }%
+    }%
+    \input{#1}%
+    \endgroup
+}
+
+% ============================================================
 % HYPERLIENS — À CHARGER EN FIN DE PRÉAMBULE
 % ============================================================
 \usepackage{xurl}
@@ -190,19 +209,19 @@
 \input{intros/introduction_generale}
 \clearpage
 
-\input{chapitre1/contexte_general}
+\inputchapterwithsupplement{chapitre1/contexte_general}{chapitre1/integration_azure_exigences}
 \clearpage
 
-\input{chapitre2/etat_art_migration}
+\inputchapterwithsupplement{chapitre2/etat_art_migration}{chapitre2/modeles_manages_entreprise}
 \clearpage
 
-\input{chapitre3/conception_architecture_sma}
+\inputchapterwithsupplement{chapitre3/conception_architecture_sma}{chapitre3/passerelle_modeles_azure}
 \clearpage
 
-\input{chapitre4/architecture_implementation_systeme}
+\inputchapterwithsupplement{chapitre4/architecture_implementation_systeme}{chapitre4/integration_azure_openai}
 \clearpage
 
-\input{chapitre5/evaluation_resultats}
+\inputchapterwithsupplement{chapitre5/evaluation_resultats}{chapitre5/evaluation_integration_azure}
 \clearpage
 
 \input{conclusion_generale}
