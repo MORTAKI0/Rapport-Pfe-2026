@@ -3,52 +3,52 @@
 \section*{Introduction}
 \addcontentsline{toc}{section}{Introduction}
 
-La Migration Factory ne repose pas uniquement sur des outils de mise à niveau. Elle combine des agents spécialisés, un orchestrateur, des services déterministes, des outils externes et une supervision humaine. La compréhension de la solution exige donc un cadrage conceptuel portant à la fois sur les agents intelligents, les systèmes multi-agents, l'orchestration et la migration logicielle.
+La Migration Factory combine agents intelligents, orchestration, services déterministes, outils de migration et supervision humaine. Sa compréhension exige donc un cadrage portant à la fois sur les agents, les systèmes multi-agents, l'orchestration et la migration logicielle.
 
-Ce chapitre présente d'abord les notions fondamentales sous une forme proche d'un cours : définition et propriétés d'un agent, organisation d'un système multi-agents, modes de coordination et modèles d'orchestration. Il expose ensuite les architectures techniques permettant d'intégrer les agents dans une plateforme logicielle. La seconde partie rappelle les concepts de migration et analyse plusieurs travaux, outils et plateformes proches afin de positionner précisément la contribution du projet.
+Le chapitre présente d'abord les notions théoriques sous une forme pédagogique, puis analyse un corpus de travaux et de plateformes couvrant la migration déterministe, la modernisation assistée par IA, la réparation automatique et l'orchestration multi-agents. La comparaison prend en compte le domaine, les agents, le mode d'orchestration, les métriques disponibles et les limites.
 
 % ============================================================
 \section{Agents intelligents}
 % ============================================================
 
-\subsection{Définition}
+\subsection{Définition et interaction avec l'environnement}
 
-Un agent logiciel est une entité informatique située dans un environnement, capable de percevoir des informations, de maintenir un état ou un contexte, puis d'agir afin de poursuivre un objectif. Wooldridge et Jennings distinguent la théorie des agents, leurs architectures et les langages permettant de les construire \cite{wooldridge-jennings}. Dans une perspective multi-agents, l'agent ne se définit pas seulement par un appel à un modèle de langage : il doit posséder une responsabilité, des capacités, des entrées, des sorties et des règles d'interaction.
+Un agent logiciel est une entité située dans un environnement, capable de recevoir des perceptions, de maintenir un état ou un contexte, puis d'agir afin de poursuivre un objectif. Wooldridge et Jennings distinguent la théorie des agents, leurs architectures et les langages utilisés pour les construire \cite{wooldridge-jennings}.
 
 \begin{figure}[H]
     \centering
     \resizebox{0.78\textwidth}{!}{%
     \begin{tikzpicture}[
-        box/.style={draw=cgiblue,rounded corners=3pt,fill=cgilight!55,minimum width=4.0cm,minimum height=1.2cm,align=center,font=\small\bfseries},
-        env/.style={draw=cgigray,rounded corners=3pt,fill=white,minimum width=4.0cm,minimum height=1.2cm,align=center,font=\small\bfseries},
+        box/.style={draw=cgiblue,rounded corners=3pt,fill=cgilight!55,minimum width=4cm,minimum height=1.2cm,align=center,font=\small\bfseries},
+        env/.style={draw=cgigray,rounded corners=3pt,fill=white,minimum width=4cm,minimum height=1.2cm,align=center,font=\small\bfseries},
         arr/.style={-{Latex[length=2.2mm]},thick,draw=cgigray}
     ]
         \node[env] (env) {Environnement};
-        \node[box,right=2.0cm of env] (agent) {Agent\\état, objectifs, capacités};
+        \node[box,right=2cm of env] (agent) {Agent\\objectifs, contexte, capacités};
         \draw[arr,bend left=18] (env) to node[above,font=\small]{perceptions} (agent);
-        \draw[arr,bend left=18] (agent) to node[below,font=\small]{actions} (env);
+        \draw[arr,bend left=18] (agent) to node[below,font=\small]{actions ou propositions} (env);
     \end{tikzpicture}%
     }
     \caption{Interaction générale entre un agent et son environnement}
     \label{fig:agent-environnement-ch2}
 \end{figure}
 
-Dans le cadre du projet, les agents sont des composants spécialisés et bornés. Ils ne contrôlent pas librement le système de fichiers ou le terminal. Ils reçoivent un contexte préparé par le backend, produisent un résultat structuré, puis rendent la main à l'orchestrateur.
+Dans ce projet, les agents sont spécialisés et bornés. Ils reçoivent un contexte préparé, produisent une sortie structurée et rendent la main à l'orchestrateur. Ils ne disposent pas d'un accès libre au terminal ou au système de fichiers.
 
-\subsection{Propriétés d'un agent}
+\subsection{Propriétés}
 
-La littérature associe généralement plusieurs propriétés aux agents \cite{wooldridge-book,weiss-mas} :
+La littérature associe aux agents plusieurs propriétés \cite{wooldridge-book,weiss-mas} :
 
 \begin{itemize}
-    \item \textbf{autonomie :} capacité à choisir une action sans intervention continue ;
-    \item \textbf{réactivité :} capacité à répondre aux changements de l'environnement ;
-    \item \textbf{proactivité :} aptitude à poursuivre un objectif et non à répondre uniquement à un événement ;
-    \item \textbf{sociabilité :} capacité à communiquer avec d'autres agents ou acteurs ;
-    \item \textbf{raisonnement :} sélection d'une action à partir d'informations et de contraintes ;
-    \item \textbf{adaptabilité :} modification du comportement selon le contexte ou les résultats précédents.
+    \item \textbf{autonomie :} choix local d'un traitement sans intervention continue ;
+    \item \textbf{réactivité :} réponse aux changements observés ;
+    \item \textbf{proactivité :} poursuite d'un objectif ;
+    \item \textbf{sociabilité :} interaction avec d'autres agents ou acteurs ;
+    \item \textbf{raisonnement :} sélection d'une réponse à partir du contexte ;
+    \item \textbf{adaptabilité :} ajustement à de nouvelles preuves ou contraintes.
 \end{itemize}
 
-Ces propriétés doivent être interprétées avec prudence. Tous les agents de la Migration Factory ne sont pas autonomes au même niveau. L'analyseur réagit à une tâche précise ; le planificateur poursuit l'objectif de produire une trajectoire ; le reviewer évalue une sortie ; l'assistant converse avec le développeur. L'autonomie reste limitée par l'orchestrateur, les schémas de sortie et les règles d'autorité.
+Ces propriétés existent à des degrés différents. L'autonomie de raisonnement d'un agent peut être importante alors que son autonomie d'action reste nulle. Cette distinction est essentielle dans un système gouverné.
 
 \subsection{Types d'agents}
 
@@ -57,27 +57,25 @@ Ces propriétés doivent être interprétées avec prudence. Tous les agents de 
     \small
     \arrayrulecolor{cgigray}
     \rowcolors{2}{cgilight!55}{white}
-    \begin{tabularx}{\textwidth}{|>{\bfseries\RaggedRight\arraybackslash}p{3.7cm}|>{\RaggedRight\arraybackslash}X|>{\RaggedRight\arraybackslash}p{4.0cm}|}
+    \begin{tabularx}{\textwidth}{|>{\bfseries\RaggedRight\arraybackslash}p{3.5cm}|>{\RaggedRight\arraybackslash}X|>{\RaggedRight\arraybackslash}p{4.2cm}|}
         \hline
         \rowcolor{cgilight!95}
-        \textbf{Type} & \textbf{Rôle général} & \textbf{Exemple dans le projet} \\
+        \textbf{Type} & \textbf{Rôle général} & \textbf{Correspondance dans le projet} \\
         \hline
-        Agent réactif & Répond à un événement ou à un état sans construire une stratégie longue. & Agent de qualification ou de contrôle d'un résultat. \\
+        Agent cognitif & Raisonne sur plusieurs informations et contraintes. & Analyseur et proposeur de réparation. \\
         \hline
-        Agent cognitif & Utilise un modèle du problème et raisonne sur plusieurs informations. & Analyseur et agent de diagnostic. \\
+        Agent de planification & Décompose un objectif en tâches ordonnées. & Planificateur de trajectoire et de stage. \\
         \hline
-        Agent conversationnel & Interagit en langage naturel avec un utilisateur. & Assistant de migration. \\
+        Agent évaluateur & Examine la qualité ou la conformité d'une sortie. & Agents de révision de l'analyse, du plan et de la réparation. \\
         \hline
-        Agent de planification & Décompose un objectif en tâches ordonnées. & Planificateur de trajectoire. \\
+        Agent conversationnel & Interagit en langage naturel avec l'utilisateur. & Assistant de migration. \\
         \hline
-        Agent de monitoring & Observe l'état, les événements et les anomalies. & Projection du cockpit et mécanismes de surveillance. \\
+        Agent de transformation & Produit des changements candidats à partir d'un plan. & Transformateur Java ou Angular lorsque le traitement est agentique. \\
         \hline
-        Agent d'exécution & Réalise une tâche opérationnelle dans un environnement. & Transformateur borné ; l'exécution shell reste déterministe. \\
-        \hline
-        Agent évaluateur & Examine la qualité ou la conformité d'une sortie. & Reviewers d'analyse, de plan et de réparation. \\
+        Agent réactif & Répond à un événement précis. & Peut être utilisé pour une classification intelligente ; les contrôles purement déterministes restent des services. \\
         \hline
     \end{tabularx}
-    \caption{Types d'agents et correspondance avec le projet}
+    \caption{Types d'agents et correspondance avec la Migration Factory}
     \label{tab:types-agents-ch2}
     \rowcolors{2}{white}{white}
     \arrayrulecolor{black}
@@ -85,9 +83,9 @@ Ces propriétés doivent être interprétées avec prudence. Tous les agents de 
 
 \subsection{Agent, LLM, service et outil}
 
-Un \textbf{LLM} produit une sortie probabiliste à partir d'un contexte. Un \textbf{agent} ajoute à ce modèle un rôle, une mémoire ou un état, des règles d'interaction et éventuellement des outils. Un \textbf{service} implémente une capacité déterministe accessible par contrat. Un \textbf{outil} réalise une opération technique, par exemple Maven, OpenRewrite ou Angular CLI.
+Un \textbf{LLM} produit une sortie probabiliste à partir d'un contexte. Un \textbf{agent} associe un modèle éventuel à un rôle, des objectifs, des règles d'interaction et un schéma de sortie. Un \textbf{service déterministe} applique une capacité vérifiable par contrat. Un \textbf{outil} réalise une opération technique, par exemple Maven ou Angular CLI.
 
-Cette distinction est centrale : appeler un LLM ne suffit pas pour construire un agent, et confier une commande à un service déterministe ne transforme pas ce service en agent. La Migration Factory associe ces catégories sans leur attribuer la même autorité.
+Ainsi, le résolveur de profils, l'exécuteur de commandes, le service de transitions, le stockage d'artefacts et la génération de rapports ne sont pas qualifiés d'agents dans ce rapport.
 
 % ============================================================
 \section{Systèmes multi-agents}
@@ -95,226 +93,130 @@ Cette distinction est centrale : appeler un LLM ne suffit pas pour construire un
 
 \subsection{Définition}
 
-Un système multi-agents (SMA) regroupe plusieurs agents capables d'interagir dans un environnement partagé afin de poursuivre des objectifs individuels ou collectifs. Les ouvrages de Wooldridge, Weiss et Ferber présentent les SMA comme des systèmes dans lesquels les responsabilités, les connaissances et les actions sont distribuées entre plusieurs entités \cite{wooldridge-book,weiss-mas,ferber-mas}.
+Un système multi-agents (SMA) regroupe plusieurs agents capables d'interagir dans un environnement partagé afin de contribuer à un objectif collectif. Les responsabilités, connaissances et actions sont réparties entre plusieurs entités \cite{wooldridge-book,weiss-mas,ferber-mas}.
 
 \begin{figure}[H]
     \centering
-    \resizebox{0.92\textwidth}{!}{%
+    \resizebox{0.9\textwidth}{!}{%
     \begin{tikzpicture}[
-        agent/.style={draw=emsigreen!70!black,rounded corners=3pt,fill=emsigreen!8,minimum width=3.2cm,minimum height=1.05cm,align=center,font=\small\bfseries},
-        state/.style={draw=cgiblue,rounded corners=3pt,fill=cgilight!55,minimum width=4.0cm,minimum height=1.05cm,align=center,font=\small\bfseries},
+        agent/.style={draw=emsigreen!70!black,rounded corners=3pt,fill=emsigreen!8,minimum width=3.2cm,minimum height=1cm,align=center,font=\small\bfseries},
+        state/.style={draw=cgiblue,rounded corners=3pt,fill=cgilight!55,minimum width=4cm,minimum height=1cm,align=center,font=\small\bfseries},
         arr/.style={<->,thick,draw=cgigray}
     ]
         \node[state] (shared) {État et artefacts partagés};
-        \node[agent,above left=1.3cm and 1.4cm of shared] (a1) {Agent d'analyse};
-        \node[agent,above right=1.3cm and 1.4cm of shared] (a2) {Agent de planification};
-        \node[agent,below left=1.3cm and 1.4cm of shared] (a3) {Agent de transformation};
-        \node[agent,below right=1.3cm and 1.4cm of shared] (a4) {Agent de révision};
-        \draw[arr] (a1) -- (shared);
-        \draw[arr] (a2) -- (shared);
-        \draw[arr] (a3) -- (shared);
-        \draw[arr] (a4) -- (shared);
+        \node[agent,above left=1.25cm and 1.4cm of shared] (a1) {Analyseur};
+        \node[agent,above right=1.25cm and 1.4cm of shared] (a2) {Planificateur};
+        \node[agent,below left=1.25cm and 1.4cm of shared] (a3) {Transformateur};
+        \node[agent,below right=1.25cm and 1.4cm of shared] (a4) {Agent de révision};
+        \draw[arr] (a1)--(shared);
+        \draw[arr] (a2)--(shared);
+        \draw[arr] (a3)--(shared);
+        \draw[arr] (a4)--(shared);
     \end{tikzpicture}%
     }
-    \caption{Vue simplifiée d'un système multi-agents spécialisé}
+    \caption{Vue simplifiée d'un SMA spécialisé}
     \label{fig:sma-simplifie-ch2}
 \end{figure}
 
 \subsection{Coordination, communication et délégation}
 
-La \textbf{coordination} organise les dépendances entre actions. La \textbf{communication} transmet des informations, demandes ou décisions. La \textbf{délégation} confie une sous-tâche à un agent disposant des capacités appropriées. La \textbf{coopération} apparaît lorsque plusieurs agents contribuent à un objectif commun. La \textbf{négociation} intervient lorsque plusieurs agents doivent arbitrer des préférences ou ressources.
+La coordination respecte les dépendances entre actions. La communication transmet informations, demandes ou décisions. La délégation confie une sous-tâche à un agent compétent. La coopération associe plusieurs contributions à un même objectif. La négociation intervient lorsque des préférences ou ressources doivent être arbitrées.
 
-FIPA a standardisé des structures de messages et des protocoles d'interaction entre agents. Son Agent Communication Language associe à chaque message une intention communicative, telle qu'informer, demander ou proposer \cite{fipa-acl}. La Migration Factory ne met pas en œuvre l'intégralité de FIPA-ACL, mais reprend le principe de contrats explicites : type de tâche, contexte, sortie, statut et corrélation.
+FIPA définit des structures de messages, des actes communicatifs et des protocoles d'interaction entre agents \cite{fipa-acl}. La Migration Factory ne prétend pas implémenter FIPA-ACL ; elle reprend seulement le principe de messages explicites comportant tâche, contexte, statut, résultat et corrélation.
 
 \subsection{Avantages et limites}
 
-Une architecture SMA peut apporter :
-
-\begin{itemize}
-    \item \textbf{modularité :} chaque agent possède une responsabilité limitée ;
-    \item \textbf{scalabilité organisationnelle :} les capacités peuvent être développées séparément ;
-    \item \textbf{robustesse :} une défaillance peut être isolée et examinée ;
-    \item \textbf{distribution des responsabilités :} proposition, review et exécution sont séparées ;
-    \item \textbf{flexibilité :} un agent ou un modèle peut être remplacé sans refonte complète ;
-    \item \textbf{gestion du contexte :} chaque agent reçoit seulement les informations utiles.
-\end{itemize}
-
-La multiplication des agents introduit néanmoins des coûts : davantage de contrats, d'états, de latence, d'appels LLM et de risques d'incohérence. La documentation LangChain rappelle qu'une tâche complexe ne nécessite pas automatiquement plusieurs agents ; un agent unique bien outillé peut parfois suffire \cite{langchain-multiagent}. Le recours au SMA doit donc être justifié par la spécialisation réelle des rôles et les contraintes de gouvernance.
+La spécialisation apporte modularité, testabilité, séparation des responsabilités et limitation du contexte. Elle permet également de remplacer un modèle ou une politique sans refondre tout le processus. En contrepartie, un SMA introduit davantage de contrats, d'états, de latence et de risques de désynchronisation. Le recours à plusieurs agents n'est donc justifié que lorsque les rôles sont réellement distincts \cite{langchain-multiagent}.
 
 % ============================================================
 \section{Orchestration d'agents}
 % ============================================================
 
-\subsection{Orchestration, chorégraphie, coordination et planification}
+\subsection{Notions à distinguer}
 
 \begin{table}[H]
     \centering
     \small
     \arrayrulecolor{cgigray}
     \rowcolors{2}{cgilight!55}{white}
-    \begin{tabularx}{\textwidth}{|>{\bfseries\RaggedRight\arraybackslash}p{3.1cm}|>{\RaggedRight\arraybackslash}X|>{\RaggedRight\arraybackslash}p{4.1cm}|}
+    \begin{tabularx}{\textwidth}{|>{\bfseries\RaggedRight\arraybackslash}p{3cm}|>{\RaggedRight\arraybackslash}X|>{\RaggedRight\arraybackslash}p{4.2cm}|}
         \hline
         \rowcolor{cgilight!95}
         \textbf{Notion} & \textbf{Définition} & \textbf{Application au projet} \\
         \hline
-        Orchestration & Un composant central décide de l'ordre, des transitions et des participants. & Modèle principal de la Migration Factory. \\
+        Orchestration & Un composant central choisit l'ordre, les transitions et les participants. & Modèle principal. \\
         \hline
-        Chorégraphie & Les participants réagissent à des messages selon un protocole partagé sans contrôleur unique. & Non retenue comme modèle principal. \\
+        Chorégraphie & Les participants réagissent à un protocole partagé sans contrôleur unique. & Non retenue comme modèle principal \cite{w3c-choreography}. \\
         \hline
-        Coordination & Ensemble des mécanismes évitant les conflits et respectant les dépendances. & États, gates, contrats, priorités et idempotence. \\
+        Coordination & Mécanismes évitant conflits et incohérences. & États, points de validation, empreintes et idempotence. \\
         \hline
-        Planification & Construction d'une séquence de tâches permettant d'atteindre un objectif. & Trajectoire de versions et plan de migration. \\
+        Planification & Construction d'une séquence permettant d'atteindre une cible. & Trajectoire de versions et unités de migration. \\
         \hline
     \end{tabularx}
-    \caption{Distinction entre orchestration, chorégraphie, coordination et planification}
+    \caption{Orchestration, chorégraphie, coordination et planification}
     \label{tab:notions-orchestration-ch2}
     \rowcolors{2}{white}{white}
     \arrayrulecolor{black}
 \end{table}
 
-La chorégraphie de services décrit des interactions observables entre participants qui connaissent un protocole commun, sans qu'un seul service pilote toutes les actions \cite{w3c-choreography}. La Migration Factory suit au contraire un état central et des transitions contrôlées ; elle relève donc d'une orchestration centralisée complétée par des agents spécialisés.
-
 \subsection{Modèles d'organisation}
 
-Quatre modèles sont courants :
-
-\begin{itemize}
-    \item \textbf{orchestrateur central :} toutes les tâches passent par un coordinateur ;
-    \item \textbf{agents distribués :} les agents se coordonnent directement ;
-    \item \textbf{architecture hiérarchique :} des superviseurs délèguent à des sous-agents ;
-    \item \textbf{architecture hybride :} l'orchestration centralise les états sensibles tandis que les agents conservent une autonomie locale.
-\end{itemize}
-
-Le projet adopte le quatrième modèle. L'orchestrateur choisit le prochain nœud selon l'état. L'agent traite sa responsabilité localement. Les services déterministes appliquent les commandes. Le développeur intervient sur les décisions sensibles.
-
-\subsection{Mécanismes d'orchestration}
-
-Les principaux mécanismes sont :
-
-\begin{itemize}
-    \item routage d'une tâche vers l'agent approprié ;
-    \item séquencement et dépendances entre étapes ;
-    \item gestion des priorités et tentatives ;
-    \item mémoire ou état partagé ;
-    \item supervision et journalisation ;
-    \item interruption et reprise ;
-    \item gestion des erreurs et compensation ;
-    \item replanification à partir d'une nouvelle preuve.
-\end{itemize}
-
-LangGraph permet de construire des workflows personnalisés combinant logique déterministe et comportements agentiques, avec un état persistant et des interruptions humaines \cite{langgraph-persistence,langchain-multiagent}. Ces propriétés correspondent au besoin de la Migration Factory, sans faire de LangGraph la source d'autorité métier.
+Les modèles courants sont l'orchestrateur central, les agents distribués, l'organisation hiérarchique et l'architecture hybride. La Migration Factory adopte un modèle hybride : l'orchestrateur centralise l'état et les transitions, alors que les agents conservent une autonomie locale de raisonnement. LangGraph fournit le graphe d'exécution, les checkpoints et les interruptions, mais ne constitue pas la source d'autorité métier \cite{langgraph-persistence}.
 
 % ============================================================
 \section{Plateformes et architectures intelligentes}
 % ============================================================
 
-\subsection{Architecture en couches}
-
-Une plateforme agentique de production ne se réduit pas à une conversation entre modèles. Elle associe généralement :
-
-\begin{itemize}
-    \item une interface utilisateur ;
-    \item une API et des services applicatifs ;
-    \item un orchestrateur ;
-    \item des agents et des outils ;
-    \item une persistance de l'état ;
-    \item un magasin d'artefacts ;
-    \item des mécanismes de sécurité, d'observabilité et d'évaluation.
-\end{itemize}
+Une plateforme agentique associe interface, API, orchestrateur, agents, services déterministes, persistance, artefacts, observabilité et sécurité. Les agents peuvent être intégrés comme modules internes ou services séparés. Une architecture microservices n'est pas une condition nécessaire : le critère central reste la séparation explicite des responsabilités et des contrats.
 
 \begin{figure}[H]
     \centering
     \resizebox{0.9\textwidth}{!}{%
     \begin{tikzpicture}[
-        layer/.style={draw=cgiblue,rounded corners=3pt,fill=cgilight!55,minimum width=12.5cm,minimum height=1.0cm,align=center,font=\small\bfseries},
+        layer/.style={draw=cgiblue,rounded corners=3pt,fill=cgilight!55,minimum width=12.5cm,minimum height=1cm,align=center,font=\small\bfseries},
         arr/.style={-{Latex[length=2mm]},thick,draw=cgigray}
     ]
         \node[layer] (ui) {Interface et API};
-        \node[layer,below=0.35cm of ui] (orch) {Orchestration, routage et gestion des états};
-        \node[layer,below=0.35cm of orch] (agents) {Agents spécialisés et services déterministes};
-        \node[layer,below=0.35cm of agents] (infra) {Persistance, artefacts, outils externes et observabilité};
-        \draw[arr] (ui) -- (orch);
-        \draw[arr] (orch) -- (agents);
-        \draw[arr] (agents) -- (infra);
+        \node[layer,below=0.35cm of ui] (orch) {Orchestration, routage et état};
+        \node[layer,below=0.35cm of orch] (agents) {Agents intelligents et services déterministes};
+        \node[layer,below=0.35cm of agents] (infra) {Persistance, artefacts, outils et observabilité};
+        \draw[arr] (ui)--(orch);
+        \draw[arr] (orch)--(agents);
+        \draw[arr] (agents)--(infra);
     \end{tikzpicture}%
     }
     \caption{Architecture en couches d'une plateforme agentique}
     \label{fig:plateforme-agentique-ch2}
 \end{figure}
 
-\subsection{Microservices, API et bus de messages}
-
-Les agents peuvent être intégrés sous forme de modules internes, de services séparés ou de processus distribués. Les API définissent les contrats synchrones. Les événements et files de messages facilitent les traitements asynchrones, le découplage et la reprise. Une architecture microservices n'est cependant pas obligatoire pour obtenir un SMA : le critère essentiel est la séparation des responsabilités et des interactions, non le nombre de processus déployés.
-
-Dans les prototypes, les agents et services sont intégrés au backend et coordonnés par le workflow. Les événements persistés jouent un rôle d'observabilité et de reconstruction. Une future industrialisation pourrait séparer certains composants ou utiliser une file de messages, mais cela n'est pas nécessaire pour le périmètre local actuel.
-
-\subsection{Humain dans la boucle}
-
-L'intégration d'un humain répond à trois objectifs : valider une décision à risque, apporter une information absente et arrêter une trajectoire incorrecte. Le contrôle humain ne doit pas être symbolique. Il doit porter sur un artefact précis, présenter les conséquences et enregistrer la décision.
+L'humain dans la boucle doit intervenir sur un artefact précis, comprendre les conséquences de son choix et laisser une décision traçable. Une simple confirmation symbolique ne suffit pas.
 
 % ============================================================
 \section{Migration logicielle : motivations, types et processus}
 % ============================================================
 
-\subsection{Définitions}
+\subsection{Définitions et motivations}
 
-\begin{table}[H]
-    \centering
-    \small
-    \arrayrulecolor{cgigray}
-    \rowcolors{2}{cgilight!55}{white}
-    \begin{tabularx}{\textwidth}{|>{\bfseries\RaggedRight\arraybackslash}p{3.3cm}|>{\RaggedRight\arraybackslash}X|}
-        \hline
-        \rowcolor{cgilight!95}
-        \textbf{Notion} & \textbf{Définition} \\
-        \hline
-        Mise à niveau & Passage à une version plus récente d'un composant ou d'un runtime. \\
-        \hline
-        Migration & Transformation contrôlée d'un système source vers une cible, incluant dépendances, configuration, code et validation. \\
-        \hline
-        Modernisation & Démarche plus large intégrant migration, architecture, sécurité et dette technique. \\
-        \hline
-        Refactorisation & Amélioration interne du code sans changement intentionnel du comportement métier. \\
-        \hline
-    \end{tabularx}
-    \caption{Notions relatives à la transformation logicielle}
-    \label{tab:notions-migration-ch2}
-    \rowcolors{2}{white}{white}
-    \arrayrulecolor{black}
-\end{table}
+La mise à niveau concerne une version de composant ; la migration transforme un système source vers une cible ; la modernisation englobe également architecture, sécurité et dette technique ; la refactorisation améliore la structure interne sans changement fonctionnel intentionnel.
 
-\subsection{Pourquoi migrer ?}
+Les migrations sont déclenchées par la fin de support, les vulnérabilités, l'incompatibilité avec les plateformes, la dette technique, la maintenabilité et l'accès à de nouvelles capacités.
 
-Les migrations sont déclenchées par la fin de support, les vulnérabilités, l'incompatibilité avec les plateformes, la dette technique, les exigences de maintenabilité et l'accès à de nouvelles capacités. Le coût de l'inaction augmente lorsque les versions anciennes deviennent plus difficiles à compiler, tester ou déployer.
+\subsection{Types et processus}
 
-\subsection{Types de migration}
-
-On distingue notamment :
-
-\begin{itemize}
-    \item migration de runtime ou de langage ;
-    \item migration de framework ;
-    \item mise à niveau de dépendances ;
-    \item migration de plateforme ou de cloud ;
-    \item migration d'architecture ;
-    \item migration de données ;
-    \item combinaison progressive de plusieurs transformations.
-\end{itemize}
-
-\subsection{Processus général}
+Les migrations peuvent concerner runtime, langage, framework, dépendances, plateforme, architecture ou données. Dans ce projet, le processus général suit inventaire, définition de cible, planification, transformation, compilation ou construction, tests, réparation et validation.
 
 \begin{figure}[H]
     \centering
     \resizebox{0.98\textwidth}{!}{%
     \begin{tikzpicture}[
-        step/.style={draw=cgiblue,rounded corners=3pt,fill=cgilight!55,minimum width=2.6cm,minimum height=1.0cm,align=center,font=\small\bfseries},
+        step/.style={draw=cgiblue,rounded corners=3pt,fill=cgilight!55,minimum width=2.6cm,minimum height=1cm,align=center,font=\small\bfseries},
         arr/.style={-{Latex[length=2mm]},thick,draw=cgigray}
     ]
         \node[step] (inventory) {Inventaire};
         \node[step,right=0.35cm of inventory] (target) {Cible};
         \node[step,right=0.35cm of target] (plan) {Plan};
         \node[step,right=0.35cm of plan] (transform) {Transformation};
-        \node[step,right=0.35cm of transform] (build) {Build et tests};
+        \node[step,right=0.35cm of transform] (build) {Compilation et tests};
         \node[step,right=0.35cm of build] (repair) {Réparation};
         \node[step,right=0.35cm of repair] (report) {Validation};
         \draw[arr] (inventory)--(target);
@@ -330,17 +232,11 @@ On distingue notamment :
     \label{fig:processus-migration-ch2}
 \end{figure}
 
-\subsection{Spécificités Java/Spring Boot}
+\subsection{Spécificités Java/Spring Boot et Angular}
 
-Une migration Spring Boot associe versions de Java, Spring Boot, Spring Framework, dépendances, plugins Maven ou Gradle, propriétés et espaces de noms. La documentation Spring recommande d'examiner les notes de chaque version traversée et de progresser par étapes compatibles \cite{spring-boot-upgrading}.
+Spring Boot associe Java, Spring Framework, dépendances, plugins et propriétés. La progression étudiée couvre Spring Boot 2.1, 2.7, 3.5 et 4.0 avec Java 11, 17 et 21 \cite{spring-boot-upgrading}.
 
-Le projet couvre Spring Boot 2.1 vers 2.7, 2.7 vers 3.5 et 3.5 vers 4.0, avec Java 11, 17 et 21. Les difficultés portent notamment sur les API dépréciées, la transition \texttt{javax} vers \texttt{jakarta}, les plugins, la configuration et les bibliothèques tierces.
-
-\subsection{Spécificités Angular}
-
-Angular dépend simultanément d'Angular CLI, Node.js, npm, TypeScript, RxJS et des bibliothèques du projet. La documentation officielle publie une matrice de compatibilité et recommande de franchir les versions majeures successivement avec l'Update Guide et \texttt{ng update} \cite{angular-versions,angular-update}.
-
-Le périmètre couvre Angular 18 vers 19, 19 vers 20 et 20 vers 21. Chaque étape nécessite un profil Node/npm compatible, une installation propre, un build et les tests disponibles.
+Angular associe Angular CLI, Node.js, npm, TypeScript et RxJS. La documentation officielle publie une matrice de compatibilité et recommande de franchir les versions majeures successivement avec l'Update Guide et \texttt{ng update} \cite{angular-versions,angular-update}. Le périmètre initial couvre Angular 18 à 21.
 
 % ============================================================
 \section{Étude de l'existant et travaux proches}
@@ -348,68 +244,50 @@ Le périmètre couvre Angular 18 vers 19, 19 vers 20 et 20 vers 21. Chaque étap
 
 \subsection{Processus manuel de référence}
 
-Dans un processus traditionnel, le développeur analyse le projet, consulte les guides, modifie les manifestes et le code, exécute les commandes, lit les journaux puis répète le cycle. Les outils existent, mais l'état, les preuves et les décisions restent dispersés. Cette organisation limite la reproductibilité, le suivi de plusieurs migrations et la capitalisation des corrections.
+Dans le processus traditionnel, le développeur analyse le projet, consulte les guides, modifie manifestes et code, exécute les commandes, lit les journaux et recommence. L'état, les preuves et les décisions restent dispersés, ce qui limite la reproductibilité et le suivi de plusieurs migrations.
 
-\subsection{Travaux et plateformes étudiés}
+\subsection{Corpus étudié}
 
-Huit solutions représentatives ont été retenues afin de couvrir la migration déterministe, l'assistance intelligente, la réparation et l'orchestration multi-agents.
+Le corpus regroupe neuf approches : OpenRewrite, Angular CLI, Dependabot, Amazon Q Developer, GitHub Copilot Modernization, SWE-agent, Repairnator, AutoGen et LangGraph. FIPA est étudié séparément comme standard de communication et non comme plateforme d'orchestration.
 
-\paragraph{OpenRewrite.}
-OpenRewrite applique des recettes composables sur des arbres sémantiques préservant le format. Les recettes peuvent réaliser des migrations de frameworks et produire des différences examinables \cite{openrewrite-recipes}. Son principal avantage est le déterminisme ; sa limite est la dépendance aux recettes disponibles.
+Repairnator est particulièrement proche de la problématique de réparation : il surveille des échecs d'intégration continue, tente de reproduire les défauts et propose des correctifs aux développeurs. L'étude rapporte cinq correctifs acceptés et fusionnés \cite{repairnator}.
 
-\paragraph{Angular CLI et \texttt{ng update}.}
-L'outil natif Angular applique les migrations officielles entre versions et met à jour les dépendances prises en charge. Il reste toutefois centré sur l'écosystème Angular et ne pilote pas à lui seul l'ensemble du processus de gouvernance.
-
-\paragraph{Dependabot.}
-Dependabot détecte des versions de dépendances et ouvre des pull requests pour mettre à jour les manifestes. La validation dépend ensuite des tests et de la revue de l'équipe \cite{dependabot}. Il automatise l'entretien des dépendances, non une migration complète de framework.
-
-\paragraph{Amazon Q Developer Code Transformation.}
-Amazon Q peut analyser un projet Maven, produire un plan, transformer le code Java, relancer des builds et tests, puis présenter un diff à accepter. Les scénarios supportés, les contraintes d'environnement et les limites de taille restent définis par le service \cite{amazonq-transform}.
-
-\paragraph{GitHub Copilot Modernization.}
-GitHub Copilot Modernization propose des workflows structurés d'évaluation, de planification, de transformation et de validation pour Java et d'autres environnements. Les fonctions récentes prennent en charge plusieurs scénarios Spring Boot et des workflows multi-agents \cite{copilot-modernization}.
-
-\paragraph{SWE-agent.}
-SWE-agent fournit à un agent LLM une interface spécialisée pour naviguer dans un dépôt, modifier des fichiers et exécuter des tests. Son évaluation sur SWE-bench montre l'importance de l'interface agent--ordinateur, mais son objectif est la résolution autonome d'issues plutôt que la gouvernance d'une trajectoire de migration \cite{swe-agent}.
-
-\paragraph{AutoGen.}
-AutoGen organise des conversations entre agents configurables combinant LLM, outils et interventions humaines. Le framework illustre plusieurs patrons de collaboration et de review, mais laisse au concepteur la responsabilité de la persistance, de la sécurité et de l'intégration métier \cite{autogen-paper}.
-
-\paragraph{LangGraph.}
-LangGraph fournit un graphe d'exécution avec état, routage, checkpoints et interruptions. Il est adapté aux workflows hybrides, mais ne définit pas les règles de migration, les agents ou la gouvernance ; ces éléments doivent être conçus par l'application.
+SWE-agent évalue l'effet d'une interface agent--ordinateur sur la résolution d'issues. La publication rapporte un taux \textit{pass@1} de 12,5\,\% sur SWE-bench et de 87,7\,\% sur HumanEvalFix \cite{swe-agent}. Ces valeurs ne sont pas directement comparables à une migration complète, mais elles illustrent l'importance de métriques explicites.
 
 \subsection{Comparaison synthétique}
 
 \scriptsize
-\begin{longtable}{|>{\bfseries\RaggedRight\arraybackslash}p{2.8cm}|>{\RaggedRight\arraybackslash}p{2.6cm}|>{\RaggedRight\arraybackslash}p{2.5cm}|>{\RaggedRight\arraybackslash}p{2.5cm}|>{\RaggedRight\arraybackslash}p{2.5cm}|>{\RaggedRight\arraybackslash}p{3.2cm}|}
+\begin{longtable}{|>{\bfseries\RaggedRight\arraybackslash}p{2.2cm}|>{\RaggedRight\arraybackslash}p{2.4cm}|>{\RaggedRight\arraybackslash}p{2.9cm}|>{\RaggedRight\arraybackslash}p{3.2cm}|>{\RaggedRight\arraybackslash}p{4.1cm}|}
     \caption{Comparaison des travaux et plateformes proches}\label{tab:travaux-proches-ch2}\\
     \hline
     \rowcolor{cgilight!95}
-    \textbf{Travail} & \textbf{Domaine} & \textbf{Agents} & \textbf{Orchestration} & \textbf{Évaluation} & \textbf{Limite principale} \\
+    \textbf{Approche} & \textbf{Domaine / agents} & \textbf{Orchestration} & \textbf{Métriques ou preuves} & \textbf{Limite principale} \\
     \hline
     \endfirsthead
     \hline
     \rowcolor{cgilight!95}
-    \textbf{Travail} & \textbf{Domaine} & \textbf{Agents} & \textbf{Orchestration} & \textbf{Évaluation} & \textbf{Limite principale} \\
+    \textbf{Approche} & \textbf{Domaine / agents} & \textbf{Orchestration} & \textbf{Métriques ou preuves} & \textbf{Limite principale} \\
     \hline
     \endhead
-    OpenRewrite & Refactorisation et migration & Aucun LLM requis & Pipeline de recettes & Diff et tests du projet & Cas limités au catalogue de recettes \\
+    OpenRewrite & Migration déterministe, sans LLM & Recettes composables & Diff, compilation et tests du projet & Dépend du catalogue de recettes \\
     \hline
-    Angular CLI & Mise à niveau Angular & Aucun agent explicite & Séquence officielle de migrations & Build et tests externes & Périmètre Angular uniquement \\
+    Angular CLI & Mise à niveau Angular & Séquence officielle & Installation, construction et tests externes & Périmètre Angular uniquement \\
     \hline
-    Dependabot & Dépendances & Bot spécialisé & Planification périodique & Revue de PR et CI & Pas de migration applicative complète \\
+    Dependabot & Bot de dépendances & Planification périodique & PR créées, CI et taux de fusion & Pas de migration applicative complète \\
     \hline
-    Amazon Q & Transformation Java & Agent de transformation & Service géré, plan et itérations & Build, tests et diff & Scénarios et quotas supportés \\
+    Amazon Q & Agent de transformation Java & Service géré avec itérations & Compilation, tests, diff et durée de transformation & Périmètre et quotas du service \\
     \hline
-    Copilot Modernization & Modernisation applicative & Agents spécialisés & Workflow agentique structuré & Build, tests, plan et rapport & Service propriétaire et périmètre supporté \\
+    Copilot Modernization & Agents de modernisation & Workflow structuré & Évaluation, plan, compilation, tests et rapport & Service propriétaire \\
     \hline
-    SWE-agent & Résolution d'issues & Agent d'exécution & Boucle autonome avec outils & SWE-bench, pass@1 & Gouvernance métier limitée \\
+    SWE-agent & Agent d'exécution logiciel & Boucle autonome avec outils & 12,5\,\% SWE-bench ; 87,7\,\% HumanEvalFix & Pas de gouvernance de migration \\
     \hline
-    AutoGen & Applications multi-agents & Agents conversationnels & Conversations et patterns configurables & Benchmarks et études de cas & Infrastructure métier à construire \\
+    Repairnator & Bot de réparation & Surveillance CI et outils de réparation & 5 correctifs acceptés et fusionnés & Dépend de défauts reproductibles et de tests \\
     \hline
-    LangGraph & Orchestration agentique & Définis par l'application & Graphe d'état et checkpoints & Traces et tests applicatifs & Ne fournit pas les agents métier \\
+    AutoGen & Agents conversationnels & Conversations configurables & Benchmarks et études de cas & Persistance et sécurité à concevoir \\
     \hline
-    Migration Factory & Migration Java et Angular & Agents spécialisés et reviewers & Orchestration centrale hybride & Build, tests, preuves, décisions et rapports & Prototype local à industrialiser \\
+    LangGraph & Orchestration agentique & Graphe d'état et checkpoints & Traces, états et tests applicatifs & Ne fournit pas les agents métier \\
+    \hline
+    Migration Factory & Agents spécialisés de migration & Orchestration centrale hybride & Compilation, tests, preuves, décisions et rapports & Prototype local ; évaluation quantitative encore partielle \\
     \hline
 \end{longtable}
 \normalsize
@@ -418,26 +296,29 @@ LangGraph fournit un graphe d'exécution avec état, routage, checkpoints et int
 
 \begin{figure}[H]
     \centering
-    \resizebox{0.93\textwidth}{!}{%
+    \resizebox{0.98\textwidth}{!}{%
     \begin{tikzpicture}[
-        root/.style={draw=cgired,rounded corners=3pt,fill=white,minimum width=4.1cm,minimum height=1.0cm,align=center,font=\small\bfseries},
-        cat/.style={draw=cgiblue,rounded corners=3pt,fill=cgilight!55,minimum width=4.1cm,minimum height=1.0cm,align=center,font=\small\bfseries},
-        item/.style={draw=cgigray,rounded corners=3pt,fill=white,text width=3.7cm,minimum height=1.2cm,align=center,font=\scriptsize},
+        root/.style={draw=cgired,rounded corners=3pt,fill=white,minimum width=4cm,minimum height=1cm,align=center,font=\small\bfseries},
+        cat/.style={draw=cgiblue,rounded corners=3pt,fill=cgilight!55,minimum width=3.7cm,minimum height=1cm,align=center,font=\small\bfseries},
+        item/.style={draw=cgigray,rounded corners=3pt,fill=white,text width=3.4cm,minimum height=1.2cm,align=center,font=\scriptsize},
         arr/.style={-{Latex[length=2mm]},thick,draw=cgigray}
     ]
         \node[root] (root) {Écosystème étudié};
-        \node[cat,below left=1.2cm and 3.8cm of root] (det) {Migration déterministe};
-        \node[cat,below=1.2cm of root] (ai) {Assistance intelligente};
-        \node[cat,below right=1.2cm and 3.8cm of root] (mas) {Orchestration multi-agents};
+        \node[cat,below left=1.2cm and 5.5cm of root] (det) {Migration déterministe};
+        \node[cat,below left=1.2cm and 1.7cm of root] (ai) {Assistance et réparation};
+        \node[cat,below right=1.2cm and 1.7cm of root] (mas) {Orchestration multi-agents};
+        \node[cat,below right=1.2cm and 5.5cm of root] (std) {Standards et protocoles};
         \node[item,below=0.55cm of det] {OpenRewrite\\Angular CLI\\Dependabot};
-        \node[item,below=0.55cm of ai] {Amazon Q\\Copilot Modernization\\SWE-agent};
-        \node[item,below=0.55cm of mas] {AutoGen\\LangGraph\\FIPA};
+        \node[item,below=0.55cm of ai] {Amazon Q\\Copilot Modernization\\SWE-agent\\Repairnator};
+        \node[item,below=0.55cm of mas] {AutoGen\\LangGraph};
+        \node[item,below=0.55cm of std] {FIPA-ACL\\protocoles d'interaction};
         \draw[arr] (root)--(det);
         \draw[arr] (root)--(ai);
         \draw[arr] (root)--(mas);
+        \draw[arr] (root)--(std);
     \end{tikzpicture}%
     }
-    \caption{Regroupement des approches étudiées}
+    \caption{Regroupement des approches, plateformes et standards étudiés}
     \label{fig:mindmap-etat-art-ch2}
 \end{figure}
 
@@ -445,23 +326,13 @@ LangGraph fournit un graphe d'exécution avec état, routage, checkpoints et int
 \section{Positionnement de la Migration Factory}
 % ============================================================
 
-La Migration Factory se situe à l'intersection des trois familles. Elle utilise les transformations déterministes lorsque les règles sont connues, les agents lorsque le problème demande une analyse contextuelle, et un orchestrateur pour maintenir l'ordre, l'état et les décisions.
+La Migration Factory se situe à l'intersection des transformations déterministes, de l'assistance intelligente et de l'orchestration multi-agents. Elle sépare proposition, révision, décision et exécution ; protège la source dans des espaces isolés ; valide avec les commandes réelles de l'écosystème ; conserve l'état et relie les décisions aux preuves.
 
-Sa contribution principale n'est pas de proposer un nouveau modèle de langage ni de remplacer les outils existants. Elle consiste à les organiser dans une architecture multi-agents gouvernée qui :
-
-\begin{itemize}
-    \item spécialise les agents par responsabilité ;
-    \item sépare proposition, review, décision et exécution ;
-    \item associe les sorties aux preuves et empreintes ;
-    \item protège la source par des espaces isolés ;
-    \item valide par les commandes réelles de l'écosystème ;
-    \item conserve l'état et permet la reprise ;
-    \item fournit une vue de pilotage au développeur.
-\end{itemize}
+Dans le corpus étudié, aucune approche ne réunit simultanément les trajectoires Java et Angular, la spécialisation multi-agents, l'isolation, la réparation gouvernée, les preuves et la supervision humaine. Cette conclusion reste limitée aux solutions analysées et ne prétend pas couvrir l'ensemble de la recherche ou du marché.
 
 \section*{Conclusion}
 \addcontentsline{toc}{section}{Conclusion}
 
-Ce chapitre a présenté les notions nécessaires à la compréhension d'une architecture multi-agents appliquée au génie logiciel. Un agent combine un objectif, un contexte, des capacités et des règles d'interaction. Un SMA coordonne plusieurs agents spécialisés, mais introduit aussi des coûts de communication, d'état et de gouvernance. Le modèle retenu par le projet est hybride et centralement orchestré : les agents contribuent à l'analyse et à la proposition, tandis que les services déterministes et le développeur conservent l'autorité.
+Ce chapitre a distingué agents, services et outils, présenté les fondements des SMA et clarifié l'orchestration centralisée retenue. L'état de l'art inclut désormais des métriques explicites lorsque les publications les fournissent, ainsi que Repairnator pour la réparation automatique. FIPA est correctement positionné comme standard de communication.
 
-L'étude de la migration et des travaux proches montre qu'aucune solution examinée ne réunit à elle seule spécialisation multi-agents, trajectoires Java et Angular, isolation, preuves, réparation gouvernée et supervision humaine. Le chapitre suivant traduit ce positionnement en une conception détaillée de l'architecture SMA, de ses agents, de son orchestrateur et de ses interactions.
+Le chapitre suivant traduit ces fondements en une conception détaillée de l'architecture multi-agents, de l'autonomie des agents, des services déterministes et des interactions gouvernées.
