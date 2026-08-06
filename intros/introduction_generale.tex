@@ -12,7 +12,9 @@ Le projet de fin d'études réalisé au sein de \textbf{CGI Technologies et Solu
 
 La solution est conçue comme une \textbf{architecture multi-agents hybride et centralement orchestrée}. Les agents disposent de responsabilités limitées : analyse, révision, planification, transformation agentique, réparation et assistance. Les services déterministes conservent l'autorité sur les profils, les transitions, les chemins, les commandes, les validations et l'application des changements. Le développeur intervient aux points où une approbation, un rejet ou une révision est nécessaire.
 
-La mise en œuvre est déclinée dans deux systèmes et deux dépôts indépendants. Le premier traite les migrations Java/Spring Boot, avec une trajectoire progressive entre Spring Boot 2.1, 2.7, 3.5 et 4.0 ainsi que plusieurs versions de Java. Le second traite Angular 18 à 21 et prépare une extension vers des applications plus anciennes. Les deux systèmes partagent les mêmes principes de gouvernance, d'isolation et de traçabilité, tout en conservant leurs outils, profils et workflows propres.
+Le projet a évolué de manière progressive. Une première preuve de concept Java/Spring Boot utilisée en ligne de commande a permis de valider la faisabilité de la démarche. Elle a ensuite été consolidée, puis transformée en une plateforme full stack intégrant un backend FastAPI, une interface de pilotage et un assistant conversationnel. Les travaux engagés après cette étape portent sur un nouveau frontend, une réparation gouvernée fondée sur la séparation entre proposition et révision, ainsi que sur l'amélioration du contexte et des sorties des agents LLM. Enfin, une seconde déclinaison consacrée à Angular a été lancée afin d'évaluer l'adaptation de l'architecture à un nouvel écosystème.
+
+La mise en œuvre est ainsi déclinée dans deux systèmes et deux dépôts indépendants. Le premier traite les migrations Java/Spring Boot, avec une trajectoire progressive entre Spring Boot 2.1, 2.7, 3.5 et 4.0 ainsi que plusieurs versions de Java. Le second traite initialement Angular 18 à 21 et prépare une extension progressive d'Angular 11 vers Angular 21. Les deux systèmes partagent les mêmes principes de gouvernance, d'isolation et de traçabilité, tout en conservant leurs outils, profils et workflows propres.
 
 L'utilisateur principal est le développeur chargé de la migration. L'objectif n'est pas de le remplacer, mais de réduire les opérations répétitives, d'accélérer le diagnostic et de lui fournir un environnement de pilotage présentant l'état, les preuves, les blocages et les actions autorisées.
 
@@ -25,14 +27,16 @@ Comment concevoir et mettre en œuvre une architecture multi-agents hybride capa
 
 Pour répondre à cette problématique, le projet poursuit plusieurs objectifs : identifier les agents nécessaires, distinguer les services déterministes, définir les rôles et limites d'autorité, concevoir l'orchestrateur, formaliser les contrats d'échange, intégrer les outils propres à chaque écosystème, mettre en œuvre une réparation gouvernée et évaluer les résultats disponibles.
 
+Sauf indication contraire, l'état d'avancement présenté dans ce rapport est arrêté au \textbf{6 août 2026}. Les démonstrations antérieures à cette date sont décrites comme réalisées ; celles annoncées pour le 11 août et pour septembre 2026 sont présentées comme des jalons planifiés.
+
 Le rapport est organisé en cinq chapitres :
 
 \begin{itemize}
-    \item le \textbf{Chapitre I} présente CGI, le projet, les utilisateurs, les catégories de composants, les problèmes observés, les besoins fonctionnels et non fonctionnels, les objectifs et la méthodologie ;
+    \item le \textbf{Chapitre I} présente CGI, le projet, les utilisateurs, les catégories de composants, la genèse du produit, les problèmes observés, les besoins, les objectifs, la planification rétrospective et la méthodologie ;
     \item le \textbf{Chapitre II} expose les notions d'agent intelligent, de système multi-agents, d'orchestration et de migration, puis compare les principaux travaux, plateformes et standards proches ;
     \item le \textbf{Chapitre III} décrit la conception de l'architecture SMA, l'autonomie des agents, les services déterministes, les mécanismes de coordination, les états et la réparation gouvernée ;
-    \item le \textbf{Chapitre IV} présente l'implémentation effective des deux systèmes, les technologies, les fiches d'agents, l'orchestrateur, le backend, le cockpit, les preuves et les difficultés techniques ;
-    \item le \textbf{Chapitre V} évalue les résultats disponibles, les caractéristiques de qualité, les limites de mesure et les perspectives d'industrialisation.
+    \item le \textbf{Chapitre IV} présente l'évolution de la solution Java depuis le prototype CLI, l'implémentation effective des deux systèmes, les technologies, les agents, l'orchestrateur, le backend, le cockpit, les preuves et les difficultés techniques ;
+    \item le \textbf{Chapitre V} évalue les résultats disponibles, formalise les démonstrations réalisées ou planifiées, analyse les caractéristiques de qualité, les limites de mesure et les perspectives d'industrialisation.
 \end{itemize}
 
 Une conclusion générale synthétisera les apports, les limites et les perspectives de la Migration Factory.
