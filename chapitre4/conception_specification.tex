@@ -1,699 +1,562 @@
-\chapter{Conception et spécification}
+\chapter{Architecture et implémentation du système}
 
 \section*{Introduction}
 \addcontentsline{toc}{section}{Introduction}
 
-Le chapitre précédent a établi les besoins fonctionnels, les exigences de confiance et les règles de gouvernance de la Migration Factory. La présente étape consiste à traduire ces besoins en une architecture cohérente, à préciser les responsabilités des composants et à formaliser les principaux échanges qui structurent une migration.
+Le chapitre précédent a défini le modèle multi-agents, les responsabilités, les interactions et les règles d'autorité. Le présent chapitre décrit leur mise en œuvre concrète dans les deux systèmes de la Migration Factory. Il présente l'environnement technique, la structure des dépôts, l'implémentation des agents, l'orchestrateur, le backend, la persistance, le cockpit et les principales difficultés rencontrées.
 
-La description retenue s'inspire d'ISO/IEC/IEEE 42010:2022, qui recommande d'exprimer une architecture à travers plusieurs points de vue adaptés aux préoccupations des parties prenantes \cite{iso42010}. Les diagrammes de cas d'utilisation, de composants et de séquence suivent les principes de la notation UML 2.5.1 publiée par l'Object Management Group \cite{omguml}. L'objectif n'est pas de reproduire chaque classe du code, mais de présenter les choix structurants nécessaires pour comprendre, faire évoluer et vérifier les deux systèmes.
-
-La Migration Factory est matérialisée par deux applications indépendantes : une déclinaison Java/Spring Boot et une déclinaison Angular. Elles partagent les mêmes principes de conception, mais chacune possède son dépôt, son interface, son backend, son orchestration, ses agents, sa persistance et ses espaces de travail. Cette séparation constitue un choix d'architecture central et non une duplication accidentelle.
+Les deux solutions ne possèdent pas le même niveau de maturité. Java/Spring Boot constitue la référence la plus avancée, avec un workflow complet, une réparation gouvernée, un assistant et un reporting. Angular est en développement actif : les agents principaux sont implémentés et l'intégration du workflow de bout en bout est en cours. Les sections suivantes signalent cette différence afin de ne pas présenter une fonctionnalité en cours comme un résultat achevé.
 
 % ============================================================
-\section{Principes directeurs de conception}
+\section{Environnement technique}
 % ============================================================
 
-La conception repose sur huit principes.
+\subsection{Technologies communes}
 
-\begin{enumerate}
-    \item \textbf{Spécialisation par écosystème.} Les outils, profils de versions, commandes et transformations sont adaptés à Java/Spring Boot ou à Angular.
-    \item \textbf{Autorité déterministe.} Les modèles de langage produisent des analyses ou des propositions, tandis que les commandes, les transitions et les écritures sont contrôlées par des services déterministes.
-    \item \textbf{Source externe protégée.} Le projet initial est utilisé en lecture seule ; les changements sont appliqués dans une copie isolée.
-    \item \textbf{Progression par étapes.} Une migration majeure est décomposée en transitions successives dont chacune possède ses prérequis, ses transformations et ses validations.
-    \item \textbf{Preuve avant progression.} Une étape n'est considérée comme réussie qu'à partir d'artefacts et de résultats d'exécution vérifiables.
-    \item \textbf{Décision humaine explicite.} Les opérations sensibles sont interrompues à des points de validation où le développeur peut poursuivre, réviser, rejeter ou arrêter.
-    \item \textbf{Reprise contrôlée.} Les états et événements sont persistés afin de reprendre une exécution après une interruption sans recommencer arbitrairement les étapes validées.
-    \item \textbf{Traçabilité de bout en bout.} Les plans, décisions, commandes, artefacts, correctifs et rapports sont reliés à une exécution et à une étape identifiables.
-\end{enumerate}
-
-Ces principes répondent notamment aux caractéristiques de fiabilité, maintenabilité, sécurité, compatibilité et efficacité définies dans le modèle de qualité ISO/IEC 25010:2023 \cite{iso25010}.
-
-% ============================================================
-\section{Architecture générale des deux systèmes}
-% ============================================================
-
-\subsection{Vue d'ensemble}
-
-Chaque déclinaison de la Migration Factory adopte une architecture en couches. L'interface de pilotage expose l'état du processus. Le backend reçoit les intentions de l'utilisateur et applique les règles métier. L'orchestrateur coordonne les étapes et les agents. Les services déterministes exécutent les outils techniques. Enfin, la base de données et le magasin d'artefacts conservent les faits nécessaires à la reprise et à l'audit.
-
-\begin{figure}[H]
+\begin{table}[H]
     \centering
-    \resizebox{0.98\textwidth}{!}{%
-    \begin{tikzpicture}[
-        layer/.style={draw=cgiblue, rounded corners=3pt, fill=cgilight!55, minimum width=14.2cm, minimum height=1.18cm, align=center, font=\small},
-        ext/.style={draw=cgigray, rounded corners=3pt, fill=white, minimum width=6.7cm, minimum height=1.15cm, align=center, font=\small},
-        flow/.style={-{Latex[length=2.4mm]}, thick, draw=cgigray}
-    ]
-        \node[layer] (ui) {\textbf{Interface de pilotage}\\Configuration, cockpit, décisions, preuves, assistant et rapports};
-        \node[layer, below=0.38cm of ui] (api) {\textbf{Backend applicatif}\\API, validation des requêtes, services métier, sécurité locale et projections};
-        \node[layer, below=0.38cm of api] (orch) {\textbf{Orchestration}\\Gestion du workflow, points d'interruption, reprise, routage et coordination des agents};
-        \node[layer, below=0.38cm of orch] (services) {\textbf{Agents et services déterministes}\\Analyse, planification, transformation, compilation, tests, réparation et reporting};
-        \node[ext, below left=0.55cm and 0.25cm of services.south] (data) {\textbf{État et preuves}\\SQLite, événements, décisions, artefacts, checkpoints et rapports};
-        \node[ext, below right=0.55cm and 0.25cm of services.south] (runtime) {\textbf{Exécution isolée}\\Workspaces, Java/Maven/OpenRewrite ou Node/npm/Angular CLI};
+    \small
+    \arrayrulecolor{cgigray}
+    \rowcolors{2}{cgilight!55}{white}
+    \begin{tabularx}{\textwidth}{|>{\bfseries\RaggedRight\arraybackslash}p{3.8cm}|>{\RaggedRight\arraybackslash}p{4.4cm}|>{\RaggedRight\arraybackslash}X|}
+        \hline
+        \rowcolor{cgilight!95}
+        \textbf{Couche} & \textbf{Technologies} & \textbf{Rôle} \\
+        \hline
+        Interface & React et Next.js & Configuration, cockpit, décisions, assistant et rapports. \\
+        \hline
+        Backend & Python et FastAPI & API HTTP, validation, services applicatifs et projections. \\
+        \hline
+        Orchestration & LangGraph & Graphe d'exécution, interruptions, reprises et routage. \\
+        \hline
+        Persistance & SQLite & États, événements, décisions, commandes et références d'artefacts. \\
+        \hline
+        Intelligence & Azure OpenAI / modèles configurés par rôle & Analyse, planification, review, réparation et assistance. \\
+        \hline
+        Validation & Tests Python et tests frontend & Vérification des services, contrats, API et composants. \\
+        \hline
+        Collaboration & GitHub, Jira, Teams et Confluence & Versionnement, backlog, communication et documentation. \\
+        \hline
+    \end{tabularx}
+    \caption{Technologies communes aux deux systèmes}
+    \label{tab:technologies-communes-ch4}
+    \rowcolors{2}{white}{white}
+    \arrayrulecolor{black}
+\end{table}
 
-        \draw[flow] (ui) -- (api);
-        \draw[flow] (api) -- (orch);
-        \draw[flow] (orch) -- (services);
-        \draw[flow] (services.south west) ++(2.7cm,0) -- (data.north);
-        \draw[flow] (services.south east) ++(-2.7cm,0) -- (runtime.north);
-        \draw[flow, bend left=20] (data.north) to (api.south west);
-    \end{tikzpicture}%
-    }
-    \caption{Architecture logique commune de la Migration Factory}
-    \label{fig:architecture-logique-generale}
-\end{figure}
+FastAPI fournit les routes et l'injection de dépendances utilisées pour assembler les services applicatifs et les adaptateurs \cite{fastapi-dependencies}. LangGraph assure la coordination des étapes avec un état et des checkpoints, ce qui facilite les interruptions humaines et la reprise \cite{langgraph-persistence}. SQLite reste adapté à un prototype local ; le mode WAL réduit certains blocages entre lecteurs et écrivain \cite{sqlite-wal}.
 
-Le backend est réalisé autour de services exposés par une API FastAPI. Le mécanisme d'injection de dépendances de FastAPI facilite l'assemblage des repositories, des services et des adaptateurs sans rendre les composants métier dépendants de l'infrastructure HTTP \cite{fastapi-dependencies}. LangGraph est utilisé pour coordonner les phases nécessitant des interruptions et des reprises. Son mécanisme de checkpoints permet de conserver l'état d'un graphe, de reprendre après une interruption humaine et de tolérer certaines défaillances \cite{langgraph-persistence}.
+\subsection{Environnement Java/Spring Boot}
 
-\subsection{Deux dépôts indépendants}
-
-La séparation des deux systèmes répond à des contraintes techniques et organisationnelles précises.
-
-\begin{figure}[H]
-    \centering
-    \resizebox{\textwidth}{!}{%
-    \begin{tikzpicture}[
-        repo/.style={draw=cgiblue, rounded corners=4pt, fill=cgilight!45, text width=6.45cm, minimum height=5.7cm, align=left, inner sep=9pt, font=\small},
-        shared/.style={draw=cgired, rounded corners=3pt, fill=white, text width=5.3cm, minimum height=1.25cm, align=center, font=\small\bfseries},
-        arrow/.style={<->, thick, draw=cgigray}
-    ]
-        \node[repo] (java) {\textbf{Dépôt Java/Spring Boot}\\[2mm]
-        Interface et cockpit Java\\
-        Backend et modèle d'état Java\\
-        Profils Spring Boot et JDK\\
-        Agents Java/Spring\\
-        Maven et OpenRewrite\\
-        Workspaces et preuves Java\\
-        Tests et cadence de livraison propres};
-
-        \node[repo, right=1.2cm of java] (angular) {\textbf{Dépôt Angular}\\[2mm]
-        Interface et cockpit Angular\\
-        Backend et modèle d'état Angular\\
-        Profils Angular, Node.js et npm\\
-        Agents Angular/TypeScript\\
-        Angular CLI et transformations\\
-        Workspaces et preuves Angular\\
-        Tests et cadence de livraison propres};
-
-        \node[shared, below=0.8cm of $(java.south)!0.5!(angular.south)$] (principles) {Principes partagés : isolation, orchestration, preuves, validation, gouvernance humaine et réparation contrôlée};
-
-        \draw[arrow] (java.south) -- (principles.north west);
-        \draw[arrow] (angular.south) -- (principles.north east);
-    \end{tikzpicture}%
-    }
-    \caption{Indépendance des dépôts et partage des principes architecturaux}
-    \label{fig:deux-depots-independants}
-\end{figure}
-
-Les principales justifications sont les suivantes :
+La chaîne Java mobilise :
 
 \begin{itemize}
-    \item les runtimes et gestionnaires de dépendances sont différents : JDK et Maven d'un côté, Node.js et npm de l'autre ;
-    \item les fichiers structurants, les règles de compatibilité et les outils de transformation ne sont pas interchangeables ;
-    \item les trajectoires de versions et les critères de validation évoluent à des rythmes distincts ;
-    \item une défaillance ou une mise à jour dans un écosystème ne doit pas bloquer l'autre ;
-    \item des dépôts séparés réduisent le couplage, clarifient les responsabilités et simplifient les tests ;
-    \item les principes communs peuvent être documentés et répliqués sans imposer un moteur universel difficile à maintenir.
+    \item JDK 11, 17 et 21 selon le stage ;
+    \item Maven pour la résolution des dépendances, la compilation et les tests ;
+    \item OpenRewrite pour des transformations déterministes composables ;
+    \item des profils Spring Boot décrivant les trajectoires 2.1, 2.7, 3.5 et 4.0 ;
+    \item PowerShell pour plusieurs scripts locaux de lancement et de diagnostic sous Windows.
 \end{itemize}
 
-La généricité du projet se situe donc au niveau du modèle de conception et de gouvernance, et non dans le partage systématique des composants d'exécution.
+OpenRewrite applique des recettes sur des arbres sémantiques préservant le format et permet de composer plusieurs opérations pour réaliser une migration plus large \cite{openrewrite-recipes}. Le système l'encapsule dans un workflow où l'exécution, le répertoire et les preuves sont contrôlés par le backend.
+
+\subsection{Environnement Angular}
+
+La chaîne Angular mobilise :
+
+\begin{itemize}
+    \item Node.js et npm, sélectionnés selon la compatibilité du stage ;
+    \item Angular CLI et \texttt{ng update} ;
+    \item TypeScript et RxJS ;
+    \item les fichiers \texttt{package.json}, \texttt{angular.json}, \texttt{tsconfig.json} et le lockfile ;
+    \item des workspaces nettoyés de \texttt{node\_modules}, \texttt{dist}, caches et couvertures ;
+    \item des commandes d'installation, de build et de test résolues par le backend.
+\end{itemize}
+
+La matrice officielle Angular relie chaque version à des plages compatibles de Node.js, TypeScript et RxJS \cite{angular-versions}. Cette contrainte est implémentée sous la forme d'un catalogue de profils et d'un service de résolution.
 
 % ============================================================
-\section{Acteur et cas d'utilisation}
+\section{Structure des projets}
 % ============================================================
 
-Le développeur chargé de la migration constitue l'acteur opérationnel principal. Il interagit avec le système pour configurer, lancer, examiner et valider une migration. Les modèles de langage et les outils techniques sont des composants internes ; ils ne sont pas représentés comme des acteurs humains.
+\subsection{Dépôt Java/Spring Boot}
 
-\begin{figure}[H]
-    \centering
-    \resizebox{0.9\textwidth}{!}{%
-    \begin{tikzpicture}[
-        uc/.style={draw=cgiblue, ellipse, fill=cgilight!45, minimum width=4.6cm, minimum height=1.0cm, align=center, font=\small},
-        boundary/.style={draw=cgigray, rounded corners=4pt, dashed, inner sep=12pt},
-        link/.style={thick, draw=cgigray}
-    ]
-        \coordinate (actor) at (0,0);
-        \draw[thick] (actor) ++(0,1.55) circle (0.22);
-        \draw[thick] (actor) ++(0,1.33) -- ++(0,-0.85);
-        \draw[thick] (actor) ++(0,1.05) -- ++(-0.45,-0.35);
-        \draw[thick] (actor) ++(0,1.05) -- ++(0.45,-0.35);
-        \draw[thick] (actor) ++(0,0.48) -- ++(-0.4,-0.55);
-        \draw[thick] (actor) ++(0,0.48) -- ++(0.4,-0.55);
-        \node[below=0.15cm of actor] {\small Développeur};
+La structure logique du dépôt Java sépare domaine, application, infrastructure, orchestration, agents, interface et tests.
 
-        \node[uc] (config) at (4.0,2.8) {Configurer et qualifier};
-        \node[uc] (launch) at (8.8,2.8) {Lancer et suivre};
-        \node[uc] (review) at (4.0,1.15) {Examiner et décider};
-        \node[uc] (repair) at (8.8,1.15) {Traiter un échec};
-        \node[uc] (report) at (4.0,-0.5) {Consulter les preuves};
-        \node[uc] (cancel) at (8.8,-0.5) {Annuler ou reprendre};
+\begin{verbatim}
+migration-factory-java/
+|-- migration_factory/
+|   |-- control_tower/
+|   |   |-- adapters/fastapi/
+|   |   |-- application/
+|   |   |-- domain/
+|   |   `-- infrastructure/sqlite/
+|   |-- orchestrator/
+|   `-- agents/
+|       |-- analysis_agent/
+|       |-- planning_agent/
+|       |-- transformation_agent/
+|       `-- repair_agents/
+|-- web/control-tower/
+|-- tests/control_tower/
+|-- scripts/
+`-- docs/
+\end{verbatim}
 
-        \node[boundary, fit=(config)(launch)(review)(repair)(report)(cancel), label={[font=\small\bfseries]above:Migration Factory}] (system) {};
+Le dossier \texttt{control\_tower} centralise les cas d'utilisation et les projections du cockpit. L'orchestrateur coordonne les nœuds. Les agents restent séparés des adaptateurs HTTP et SQLite. Le frontend communique uniquement avec les routes exposées par le backend.
 
-        \draw[link] (0.5,1.05) -- (config.west);
-        \draw[link] (0.5,1.0) -- (review.west);
-        \draw[link] (0.45,0.85) -- (report.west);
-        \draw[link] (0.5,1.05) -- (launch.west);
-        \draw[link] (0.5,0.95) -- (repair.west);
-        \draw[link] (0.45,0.8) -- (cancel.west);
-    \end{tikzpicture}%
-    }
-    \caption{Diagramme de cas d'utilisation principal}
-    \label{fig:cas-utilisation-ch4}
-\end{figure}
+\subsection{Dépôt Angular}
 
-Les décisions disponibles dépendent de l'état du processus. Une analyse peut être acceptée ou relancée ; un plan peut être approuvé, révisé ou rejeté ; une réparation peut être approuvée, rejetée ou renvoyée en révision. Le système ne doit proposer que les actions compatibles avec le point de validation courant.
+La structure Angular suit les mêmes principes avec des services propres aux profils Node/npm et aux stages Angular.
 
-% ============================================================
-\section{Architecture des composants}
-% ============================================================
+\begin{verbatim}
+angular-migration/
+|-- backend/
+|   |-- app/
+|   |   |-- domain/
+|   |   |-- services/
+|   |   |-- api/
+|   |   |-- infrastructure/
+|   |   `-- orchestration/
+|   `-- tests/
+|-- frontend/
+|-- goals/
+|-- artifacts/
+|-- scripts/
+`-- tests/
+\end{verbatim}
 
-\subsection{Composants communs}
+Les deux dépôts ne partagent pas leurs services d'exécution. Le partage concerne les principes, la terminologie et les règles de gouvernance. Cette indépendance permet aux catalogues et agents Angular d'évoluer sans perturber le workflow Java.
 
-\begin{figure}[H]
-    \centering
-    \resizebox{\textwidth}{!}{%
-    \begin{tikzpicture}[
-        comp/.style={draw=cgiblue, rounded corners=3pt, fill=cgilight!50, minimum width=3.55cm, minimum height=1.1cm, align=center, font=\small},
-        store/.style={draw=cgigray, rounded corners=3pt, fill=white, minimum width=3.55cm, minimum height=1.1cm, align=center, font=\small},
-        arrow/.style={-{Latex[length=2.2mm]}, thick, draw=cgigray}
-    ]
-        \node[comp] (ui) {Interface de pilotage};
-        \node[comp, right=0.7cm of ui] (api) {API et services\\applicatifs};
-        \node[comp, right=0.7cm of api] (transition) {Service de transitions\\et commandes};
-        \node[comp, right=0.7cm of transition] (orch) {Orchestrateur\\LangGraph};
-
-        \node[comp, below=1.0cm of api] (agents) {Agents spécialisés};
-        \node[comp, below=1.0cm of transition] (executor) {Exécuteur déterministe};
-        \node[store, below=1.0cm of ui] (db) {Base SQLite\\état autoritaire};
-        \node[store, below=1.0cm of orch] (artifacts) {Magasin d'artefacts\\et workspaces};
-
-        \draw[arrow] (ui) -- (api);
-        \draw[arrow] (api) -- (transition);
-        \draw[arrow] (transition) -- (orch);
-        \draw[arrow] (orch) -- (agents);
-        \draw[arrow] (agents) -- (executor);
-        \draw[arrow] (executor) -- (artifacts);
-        \draw[arrow] (transition) -- (db);
-        \draw[arrow] (agents) -- (artifacts);
-        \draw[arrow, bend right=18] (db) to (api);
-        \draw[arrow, bend left=18] (artifacts) to (transition);
-    \end{tikzpicture}%
-    }
-    \caption{Diagramme de composants commun aux deux systèmes}
-    \label{fig:composants-communs-ch4}
-\end{figure}
-
-Les responsabilités sont réparties de la manière suivante :
-
-\begin{table}[H]
-    \centering
-    \small
-    \arrayrulecolor{cgigray}
-    \rowcolors{2}{cgilight!55}{white}
-    \begin{tabularx}{\textwidth}{|>{\bfseries\RaggedRight\arraybackslash}p{4.1cm}|>{\RaggedRight\arraybackslash}X|}
-        \hline
-        \rowcolor{cgilight!95}
-        \textbf{Composant} & \textbf{Responsabilité principale} \\
-        \hline
-        Interface de pilotage & Présenter l'état, collecter les paramètres, afficher les preuves et transmettre les décisions. \\
-        \hline
-        API et services applicatifs & Valider les requêtes, appliquer les cas d'utilisation et construire les projections destinées au frontend. \\
-        \hline
-        Service de transitions & Vérifier les préconditions, enregistrer les décisions et faire évoluer l'état autoritaire. \\
-        \hline
-        Orchestrateur & Coordonner les phases, gérer les interruptions et reprendre depuis un checkpoint. \\
-        \hline
-        Agents spécialisés & Produire une analyse, un plan, une transformation ou une proposition à partir d'un contexte limité. \\
-        \hline
-        Exécuteur déterministe & Construire et lancer les commandes autorisées, appliquer les modifications et collecter les résultats. \\
-        \hline
-        Base SQLite & Conserver les exécutions, étapes, événements, décisions, commandes et références d'artefacts. \\
-        \hline
-        Magasin d'artefacts & Conserver les plans, journaux, rapports, diffs, preuves et workspaces isolés. \\
-        \hline
-    \end{tabularx}
-    \caption{Responsabilités des composants principaux}
-    \label{tab:responsabilites-composants}
-    \rowcolors{2}{white}{white}
-    \arrayrulecolor{black}
-\end{table}
-
-\subsection{Spécialisation Java/Spring Boot}
-
-Dans la déclinaison Java, les services d'exécution sélectionnent le profil Spring Boot et le JDK associés à l'étape courante. Maven est utilisé pour analyser les dépendances, exécuter les recettes, compiler et lancer les tests. OpenRewrite complète les transformations déterministes grâce à des recettes composables opérant sur une représentation sémantique du code \cite{openrewrite-recipes}. La documentation OpenRewrite recommande qu'une recette s'abstienne lorsqu'elle ne peut pas établir la sûreté d'un changement, principe cohérent avec le comportement fail-closed recherché \cite{openrewrite-best-practices}.
-
-Les principaux blocs propres à Java sont : le catalogue des profils Spring Boot/Java, l'analyse du fichier \texttt{pom.xml}, les recettes Java et Maven, l'alignement des dépendances, la validation JDK/Maven et la production d'un candidat compilé dans le sandbox. Les migrations progressives suivent les recommandations générales de mise à niveau de Spring Boot, notamment le passage par une version intermédiaire prise en charge avant d'aborder une nouvelle génération majeure \cite{spring-boot-upgrading}.
-
-\subsection{Spécialisation Angular}
-
-La déclinaison Angular conserve la même séparation entre orchestration et exécution, mais remplace les profils Java par des profils Angular/Node.js/npm. Le catalogue doit vérifier la compatibilité entre Angular, Node.js, TypeScript et RxJS, conformément aux matrices officielles \cite{angular-versions}. Les transitions majeures sont réalisées successivement et peuvent s'appuyer sur les migrations de l'Angular CLI et la commande \texttt{ng update} \cite{angular-update}.
-
-Les composants spécifiques comprennent l'analyse de \texttt{package.json}, \texttt{angular.json} et des configurations TypeScript, le nettoyage du workspace, l'installation npm, la construction Angular, les tests, l'analyse des erreurs TypeScript et la transformation des sources. Au moment de la rédaction, l'analyse, la planification, la révision et la transformation sont développées ; leur intégration complète, la boucle de réparation et le reporting continuent d'être consolidés.
-
-% ============================================================
-\section{Spécification des interactions}
-% ============================================================
-
-\subsection{Séquence nominale}
-
-Le diagramme suivant décrit une migration nominale indépendamment de l'écosystème. Les commandes exactes sont résolues par le backend à partir du profil sélectionné.
-
-\begin{figure}[H]
-    \centering
-    \resizebox{\textwidth}{!}{%
-    \begin{tikzpicture}[
-        actor/.style={font=\small\bfseries, align=center},
-        msg/.style={-{Latex[length=2mm]}, thick, draw=cgigray},
-        ret/.style={-{Latex[length=2mm]}, dashed, draw=cgigray},
-        note/.style={draw=cgilight, fill=cgilight!35, rounded corners=2pt, font=\scriptsize, align=center}
-    ]
-        \node[actor] (dev) at (0,0) {Développeur};
-        \node[actor] (ui) at (3.1,0) {Cockpit};
-        \node[actor] (api) at (6.2,0) {Backend};
-        \node[actor] (orch) at (9.3,0) {Orchestrateur};
-        \node[actor] (agent) at (12.4,0) {Agents};
-        \node[actor] (exec) at (15.5,0) {Exécuteur};
-        \node[actor] (store) at (18.6,0) {État/artefacts};
-
-        \foreach \x in {0,3.1,6.2,9.3,12.4,15.5,18.6} {\draw[dashed,cgigray] (\x,-0.35) -- (\x,-8.2);}
-
-        \draw[msg] (0,-0.9) -- node[above,font=\scriptsize]{Configurer} (3.1,-0.9);
-        \draw[msg] (3.1,-1.45) -- node[above,font=\scriptsize]{Créer et qualifier} (6.2,-1.45);
-        \draw[msg] (6.2,-2.0) -- node[above,font=\scriptsize]{Démarrer le workflow} (9.3,-2.0);
-        \draw[msg] (9.3,-2.55) -- node[above,font=\scriptsize]{Analyser puis planifier} (12.4,-2.55);
-        \draw[msg] (12.4,-3.1) -- node[above,font=\scriptsize]{Publier les artefacts} (18.6,-3.1);
-        \draw[ret] (18.6,-3.65) -- node[above,font=\scriptsize]{Références et empreintes} (6.2,-3.65);
-        \draw[ret] (6.2,-4.2) -- node[above,font=\scriptsize]{Point de validation} (3.1,-4.2);
-        \draw[msg] (0,-4.75) -- node[above,font=\scriptsize]{Approuver} (3.1,-4.75);
-        \draw[msg] (3.1,-5.3) -- node[above,font=\scriptsize]{Décision liée aux preuves} (6.2,-5.3);
-        \draw[msg] (6.2,-5.85) -- node[above,font=\scriptsize]{Reprendre} (9.3,-5.85);
-        \draw[msg] (9.3,-6.4) -- node[above,font=\scriptsize]{Transformer et valider} (15.5,-6.4);
-        \draw[msg] (15.5,-6.95) -- node[above,font=\scriptsize]{Logs, résultats, artefacts} (18.6,-6.95);
-        \draw[ret] (18.6,-7.5) -- node[above,font=\scriptsize]{État final} (3.1,-7.5);
-
-        \node[note] at (9.3,-8.0) {Toute progression dépend d'un état persistant et de preuves vérifiables};
-    \end{tikzpicture}%
-    }
-    \caption{Diagramme de séquence du parcours nominal}
-    \label{fig:sequence-nominale-ch4}
-\end{figure}
-
-\subsection{Contrats de commande}
-
-L'interface ne transmet pas une commande shell libre. Elle transmet une intention : démarrer une étape, approuver un plan, annuler une exécution ou appliquer un correctif approuvé. Le backend résout ensuite un manifeste de commande contenant l'exécutable, les arguments autorisés, l'environnement matérialisé, le répertoire de travail, le timeout et les identifiants de corrélation.
-
-Ce découplage empêche le frontend ou un modèle de langage de choisir directement des chemins, des variables sensibles ou des commandes privilégiées. Le résultat d'une commande comprend au minimum son statut, son code de sortie, sa durée, ses références de journaux et les artefacts produits.
-
-% ============================================================
-\section{Modèle de données et gestion des états}
-% ============================================================
-
-\subsection{Modèle conceptuel des données}
-
-Le modèle suivant représente les entités communes. Les noms physiques peuvent différer entre les dépôts, mais les responsabilités restent identiques.
-
-\begin{figure}[H]
-    \centering
-    \resizebox{0.96\textwidth}{!}{%
-    \begin{tikzpicture}[
-        entity/.style={draw=cgiblue, rounded corners=2pt, fill=cgilight!50, minimum width=3.0cm, minimum height=1.0cm, align=center, font=\small\bfseries},
-        relation/.style={-{Latex[length=2mm]}, thick, draw=cgigray}
-    ]
-        \node[entity] (run) {MigrationRun};
-        \node[entity, right=1.0cm of run] (stage) {Stage};
-        \node[entity, right=1.0cm of stage] (command) {Command};
-        \node[entity, right=1.0cm of command] (artifact) {Artifact};
-
-        \node[entity, below=1.15cm of run] (event) {Event};
-        \node[entity, below=1.15cm of stage] (gate) {Gate};
-        \node[entity, below=1.15cm of command] (decision) {Decision};
-        \node[entity, below=1.15cm of artifact] (report) {Report};
-
-        \node[entity, below=1.15cm of gate] (proposal) {Proposal};
-        \node[entity, below=1.15cm of decision] (review) {Review};
-        \node[entity, below=1.15cm of report] (profile) {RuntimeProfile};
-
-        \draw[relation] (run) -- node[above,font=\scriptsize]{1..n} (stage);
-        \draw[relation] (stage) -- node[above,font=\scriptsize]{0..n} (command);
-        \draw[relation] (command) -- node[above,font=\scriptsize]{produit} (artifact);
-        \draw[relation] (run) -- (event);
-        \draw[relation] (stage) -- (gate);
-        \draw[relation] (gate) -- (decision);
-        \draw[relation] (artifact) -- (report);
-        \draw[relation] (gate) -- (proposal);
-        \draw[relation] (proposal) -- (review);
-        \draw[relation] (profile) -- (stage);
-        \draw[relation, bend right=18] (decision) to (artifact);
-        \draw[relation, bend left=20] (event) to (report);
-    \end{tikzpicture}%
-    }
-    \caption{Modèle conceptuel des données de migration}
-    \label{fig:modele-donnees-ch4}
-\end{figure}
-
-\begin{table}[H]
-    \centering
-    \small
-    \arrayrulecolor{cgigray}
-    \rowcolors{2}{cgilight!55}{white}
-    \begin{tabularx}{\textwidth}{|>{\bfseries\RaggedRight\arraybackslash}p{3.3cm}|>{\RaggedRight\arraybackslash}X|}
-        \hline
-        \rowcolor{cgilight!95}
-        \textbf{Entité} & \textbf{Informations conservées} \\
-        \hline
-        MigrationRun & Identité, configuration, versions source/cible, statut global et dates. \\
-        \hline
-        Stage & Étape de version, profil d'exécution, statut, preuves de début et de fin. \\
-        \hline
-        Command & Type, manifeste, état, durée, code de sortie et références de logs. \\
-        \hline
-        Event & Séquence, type, horodatage et données de corrélation pour le replay. \\
-        \hline
-        Artifact & Type, chemin interne, empreinte, producteur et niveau de visibilité. \\
-        \hline
-        Gate/Decision & Point de validation, actions autorisées, décision, acteur et empreinte de la preuve examinée. \\
-        \hline
-        Proposal/Review & Correctif proposé, révision, décision du reviewer, lignée et empreintes. \\
-        \hline
-        RuntimeProfile & Versions compatibles, outils, variables attendues et règles propres à l'étape. \\
-        \hline
-        Report & Synthèse finale, provenance et références vers les preuves utilisées. \\
-        \hline
-    \end{tabularx}
-    \caption{Contenu logique des principales entités}
-    \label{tab:entites-ch4}
-    \rowcolors{2}{white}{white}
-    \arrayrulecolor{black}
-\end{table}
-
-SQLite est adapté au périmètre local des prototypes. Le mode WAL permet aux lecteurs et à l'écrivain de progresser avec moins de blocages, tout en conservant les garanties transactionnelles de SQLite \cite{sqlite-wal}. Pour une industrialisation multi-instance, une base serveur et des mécanismes de coordination distribuée devront remplacer les hypothèses locales.
-
-\subsection{Machine à états}
-
-La base de données et le service de transitions possèdent l'état autoritaire. Le frontend ne fait qu'afficher une projection de cet état.
+\subsection{Vue de déploiement local}
 
 \begin{figure}[H]
     \centering
     \resizebox{0.94\textwidth}{!}{%
     \begin{tikzpicture}[
-        state/.style={draw=cgiblue, rounded corners=3pt, fill=cgilight!50, minimum width=2.9cm, minimum height=1.0cm, align=center, font=\small\bfseries},
-        terminal/.style={draw=cgired, rounded corners=3pt, fill=white, minimum width=2.9cm, minimum height=1.0cm, align=center, font=\small\bfseries},
-        arrow/.style={-{Latex[length=2mm]}, thick, draw=cgigray}
+        node/.style={draw=cgiblue,rounded corners=3pt,fill=cgilight!55,minimum width=4.0cm,minimum height=1.15cm,align=center,font=\small\bfseries},
+        store/.style={draw=cgigray,rounded corners=3pt,fill=white,minimum width=4.0cm,minimum height=1.15cm,align=center,font=\small\bfseries},
+        arr/.style={-{Latex[length=2mm]},thick,draw=cgigray}
     ]
-        \node[state] (created) {CREATED};
-        \node[state, right=0.7cm of created] (ready) {READY};
-        \node[state, right=0.7cm of ready] (running) {RUNNING};
-        \node[state, right=0.7cm of running] (paused) {PAUSED};
-        \node[terminal, right=0.7cm of paused] (completed) {COMPLETED};
-
-        \node[terminal, below=1.3cm of running] (failed) {FAILED};
-        \node[terminal, below=1.3cm of paused] (cancelled) {CANCELLED};
-        \node[state, below=1.3cm of ready] (recovery) {RECOVERY\\REQUIRED};
-
-        \draw[arrow] (created) -- node[above,font=\scriptsize]{qualification} (ready);
-        \draw[arrow] (ready) -- node[above,font=\scriptsize]{démarrage} (running);
-        \draw[arrow] (running) -- node[above,font=\scriptsize]{décision requise} (paused);
-        \draw[arrow] (paused) -- node[above,font=\scriptsize]{approbation/reprise} (completed);
-        \draw[arrow, bend left=25] (paused) to node[below,font=\scriptsize]{continuer l'étape} (running);
-        \draw[arrow] (running) -- node[right,font=\scriptsize]{échec terminal} (failed);
-        \draw[arrow] (paused) -- node[right,font=\scriptsize]{annulation} (cancelled);
-        \draw[arrow] (running) -- node[above,sloped,font=\scriptsize]{interruption} (recovery);
-        \draw[arrow] (recovery) -- node[above,sloped,font=\scriptsize]{réconciliation} (paused);
+        \node[node] (browser) {Navigateur\\cockpit local};
+        \node[node,right=1.0cm of browser] (frontend) {Serveur frontend\\Next.js};
+        \node[node,right=1.0cm of frontend] (backend) {Backend local\\FastAPI};
+        \node[store,below=1.1cm of backend] (db) {SQLite et artefacts};
+        \node[store,left=1.0cm of db] (workspace) {Workspaces\\et outils};
+        \node[store,right=1.0cm of db] (llm) {Fournisseur LLM\\externe};
+        \draw[arr] (browser)--(frontend);
+        \draw[arr] (frontend)--(backend);
+        \draw[arr] (backend)--(db);
+        \draw[arr] (backend)--(workspace);
+        \draw[arr] (backend)--(llm);
     \end{tikzpicture}%
     }
-    \caption{Machine à états simplifiée d'une exécution}
-    \label{fig:machine-etats-ch4}
+    \caption{Déploiement local des prototypes}
+    \label{fig:deploiement-local-ch4}
 \end{figure}
 
-Une exécution peut contenir plusieurs étapes. Chaque étape possède son propre état, par exemple \texttt{PENDING}, \texttt{RUNNING}, \texttt{PAUSED}, \texttt{PASSED}, \texttt{FAILED}, \texttt{SKIPPED} ou \texttt{CANCELLED}. Le statut global est calculé à partir des étapes et des points de validation encore ouverts.
-
 % ============================================================
-\section{Spécification des workflows de migration}
+\section{Développement des agents}
 % ============================================================
 
-\subsection{Workflow Java/Spring Boot}
+Chaque agent est décrit à l'aide d'une fiche uniforme : objectif, entrées, traitement, sorties, scénario et limitations.
 
-Le workflow Java est organisé autour d'une trajectoire progressive. Une transition type suit les opérations suivantes :
-
-\begin{enumerate}
-    \item qualifier les chemins, les JDK, Maven et les profils ;
-    \item analyser le \texttt{pom.xml}, le code, la configuration et les tests ;
-    \item produire un plan et une évaluation des impacts ;
-    \item soumettre les artefacts au point de validation ;
-    \item créer une copie isolée et verrouiller le plan approuvé ;
-    \item exécuter les transformations déterministes et les recettes OpenRewrite ;
-    \item lancer Maven, compiler et exécuter les tests ;
-    \item ouvrir la réparation gouvernée en cas d'échec ;
-    \item enregistrer les preuves puis passer au profil suivant ;
-    \item générer le rapport lorsque la cible est atteinte.
-\end{enumerate}
-
-La trajectoire n'est pas une unique transformation de Spring Boot 2.1 vers 4.0. Elle est constituée de transitions compatibles, chacune utilisant le JDK et les règles associés à la version cible.
-
-\subsection{Workflow Angular}
-
-Le workflow Angular reprend la même structure de gouvernance avec des opérations adaptées :
-
-\begin{enumerate}
-    \item identifier la version Angular et vérifier Node.js, npm et TypeScript ;
-    \item sélectionner la transition majeure suivante ;
-    \item créer un workspace de stage à partir du résultat précédent ;
-    \item exclure les dépendances installées, caches et sorties de construction de la copie ;
-    \item analyser les dépendances, la configuration et les sources TypeScript ;
-    \item produire puis réviser le plan de transformation ;
-    \item appliquer les modifications dans le workspace isolé ;
-    \item installer les dépendances et exécuter la construction Angular ;
-    \item exécuter les tests disponibles et collecter les résultats ;
-    \item poursuivre vers la version suivante ou ouvrir une réparation lorsque celle-ci sera intégrée.
-\end{enumerate}
-
-La documentation Angular recommande de franchir les versions majeures successivement et de vérifier les compatibilités à chaque transition \cite{angular-update}. Cette contrainte est modélisée par une route composée de stages ordonnés plutôt que par un saut libre vers la dernière version.
-
-% ============================================================
-\section{Conception des agents}
-% ============================================================
-
-Un agent est défini par une responsabilité limitée, un contexte d'entrée, un schéma de sortie et une politique d'autorité. Cette décomposition évite de confier l'ensemble de la migration à un agent généraliste.
+\subsection{Agent d'analyse}
 
 \begin{table}[H]
     \centering
-    \scriptsize
-    \arrayrulecolor{cgigray}
-    \rowcolors{2}{cgilight!55}{white}
-    \begin{tabularx}{\textwidth}{|>{\bfseries\RaggedRight\arraybackslash}p{2.8cm}|>{\RaggedRight\arraybackslash}p{3.5cm}|>{\RaggedRight\arraybackslash}p{3.6cm}|>{\RaggedRight\arraybackslash}X|}
+    \small
+    \begin{tabularx}{\textwidth}{|>{\bfseries\RaggedRight\arraybackslash}p{3.2cm}|>{\RaggedRight\arraybackslash}X|}
         \hline
-        \rowcolor{cgilight!95}
-        \textbf{Agent} & \textbf{Entrées principales} & \textbf{Sorties} & \textbf{Limite d'autorité} \\
+        Objectif & Construire une représentation exploitable de l'application sans modifier la source. \\
         \hline
-        Analyseur & Snapshot du projet, manifestes, profils et inventaire. & Rapport d'analyse, détection de version, risques et preuves. & Lecture seule sur la source. \\
+        Entrées & Snapshot, versions, manifestes, structure, configurations et profil d'exécution. \\
         \hline
-        Reviewer d'analyse & Rapport, preuves et règles d'acceptation. & Acceptation, révision ou rejet motivé. & Ne lance aucune commande. \\
+        Traitement & Inventaire déterministe, extraction de faits, construction d'un contexte borné et enrichissement LLM. \\
         \hline
-        Planificateur & Analyse validée, cible et catalogue de compatibilité. & Plan, unités de migration et ordre d'exécution. & Le plan doit être revu et approuvé. \\
+        Sorties & Rapport d'analyse structuré, risques, dépendances, preuves et références de fichiers. \\
         \hline
-        Reviewer de plan & Plan, analyse et contraintes de trajectoire. & Décision structurée et remarques. & Ne transforme pas le projet. \\
+        Scénario & Détecter une ancienne version Spring Boot ou une incompatibilité Angular--Node.js. \\
         \hline
-        Transformateur & Plan approuvé et workspace isolé. & Modifications candidates et artefacts de transformation. & Écrit uniquement dans le workspace autorisé. \\
-        \hline
-        Build/Test & Manifestes de commandes et workspace. & Codes de sortie, journaux et résultats de validation. & Commandes construites par le backend. \\
-        \hline
-        Proposeur de réparation & Échec, extraits bornés, plan et état du sandbox. & Diff candidat structuré. & Ne peut ni approuver ni appliquer. \\
-        \hline
-        Reviewer de réparation & Proposition, preuves et politiques. & Décision et diff consolidé éventuel. & La sortie reste soumise aux contrôles et à l'humain. \\
-        \hline
-        Assistant & État courant, événements et preuves autorisées. & Explication, synthèse ou proposition d'action. & Aucun pouvoir direct d'exécution ou d'approbation. \\
+        Limitations & Les dépendances privées ou configurations dynamiques peuvent nécessiter une information humaine. \\
         \hline
     \end{tabularx}
-    \caption{Spécification des responsabilités des agents}
-    \label{tab:agents-ch4}
-    \rowcolors{2}{white}{white}
-    \arrayrulecolor{black}
+    \caption{Fiche de l'agent d'analyse}
+    \label{tab:agent-analyse-ch4}
 \end{table}
 
-Les sorties LLM sont validées selon un schéma attendu avant d'être persistées ou consommées. Un résultat textuel libre ne peut pas modifier l'état métier. Cette conception suit une logique de gestion des risques adaptée aux systèmes utilisant l'intelligence artificielle, telle que décrite par ISO/IEC 23894:2023 et le NIST AI RMF \cite{iso23894,nist-airmf,nist-genai}.
+Dans Java, l'analyse examine notamment le \texttt{pom.xml}, le code, les propriétés et les tests. Dans Angular, elle analyse \texttt{package.json}, \texttt{angular.json}, TypeScript et les profils de compatibilité.
+
+\subsection{Reviewer d'analyse}
+
+Le reviewer reçoit le rapport et les preuves. Il vérifie la couverture, la cohérence des versions et la présence des informations nécessaires au planificateur. Sa sortie est une décision structurée : accepter, demander une révision ou refuser. Il ne lance aucune commande et ne modifie pas le projet.
+
+\subsection{Agent de planification}
+
+\begin{table}[H]
+    \centering
+    \small
+    \begin{tabularx}{\textwidth}{|>{\bfseries\RaggedRight\arraybackslash}p{3.2cm}|>{\RaggedRight\arraybackslash}X|}
+        \hline
+        Objectif & Décomposer la cible en stages, unités de travail et validations. \\
+        \hline
+        Entrées & Analyse validée, cible, catalogue de compatibilité et politiques. \\
+        \hline
+        Traitement & Sélection d'une trajectoire, ordonnancement des transformations et définition des critères de sortie. \\
+        \hline
+        Sorties & Plan versionné, dépendances, risques, commandes attendues et points de décision. \\
+        \hline
+        Scénario & Construire 2.1 $\rightarrow$ 2.7 $\rightarrow$ 3.5 $\rightarrow$ 4.0 ou Angular 18 $\rightarrow$ 19 $\rightarrow$ 20 $\rightarrow$ 21. \\
+        \hline
+        Limitations & Le plan dépend de la qualité de l'analyse et des profils disponibles. \\
+        \hline
+    \end{tabularx}
+    \caption{Fiche de l'agent de planification}
+    \label{tab:agent-planification-ch4}
+\end{table}
+
+Le reviewer du plan contrôle ensuite l'ordre, les prérequis et les validations. Un plan rejeté produit une nouvelle version ; l'ancien plan n'est pas modifié silencieusement.
+
+\subsection{Agent de transformation}
+
+L'agent de transformation consomme uniquement un plan approuvé et un workspace autorisé. Dans Java, il combine des transformations Maven, Java et OpenRewrite. Dans Angular, il prépare les modifications des dépendances, configurations et sources TypeScript. Sa sortie est un ensemble de changements candidats accompagné de métadonnées.
+
+L'agent ne choisit pas librement un répertoire. Le chemin est fourni par le backend et vérifié avant écriture. Les transformations déterministes peuvent être appliquées directement par un service ; les modifications proposées par un modèle sont converties en artefacts contrôlables.
+
+\subsection{Agent de build et de tests}
+
+La validation repose sur un manifeste de commande construit par le backend. L'agent ou service de build ne reçoit pas une chaîne shell arbitraire. Il exécute Maven pour Java ou npm/Angular CLI pour Angular, puis capture : code de sortie, durée, journaux, résultats de tests et fichiers produits.
+
+Un succès est déterminé par les résultats d'exécution, non par une affirmation du LLM. En cas d'échec, les preuves sont classées et transmises au workflow de réparation.
+
+\subsection{Agents de réparation}
+
+Le \textbf{proposeur} reçoit un contexte d'échec borné : erreurs, extraits de code, commande, profil et état du workspace. Il produit un diff structuré. Le \textbf{reviewer} vérifie la cohérence, les risques et l'applicabilité ; il peut accepter, refuser ou consolider le correctif. La version finale reste soumise au développeur.
+
+\begin{figure}[H]
+    \centering
+    \resizebox{0.96\textwidth}{!}{%
+    \begin{tikzpicture}[
+        step/.style={draw=cgiblue,rounded corners=3pt,fill=cgilight!55,minimum width=3.0cm,minimum height=1.0cm,align=center,font=\small\bfseries},
+        human/.style={draw=cgired,rounded corners=3pt,fill=white,minimum width=3.0cm,minimum height=1.0cm,align=center,font=\small\bfseries},
+        arr/.style={-{Latex[length=2mm]},thick,draw=cgigray}
+    ]
+        \node[step] (failure) {Échec vérifié};
+        \node[step,right=0.45cm of failure] (context) {Contexte borné};
+        \node[step,right=0.45cm of context] (proposal) {Proposition};
+        \node[step,right=0.45cm of proposal] (review) {Review};
+        \node[human,right=0.45cm of review] (human) {Approbation};
+        \node[step,below=1.1cm of human] (apply) {Application};
+        \node[step,left=0.45cm of apply] (validate) {Build et tests};
+        \draw[arr] (failure)--(context);
+        \draw[arr] (context)--(proposal);
+        \draw[arr] (proposal)--(review);
+        \draw[arr] (review)--(human);
+        \draw[arr] (human)--(apply);
+        \draw[arr] (apply)--(validate);
+        \draw[arr,bend left=30] (validate.north) to (context.south);
+    \end{tikzpicture}%
+    }
+    \caption{Implémentation de la chaîne de réparation}
+    \label{fig:implementation-reparation-ch4}
+\end{figure}
+
+Dans l'implémentation Java actuelle, le reviewer peut produire une version consolidée du diff. Cette décision est contrôlée par des schémas, une lignée, des empreintes et une approbation humaine. La réparation Angular complète reste à intégrer.
+
+\subsection{Assistant de migration}
+
+L'assistant utilise une projection de l'état courant, les derniers événements, les preuves autorisées et un historique borné de conversation. Il peut expliquer un blocage, résumer les étapes et indiquer la prochaine action. Les prompts imposent un comportement en lecture seule : l'assistant ne peut pas exécuter, approuver ou modifier des fichiers.
+
+Sa principale limitation est la qualité des données projetées. Une information absente de l'état ou des artefacts ne doit pas être inventée. Les réponses sont donc présentées comme une assistance, non comme une preuve d'exécution.
 
 % ============================================================
-\section{Workspaces, preuves et traçabilité}
+\section{Développement de l'orchestrateur}
 % ============================================================
 
-\subsection{Organisation des workspaces}
+\subsection{Réception de la requête}
 
-Chaque exécution possède un répertoire dédié. La structure logique peut être représentée comme suit :
+Le frontend transmet une intention à l'API : créer une migration, démarrer un stage, approuver, rejeter, réviser, annuler ou reprendre. Le backend valide le schéma, charge la migration et vérifie que l'action est autorisée dans l'état courant.
+
+\subsection{Choix des agents}
+
+Le choix n'est pas effectué par une discussion libre. Le nœud suivant dépend du stage et de l'état persistant. L'orchestrateur appelle l'analyseur après la qualification, le reviewer après l'analyse, le planificateur après validation, puis le transformateur après approbation.
+
+\subsection{Séquencement des tâches}
+
+\begin{figure}[H]
+    \centering
+    \resizebox{\textwidth}{!}{%
+    \begin{tikzpicture}[
+        step/.style={draw=cgiblue,rounded corners=3pt,fill=cgilight!55,minimum width=2.75cm,minimum height=1.0cm,align=center,font=\small\bfseries},
+        gate/.style={draw=cgired,rounded corners=3pt,fill=white,minimum width=2.75cm,minimum height=1.0cm,align=center,font=\small\bfseries},
+        arr/.style={-{Latex[length=2mm]},thick,draw=cgigray}
+    ]
+        \node[step] (qualify) {Qualification};
+        \node[step,right=0.4cm of qualify] (analyse) {Analyse};
+        \node[step,right=0.4cm of analyse] (review) {Review};
+        \node[step,right=0.4cm of review] (plan) {Planification};
+        \node[gate,right=0.4cm of plan] (approval) {Décision};
+        \node[step,right=0.4cm of approval] (transform) {Transformation};
+        \node[step,right=0.4cm of transform] (validate) {Validation};
+        \draw[arr] (qualify)--(analyse);
+        \draw[arr] (analyse)--(review);
+        \draw[arr] (review)--(plan);
+        \draw[arr] (plan)--(approval);
+        \draw[arr] (approval)--(transform);
+        \draw[arr] (transform)--(validate);
+    \end{tikzpicture}%
+    }
+    \caption{Séquencement principal implémenté par l'orchestrateur}
+    \label{fig:sequencement-orchestrateur-ch4}
+\end{figure}
+
+\subsection{Récupération des résultats}
+
+Chaque nœud publie un résultat structuré et des artefacts. L'orchestrateur enregistre les références, met à jour le stage et produit un événement. Le frontend obtient ensuite une projection cohérente à partir de la base et non directement à partir de la réponse du modèle.
+
+\subsection{Gestion des erreurs}
+
+Les erreurs sont classées selon leur origine : configuration, environnement, agent, commande, transformation, build ou test. Une erreur de précondition bloque avant l'exécution. Une erreur de modèle produit un échec fermé ou un fallback. Une erreur de build ouvre la réparation si les règles et le nombre de tentatives le permettent.
+
+\subsection{Production du résultat final}
+
+Lorsque tous les stages sont validés, un service de rapport agrège versions, étapes, décisions, artefacts, résultats de build et tests, réparations et références de preuves. Le résultat reste un candidat de migration ; le système ne réalise pas de déploiement en production.
+
+% ============================================================
+\section{Backend, persistance et contrats}
+% ============================================================
+
+\subsection{API d'intégration}
+
+Les API sont organisées autour des ressources suivantes :
+
+\begin{itemize}
+    \item configurations et prérequis ;
+    \item migrations, stages et progression ;
+    \item points de décision et approbations ;
+    \item propositions de réparation ;
+    \item artefacts, événements et rapports ;
+    \item assistant et consommation des modèles.
+\end{itemize}
+
+Les requêtes utilisent des schémas typés. Les décisions sensibles incluent une empreinte attendue afin de détecter qu'un artefact a changé depuis son affichage.
+
+\subsection{Modèle de données}
+
+\begin{figure}[H]
+    \centering
+    \resizebox{0.95\textwidth}{!}{%
+    \begin{tikzpicture}[
+        entity/.style={draw=cgiblue,rounded corners=3pt,fill=cgilight!55,minimum width=2.8cm,minimum height=0.95cm,align=center,font=\small\bfseries},
+        arr/.style={-{Latex[length=2mm]},thick,draw=cgigray}
+    ]
+        \node[entity] (run) {Migration};
+        \node[entity,right=0.7cm of run] (stage) {Stage};
+        \node[entity,right=0.7cm of stage] (command) {Commande};
+        \node[entity,right=0.7cm of command] (artifact) {Artefact};
+        \node[entity,below=1.0cm of run] (event) {Événement};
+        \node[entity,below=1.0cm of stage] (gate) {Gate};
+        \node[entity,below=1.0cm of command] (proposal) {Proposition};
+        \node[entity,below=1.0cm of artifact] (report) {Rapport};
+        \draw[arr] (run)--(stage);
+        \draw[arr] (stage)--(command);
+        \draw[arr] (command)--(artifact);
+        \draw[arr] (run)--(event);
+        \draw[arr] (stage)--(gate);
+        \draw[arr] (gate)--(proposal);
+        \draw[arr] (artifact)--(report);
+    \end{tikzpicture}%
+    }
+    \caption{Principales entités persistées}
+    \label{fig:entites-persistantes-ch4}
+\end{figure}
+
+Les événements sont ajoutés de manière séquentielle. Les artefacts stockent leur type, producteur, chemin interne et empreinte. Les commandes conservent leur état, durée, code de sortie et références de journaux.
+
+\subsection{Workspaces et artefacts}
+
+Chaque migration possède un répertoire dédié, subdivisé par stage et type d'artefact.
 
 \begin{verbatim}
 run_<id>/
 |-- source_snapshot/
 |-- stages/
-|   |-- stage_01/
-|   |   |-- workspace/
-|   |   |-- analysis/
-|   |   |-- planning/
-|   |   |-- transformation/
-|   |   `-- validation/
-|   `-- stage_02/ ...
+|   |-- stage_01/workspace/
+|   |-- stage_01/analysis/
+|   |-- stage_01/planning/
+|   |-- stage_01/validation/
+|   `-- stage_02/...
 |-- repairs/
 |-- logs/
 |-- evidence/
 `-- reports/
 \end{verbatim}
 
-La source externe n'est jamais utilisée comme répertoire d'écriture. Le premier workspace est construit à partir d'une copie contrôlée. Le workspace d'une étape suivante est dérivé du candidat validé de l'étape précédente. Les répertoires volumineux ou générés, tels que \texttt{target}, \texttt{node\_modules}, \texttt{dist} et les caches, sont exclus lorsque leur reconstruction est possible.
-
-\subsection{Artefacts et empreintes}
-
-Chaque artefact est associé à un type, un producteur, une étape, un chemin interne et une empreinte SHA-256. Une décision sensible référence l'empreinte de l'artefact examiné. Si le contenu change entre la consultation et l'approbation, la décision est refusée comme obsolète.
-
-Les artefacts essentiels sont : les rapports d'analyse, plans, inventaires, profils détectés, journaux, résultats de build et de tests, diffs, décisions de review, preuves de validation et rapports finaux. Cette approche rend possible l'audit de la chaîne de décision sans dépendre uniquement de l'état affiché par l'interface.
+La source externe n'est pas utilisée comme répertoire d'écriture. Le candidat validé d'un stage sert de base au suivant. Les artefacts importants sont liés par SHA-256.
 
 % ============================================================
-\section{Conception de la boucle de réparation gouvernée}
+\section{Interface utilisateur et cockpit}
 % ============================================================
 
-La réparation intervient après un échec de transformation, de compilation ou de test. Elle est conçue comme une sous-machine à états dont les sorties sont liées au contexte d'échec et à l'état exact du workspace.
+\subsection{Configuration}
+
+L'écran de création collecte les chemins, versions source et cible, profils et options. Les valeurs sont validées par le backend. Dans Java, la source est fournie par chemin local. Angular utilise également un projet local ou un package préparé selon le workflow en cours d'intégration.
+
+\subsection{Tableau de bord}
+
+Le cockpit présente :
+
+\begin{itemize}
+    \item résumé de la migration ;
+    \item pipeline et stage sélectionné ;
+    \item analyse, plan et points de décision ;
+    \item commandes, journaux et résultats ;
+    \item événements du workflow ;
+    \item propositions de réparation ;
+    \item assistant et rapports.
+\end{itemize}
 
 \begin{figure}[H]
     \centering
-    \resizebox{0.98\textwidth}{!}{%
+    \resizebox{0.94\textwidth}{!}{%
     \begin{tikzpicture}[
-        step/.style={draw=cgiblue, rounded corners=3pt, fill=cgilight!55, minimum width=3.2cm, minimum height=1.05cm, align=center, font=\small\bfseries},
-        human/.style={draw=cgired, rounded corners=3pt, fill=white, minimum width=3.2cm, minimum height=1.05cm, align=center, font=\small\bfseries},
-        arrow/.style={-{Latex[length=2.2mm]}, thick, draw=cgigray}
+        screen/.style={draw=cgigray,rounded corners=4pt,fill=white,minimum width=14cm,minimum height=7cm},
+        nav/.style={draw=cgiblue,fill=cgiblue!10,minimum width=3.0cm,minimum height=6.4cm,align=center,font=\small},
+        panel/.style={draw=cgilight,fill=cgilight!35,rounded corners=2pt,minimum width=4.6cm,minimum height=2.0cm,align=center,font=\small\bfseries}
     ]
-        \node[step] (failure) {Préserver l'échec\\et les preuves};
-        \node[step, right=0.5cm of failure] (context) {Construire un\\contexte borné};
-        \node[step, right=0.5cm of context] (proposer) {Agent de\\proposition};
-        \node[step, right=0.5cm of proposer] (reviewer) {Agent de\\révision};
-        \node[human, right=0.5cm of reviewer] (approval) {Décision du\\développeur};
-
-        \node[step, below=1.15cm of approval] (apply) {Appliquer le diff\\exact approuvé};
-        \node[step, left=0.5cm of apply] (validate) {Recompiler et\\retester};
-        \node[step, left=0.5cm of validate] (result) {Preuve de validation\\ou nouvel échec};
-
-        \draw[arrow] (failure) -- (context);
-        \draw[arrow] (context) -- (proposer);
-        \draw[arrow] (proposer) -- (reviewer);
-        \draw[arrow] (reviewer) -- (approval);
-        \draw[arrow] (approval) -- node[right,font=\scriptsize]{approuver} (apply);
-        \draw[arrow] (apply) -- (validate);
-        \draw[arrow] (validate) -- (result);
-        \draw[arrow, bend left=28] (result.north) to node[below,font=\scriptsize]{tentative suivante} (context.south);
-        \draw[arrow, bend left=25] (approval.north) to node[above,font=\scriptsize]{réviser} (proposer.north);
+        \node[screen] (screen) {};
+        \node[nav] at ($(screen.west)+(1.7,0)$) {Navigation\\[2mm]Vue d'ensemble\\Pipeline\\Analyse\\Commandes\\Événements\\Assistant\\Rapports};
+        \node[panel] at ($(screen.center)+(1.0,1.8)$) {Résumé et état courant};
+        \node[panel] at ($(screen.center)+(6.0,1.8)$) {Décision ou blocage};
+        \node[panel,minimum width=9.8cm] at ($(screen.center)+(3.5,-1.0)$) {Stage sélectionné, preuves, logs et prochaines actions};
+        \node[font=\small\bfseries] at ($(screen.north)+(0,-0.35)$) {Cockpit de migration};
     \end{tikzpicture}%
     }
-    \caption{Boucle de réparation gouvernée}
-    \label{fig:boucle-reparation-ch4}
+    \caption{Organisation fonctionnelle du cockpit}
+    \label{fig:cockpit-ch4}
 \end{figure}
 
-Les invariants de la boucle sont les suivants :
+Le frontend ne conserve pas un état métier parallèle. Il projette les ressources fournies par le backend et envoie des intentions explicites.
+
+\subsection{Logs et preuves}
+
+Les journaux de commande sont stockés comme artefacts et affichés sous forme de vues bornées. Les événements permettent de suivre l'ordre des transitions. Les preuves sensibles sont accompagnées d'une empreinte et d'une provenance.
+
+% ============================================================
+\section{Authentification et sécurité}
+% ============================================================
+
+Les prototypes ne comportent pas encore d'authentification, de comptes ni de contrôle d'accès par rôle. Le système Java limite l'API au poste local, vérifie l'origine des requêtes mutatives et exige un identifiant client statique. Ces mécanismes protègent l'usage local, mais ne constituent pas une authentification.
+
+L'identité utilisée dans certaines traces provient du compte du système d'exploitation ou de valeurs génériques. Elle ne permet pas une attribution fiable à plusieurs utilisateurs. Une industrialisation devra ajouter :
 
 \begin{itemize}
-    \item le contexte exclut les fichiers sensibles et reste limité aux éléments utiles ;
-    \item la proposition et la révision possèdent des schémas structurés ;
-    \item le diff final est validé par des règles déterministes et un contrôle d'applicabilité ;
-    \item le reviewer peut consolider le correctif, mais ne peut pas l'appliquer ;
-    \item l'approbation humaine porte sur des empreintes précises ;
-    \item l'application s'effectue uniquement dans le workspace isolé ;
-    \item la compilation et les tests sont obligatoires après chaque application ;
-    \item le nombre de tentatives est limité et l'épuisement produit une preuve terminale.
+    \item authentification forte ;
+    \item rôles développeur, reviewer et administrateur ;
+    \item autorisation par action ;
+    \item journal d'audit attribuable ;
+    \item gestion des sessions et révocation.
 \end{itemize}
 
-Cette boucle est avancée dans le système Java/Spring Boot. Le système Angular doit réutiliser le même modèle de gouvernance après stabilisation de son workflow principal, avec un contexte et des validateurs adaptés à Angular, TypeScript et npm.
+Les contextes LLM sont limités et nettoyés. Les fichiers de secrets, clés et chemins interdits sont exclus. Les redactions restent fondées sur des règles et ne garantissent pas la détection de toute valeur sensible intégrée arbitrairement dans le code.
 
 % ============================================================
-\section{Interfaces et contrats entre composants}
+\section{Principales difficultés techniques et corrections}
 % ============================================================
 
-Les composants communiquent par des contrats explicites. Ces contrats limitent le couplage et permettent de remplacer une implémentation sans modifier l'ensemble du workflow.
+\subsection{Application fiable des correctifs}
 
-\begin{table}[H]
-    \centering
-    \scriptsize
-    \arrayrulecolor{cgigray}
-    \rowcolors{2}{cgilight!55}{white}
-    \begin{tabularx}{\textwidth}{|>{\bfseries\RaggedRight\arraybackslash}p{3.2cm}|>{\RaggedRight\arraybackslash}p{3.6cm}|>{\RaggedRight\arraybackslash}p{4.3cm}|>{\RaggedRight\arraybackslash}X|}
-        \hline
-        \rowcolor{cgilight!95}
-        \textbf{Contrat} & \textbf{Producteur} & \textbf{Contenu} & \textbf{Contrôles} \\
-        \hline
-        Configuration de migration & Frontend/API & Projet, cible, profils, chemins et options. & Schéma, chemins autorisés et cohérence source/cible. \\
-        \hline
-        Manifeste de commande & Backend & Exécutable, arguments, environnement, cwd, timeout et identifiants. & Construction serveur, listes d'autorisation et empreinte. \\
-        \hline
-        Artefact d'analyse & Analyseur & Faits détectés, risques, références et résumé. & Schéma, bornes, provenance et checksum. \\
-        \hline
-        Plan de migration & Planificateur & Étapes, unités, dépendances, validations et risques. & Compatibilité, ordre des étapes, review et approbation. \\
-        \hline
-        Décision de gate & Développeur/service & Action, motif, acteur, idempotency key et checksum attendu. & État ouvert, action autorisée et détection de vue obsolète. \\
-        \hline
-        Proposition de réparation & Proposeur/reviewer & Diff, justification, fichiers concernés et empreintes. & Schéma, politique de patch, applicabilité et revue. \\
-        \hline
-        Résultat de validation & Exécuteur & Statut, code de sortie, durée, logs et preuves. & Corrélation avec la commande et classification déterministe. \\
-        \hline
-        Événement de workflow & Services métier & Séquence, type, payload sûr et horodatage. & Append-only, ordre monotone et redaction. \\
-        \hline
-    \end{tabularx}
-    \caption{Principaux contrats entre composants}
-    \label{tab:contrats-composants-ch4}
-    \rowcolors{2}{white}{white}
-    \arrayrulecolor{black}
-\end{table}
+Les premières versions de la réparation Java ont rencontré des différences de fins de ligne, des hunks non applicables et des propositions liées à un état obsolète. Les corrections ont introduit des diffs structurés, des empreintes, une lignée de propositions, une validation d'applicabilité et une application uniquement dans le sandbox.
 
-Trois propriétés sont systématiques : \textbf{validation de schéma}, \textbf{liaison par empreinte} et \textbf{idempotence}. La validation de schéma empêche la consommation de sorties incomplètes. L'empreinte lie une décision au contenu examiné. L'idempotence évite qu'un double clic ou une répétition réseau applique plusieurs fois la même action.
+\subsection{Autorité des commandes}
 
-% ============================================================
-\section{Sécurité, confidentialité et gouvernance}
-% ============================================================
+Plusieurs chemins de commande pouvaient créer une ambiguïté entre frontend, orchestrateur et exécuteur. L'architecture a été renforcée afin que le backend construise le manifeste autoritaire et que les agents ne fournissent pas de commandes shell libres.
 
-La conception actuelle cible une utilisation locale. Les API sont limitées à l'interface locale, mais l'absence d'authentification et de rôles interdit de considérer cette protection comme suffisante pour un déploiement partagé. Une version industrialisée devra introduire une identité forte, une autorisation par rôle et une attribution fiable de chaque décision.
+\subsection{Compatibilité des runtimes Angular}
 
-Les données envoyées aux modèles sont sélectionnées, bornées et nettoyées. Les fichiers de secrets, clés privées, variables sensibles et chemins interdits sont exclus. Les journaux sont tronqués et les extraits de code limités. Ces mesures réduisent le risque, sans garantir la détection de toute information sensible intégrée arbitrairement au code source.
+Lors des premiers essais Angular, le profil détecté Node.js 22.23.1 et npm 10.9.8 était rejeté par un catalogue ne reconnaissant qu'un profil plus ancien pour le premier stage. La résolution a consisté à ajouter un catalogue versionné contenant les paires validées tout en conservant l'ancienne version pour la reproductibilité.
 
-La démarche s'aligne sur une gestion du risque proportionnée : identifier les données et actions sensibles, limiter les capacités du modèle, conserver les preuves, valider les sorties et maintenir une supervision humaine. Ces principes sont cohérents avec ISO/IEC 23894 et le NIST AI RMF, qui recommandent d'intégrer la gestion des risques liés à l'IA aux activités de conception et d'exploitation \cite{iso23894,nist-airmf}.
+\subsection{Persistance et migrations de base}
 
-% ============================================================
-\section{Synthèse des décisions architecturales}
-% ============================================================
+L'évolution rapide du backend a produit plusieurs migrations SQLite et, dans un cas, plusieurs têtes Alembic. Le diagnostic a nécessité l'identification de la base réellement utilisée et la réconciliation des migrations avant le redémarrage du workflow.
+
+\subsection{Intégration du frontend}
+
+L'intégration d'un nouveau cockpit avec des fonctionnalités existantes, notamment l'assistant et les points de décision, a demandé une fusion contrôlée. Les vérifications ont distingué les échecs préexistants des régressions introduites et ont utilisé une base temporaire pour les essais runtime.
 
 \begin{table}[H]
     \centering
     \small
     \arrayrulecolor{cgigray}
     \rowcolors{2}{cgilight!55}{white}
-    \begin{tabularx}{\textwidth}{|>{\bfseries\RaggedRight\arraybackslash}p{4.0cm}|>{\RaggedRight\arraybackslash}p{5.2cm}|>{\RaggedRight\arraybackslash}X|}
+    \begin{tabularx}{\textwidth}{|>{\bfseries\RaggedRight\arraybackslash}p{3.8cm}|>{\RaggedRight\arraybackslash}p{4.6cm}|>{\RaggedRight\arraybackslash}X|}
         \hline
         \rowcolor{cgilight!95}
-        \textbf{Décision} & \textbf{Motivation} & \textbf{Conséquence} \\
+        \textbf{Difficulté} & \textbf{Cause principale} & \textbf{Correction} \\
         \hline
-        Deux dépôts indépendants & Écosystèmes, runtimes et cycles de livraison différents. & Faible couplage, mais duplication maîtrisée de certains principes. \\
+        Patch non applicable & CRLF, contexte ou fichier obsolète. & Normalisation, checksum et validation préalable. \\
         \hline
-        Backend autoritaire & Éviter que le frontend ou un LLM choisisse directement l'exécution. & Services et contrats plus stricts, audit plus fiable. \\
+        Commande ambiguë & Plusieurs composants pouvaient influencer l'exécution. & Manifeste construit par le backend. \\
         \hline
-        Workspaces par exécution et par stage & Protéger la source et conserver les résultats intermédiaires. & Coût de stockage supérieur, mais rollback et preuve facilités. \\
+        Profil Angular bloqué & Catalogue incompatible avec le runtime validé. & Catalogue versionné et paire Node/npm explicite. \\
         \hline
-        SQLite et artefacts locaux & Simplifier le prototype et permettre une démonstration autonome. & Adapté au local ; migration nécessaire pour le multi-instance. \\
+        État de base incohérent & Migrations multiples ou base non autoritaire. & Réconciliation et identification de la base active. \\
         \hline
-        Orchestration avec checkpoints & Gérer les pauses humaines et les reprises. & État durable et workflow plus complexe à réconcilier. \\
-        \hline
-        Agents spécialisés & Réduire le contexte et séparer les responsabilités. & Davantage de contrats, mais meilleure contrôlabilité. \\
-        \hline
-        Correctifs sous forme de diffs & Examiner et lier exactement la modification proposée. & Validation et approbation précises avant écriture. \\
-        \hline
-        Validation après chaque étape & Détecter tôt les incompatibilités. & Durée d'exécution plus longue, mais risque réduit. \\
+        Régression frontend & Fusion d'interfaces et fonctionnalités concurrentes. & Intégration par étapes et comparaison avec le baseline. \\
         \hline
     \end{tabularx}
-    \caption{Décisions architecturales majeures}
-    \label{tab:decisions-architecture-ch4}
+    \caption{Synthèse des difficultés et corrections}
+    \label{tab:difficultes-corrections-ch4}
     \rowcolors{2}{white}{white}
     \arrayrulecolor{black}
 \end{table}
 
 % ============================================================
+\section{Fonctionnalités effectivement développées}
+% ============================================================
+
+\begin{table}[H]
+    \centering
+    \scriptsize
+    \arrayrulecolor{cgigray}
+    \rowcolors{2}{cgilight!55}{white}
+    \begin{tabularx}{\textwidth}{|>{\bfseries\RaggedRight\arraybackslash}p{4.2cm}|>{\centering\arraybackslash}p{3.0cm}|>{\centering\arraybackslash}p{3.0cm}|>{\RaggedRight\arraybackslash}X|}
+        \hline
+        \rowcolor{cgilight!95}
+        \textbf{Fonctionnalité} & \textbf{Java/Spring Boot} & \textbf{Angular} & \textbf{Observation} \\
+        \hline
+        Configuration et qualification & Implémentée & En intégration & Profils propres à l'écosystème. \\
+        \hline
+        Analyse et reviewer & Implémentés & Implémentés & Intégration Angular en cours. \\
+        \hline
+        Planification et reviewer & Implémentés & Implémentés & Trajectoires progressives. \\
+        \hline
+        Transformation isolée & Implémentée & Implémentée & Validation Angular globale en cours. \\
+        \hline
+        Build et tests & Implémentés & En validation & Maven contre npm/Angular CLI. \\
+        \hline
+        Réparation gouvernée & Implémentée & Planifiée & Modèle proposé/révisé/humain. \\
+        \hline
+        Cockpit et événements & Avancés & En intégration & Nouveau frontend Angular. \\
+        \hline
+        Assistant & Implémenté & À consolider & Lecture de l'état et des preuves. \\
+        \hline
+        Rapport final & Implémenté & En développement & Relié aux artefacts. \\
+        \hline
+        Authentification/RBAC & Non implémentés & Non implémentés & Évolution d'industrialisation. \\
+        \hline
+    \end{tabularx}
+    \caption{État des fonctionnalités réalisées}
+    \label{tab:fonctionnalites-realisees-ch4}
+    \rowcolors{2}{white}{white}
+    \arrayrulecolor{black}
+\end{table}
+
 \section*{Conclusion}
 \addcontentsline{toc}{section}{Conclusion}
 
-Ce chapitre a défini l'architecture et les contrats qui traduisent les besoins de la Migration Factory. Les deux systèmes reposent sur un même modèle : une interface de pilotage, un backend autoritaire, une orchestration persistante, des agents spécialisés, des services déterministes, des workspaces isolés et une chaîne de preuves. Leur séparation en deux dépôts permet de respecter les contraintes propres à Java/Spring Boot et Angular sans renoncer aux principes communs de gouvernance.
+Ce chapitre a présenté l'implémentation de la Migration Factory à travers ses technologies, la structure des dépôts, les agents, l'orchestrateur, la persistance et le cockpit. La solution Java/Spring Boot dispose du parcours le plus complet et a permis de stabiliser les mécanismes de gouvernance, de réparation et de reporting. La solution Angular reprend les mêmes principes avec des profils, outils et agents adaptés, mais demeure en phase d'intégration et de validation globale.
 
-La conception distingue systématiquement la proposition de l'exécution. Les modèles de langage peuvent enrichir l'analyse, produire un plan ou proposer un correctif, mais les transitions, les commandes et les écritures restent contrôlées. Les états, les décisions et les artefacts sont persistés et liés par des empreintes afin de permettre la reprise et l'audit.
+L'implémentation montre que l'intelligence est volontairement séparée de l'autorité. Les agents analysent, planifient, transforment ou proposent ; le backend contrôle les transitions, les commandes, les chemins et l'application des correctifs. Cette séparation permet de profiter des capacités des LLM tout en conservant des preuves techniques et une supervision humaine.
 
-Les spécifications présentées constituent la base de la réalisation technique exposée dans le Chapitre V. Celui-ci décrira les technologies retenues, l'implémentation effective des deux systèmes, les difficultés rencontrées et les démonstrations réalisées à partir des interfaces et workflows développés.
+Les prochaines étapes portent sur la consolidation du workflow Angular, l'enrichissement de l'évaluation quantitative, l'introduction d'une authentification et l'adaptation de la persistance à une exploitation multi-utilisateur.
