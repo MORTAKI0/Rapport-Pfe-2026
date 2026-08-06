@@ -1,446 +1,467 @@
-\chapter{Fondements et étude préalable de l'existant}
+\chapter{Cadrage conceptuel et état de l'art}
 
 \section*{Introduction}
 \addcontentsline{toc}{section}{Introduction}
 
-Avant de concevoir une solution d'industrialisation des migrations logicielles, il est nécessaire de comprendre la nature d'une migration, les contraintes propres aux écosystèmes concernés et les limites des pratiques actuellement utilisées. Cette analyse préalable permet de distinguer les opérations pouvant être automatisées de manière déterministe de celles qui nécessitent une expertise contextuelle, une assistance intelligente ou une décision humaine.
+La Migration Factory ne repose pas uniquement sur des outils de mise à niveau. Elle combine des agents spécialisés, un orchestrateur, des services déterministes, des outils externes et une supervision humaine. La compréhension de la solution exige donc un cadrage conceptuel portant à la fois sur les agents intelligents, les systèmes multi-agents, l'orchestration et la migration logicielle.
 
-Ce chapitre comporte trois volets complémentaires. Le premier présente les notions essentielles relatives à la migration et à la modernisation d'applications. Le deuxième étudie le processus de migration traditionnel observé dans le contexte du projet, ainsi que ses limites techniques et organisationnelles. Le troisième examine les principales familles d'outils existantes et positionne l'approche cible de la Migration Factory. Cette étude constitue la base des choix fonctionnels et architecturaux détaillés dans les chapitres suivants.
+Ce chapitre présente d'abord les notions fondamentales sous une forme proche d'un cours : définition et propriétés d'un agent, organisation d'un système multi-agents, modes de coordination et modèles d'orchestration. Il expose ensuite les architectures techniques permettant d'intégrer les agents dans une plateforme logicielle. La seconde partie rappelle les concepts de migration et analyse plusieurs travaux, outils et plateformes proches afin de positionner précisément la contribution du projet.
 
 % ============================================================
-\section{Fondements de la migration logicielle}
+\section{Agents intelligents}
 % ============================================================
 
-\subsection{Migration, mise à niveau et modernisation}
+\subsection{Définition}
 
-Les notions de mise à niveau, de migration et de modernisation sont proches, mais ne désignent pas exactement le même niveau de transformation.
+Un agent logiciel est une entité informatique située dans un environnement, capable de percevoir des informations, de maintenir un état ou un contexte, puis d'agir afin de poursuivre un objectif. Wooldridge et Jennings distinguent la théorie des agents, leurs architectures et les langages permettant de les construire \cite{wooldridge-jennings}. Dans une perspective multi-agents, l'agent ne se définit pas seulement par un appel à un modèle de langage : il doit posséder une responsabilité, des capacités, des entrées, des sorties et des règles d'interaction.
+
+\begin{figure}[H]
+    \centering
+    \resizebox{0.78\textwidth}{!}{%
+    \begin{tikzpicture}[
+        box/.style={draw=cgiblue,rounded corners=3pt,fill=cgilight!55,minimum width=4.0cm,minimum height=1.2cm,align=center,font=\small\bfseries},
+        env/.style={draw=cgigray,rounded corners=3pt,fill=white,minimum width=4.0cm,minimum height=1.2cm,align=center,font=\small\bfseries},
+        arr/.style={-{Latex[length=2.2mm]},thick,draw=cgigray}
+    ]
+        \node[env] (env) {Environnement};
+        \node[box,right=2.0cm of env] (agent) {Agent\\état, objectifs, capacités};
+        \draw[arr,bend left=18] (env) to node[above,font=\small]{perceptions} (agent);
+        \draw[arr,bend left=18] (agent) to node[below,font=\small]{actions} (env);
+    \end{tikzpicture}%
+    }
+    \caption{Interaction générale entre un agent et son environnement}
+    \label{fig:agent-environnement-ch2}
+\end{figure}
+
+Dans le cadre du projet, les agents sont des composants spécialisés et bornés. Ils ne contrôlent pas librement le système de fichiers ou le terminal. Ils reçoivent un contexte préparé par le backend, produisent un résultat structuré, puis rendent la main à l'orchestrateur.
+
+\subsection{Propriétés d'un agent}
+
+La littérature associe généralement plusieurs propriétés aux agents \cite{wooldridge-book,weiss-mas} :
+
+\begin{itemize}
+    \item \textbf{autonomie :} capacité à choisir une action sans intervention continue ;
+    \item \textbf{réactivité :} capacité à répondre aux changements de l'environnement ;
+    \item \textbf{proactivité :} aptitude à poursuivre un objectif et non à répondre uniquement à un événement ;
+    \item \textbf{sociabilité :} capacité à communiquer avec d'autres agents ou acteurs ;
+    \item \textbf{raisonnement :} sélection d'une action à partir d'informations et de contraintes ;
+    \item \textbf{adaptabilité :} modification du comportement selon le contexte ou les résultats précédents.
+\end{itemize}
+
+Ces propriétés doivent être interprétées avec prudence. Tous les agents de la Migration Factory ne sont pas autonomes au même niveau. L'analyseur réagit à une tâche précise ; le planificateur poursuit l'objectif de produire une trajectoire ; le reviewer évalue une sortie ; l'assistant converse avec le développeur. L'autonomie reste limitée par l'orchestrateur, les schémas de sortie et les règles d'autorité.
+
+\subsection{Types d'agents}
 
 \begin{table}[H]
     \centering
     \small
     \arrayrulecolor{cgigray}
-    \rowcolors{2}{cgilight!65}{white}
-    \begin{tabularx}{0.96\textwidth}{|>{\bfseries\RaggedRight\arraybackslash}p{3.4cm}|>{\RaggedRight\arraybackslash}X|}
+    \rowcolors{2}{cgilight!55}{white}
+    \begin{tabularx}{\textwidth}{|>{\bfseries\RaggedRight\arraybackslash}p{3.7cm}|>{\RaggedRight\arraybackslash}X|>{\RaggedRight\arraybackslash}p{4.0cm}|}
         \hline
         \rowcolor{cgilight!95}
-        \textbf{Notion} & \textbf{Définition dans le cadre du projet} \\
+        \textbf{Type} & \textbf{Rôle général} & \textbf{Exemple dans le projet} \\
         \hline
-        Mise à niveau & Passage vers une version plus récente d'un composant, d'une dépendance, d'un langage ou d'un framework, avec un impact potentiellement limité. \\
+        Agent réactif & Répond à un événement ou à un état sans construire une stratégie longue. & Agent de qualification ou de contrôle d'un résultat. \\
         \hline
-        Migration & Transformation contrôlée permettant de faire évoluer une application d'un environnement source vers une cible définie, en adaptant ses dépendances, sa configuration, son code et ses mécanismes de validation. \\
+        Agent cognitif & Utilise un modèle du problème et raisonne sur plusieurs informations. & Analyseur et agent de diagnostic. \\
         \hline
-        Modernisation & Démarche plus large pouvant inclure la migration, la réduction de la dette technique, l'amélioration de la sécurité, l'évolution de l'architecture et la préparation à de nouveaux environnements d'exécution. \\
+        Agent conversationnel & Interagit en langage naturel avec un utilisateur. & Assistant de migration. \\
         \hline
-        Refactorisation & Restructuration interne du code visant à améliorer sa qualité ou sa maintenabilité sans modifier intentionnellement son comportement fonctionnel. \\
+        Agent de planification & Décompose un objectif en tâches ordonnées. & Planificateur de trajectoire. \\
+        \hline
+        Agent de monitoring & Observe l'état, les événements et les anomalies. & Projection du cockpit et mécanismes de surveillance. \\
+        \hline
+        Agent d'exécution & Réalise une tâche opérationnelle dans un environnement. & Transformateur borné ; l'exécution shell reste déterministe. \\
+        \hline
+        Agent évaluateur & Examine la qualité ou la conformité d'une sortie. & Reviewers d'analyse, de plan et de réparation. \\
         \hline
     \end{tabularx}
-    \caption{Distinction entre les principales notions de transformation logicielle}
-    \label{tab:notions-migration}
+    \caption{Types d'agents et correspondance avec le projet}
+    \label{tab:types-agents-ch2}
     \rowcolors{2}{white}{white}
     \arrayrulecolor{black}
 \end{table}
 
-Dans ce rapport, le terme \textit{migration} est utilisé dans un sens suffisamment large pour inclure les adaptations techniques indispensables au passage vers une version cible supportée. Il ne s'agit donc pas d'une simple modification de numéros de version, mais d'un processus comprenant analyse, planification, transformation, exécution et validation.
+\subsection{Agent, LLM, service et outil}
 
-\subsection{Facteurs déclencheurs d'une migration}
+Un \textbf{LLM} produit une sortie probabiliste à partir d'un contexte. Un \textbf{agent} ajoute à ce modèle un rôle, une mémoire ou un état, des règles d'interaction et éventuellement des outils. Un \textbf{service} implémente une capacité déterministe accessible par contrat. Un \textbf{outil} réalise une opération technique, par exemple Maven, OpenRewrite ou Angular CLI.
 
-Plusieurs facteurs peuvent rendre une migration nécessaire :
+Cette distinction est centrale : appeler un LLM ne suffit pas pour construire un agent, et confier une commande à un service déterministe ne transforme pas ce service en agent. La Migration Factory associe ces catégories sans leur attribuer la même autorité.
+
+% ============================================================
+\section{Systèmes multi-agents}
+% ============================================================
+
+\subsection{Définition}
+
+Un système multi-agents (SMA) regroupe plusieurs agents capables d'interagir dans un environnement partagé afin de poursuivre des objectifs individuels ou collectifs. Les ouvrages de Wooldridge, Weiss et Ferber présentent les SMA comme des systèmes dans lesquels les responsabilités, les connaissances et les actions sont distribuées entre plusieurs entités \cite{wooldridge-book,weiss-mas,ferber-mas}.
+
+\begin{figure}[H]
+    \centering
+    \resizebox{0.92\textwidth}{!}{%
+    \begin{tikzpicture}[
+        agent/.style={draw=emsigreen!70!black,rounded corners=3pt,fill=emsigreen!8,minimum width=3.2cm,minimum height=1.05cm,align=center,font=\small\bfseries},
+        state/.style={draw=cgiblue,rounded corners=3pt,fill=cgilight!55,minimum width=4.0cm,minimum height=1.05cm,align=center,font=\small\bfseries},
+        arr/.style={<->,thick,draw=cgigray}
+    ]
+        \node[state] (shared) {État et artefacts partagés};
+        \node[agent,above left=1.3cm and 1.4cm of shared] (a1) {Agent d'analyse};
+        \node[agent,above right=1.3cm and 1.4cm of shared] (a2) {Agent de planification};
+        \node[agent,below left=1.3cm and 1.4cm of shared] (a3) {Agent de transformation};
+        \node[agent,below right=1.3cm and 1.4cm of shared] (a4) {Agent de révision};
+        \draw[arr] (a1) -- (shared);
+        \draw[arr] (a2) -- (shared);
+        \draw[arr] (a3) -- (shared);
+        \draw[arr] (a4) -- (shared);
+    \end{tikzpicture}%
+    }
+    \caption{Vue simplifiée d'un système multi-agents spécialisé}
+    \label{fig:sma-simplifie-ch2}
+\end{figure}
+
+\subsection{Coordination, communication et délégation}
+
+La \textbf{coordination} organise les dépendances entre actions. La \textbf{communication} transmet des informations, demandes ou décisions. La \textbf{délégation} confie une sous-tâche à un agent disposant des capacités appropriées. La \textbf{coopération} apparaît lorsque plusieurs agents contribuent à un objectif commun. La \textbf{négociation} intervient lorsque plusieurs agents doivent arbitrer des préférences ou ressources.
+
+FIPA a standardisé des structures de messages et des protocoles d'interaction entre agents. Son Agent Communication Language associe à chaque message une intention communicative, telle qu'informer, demander ou proposer \cite{fipa-acl}. La Migration Factory ne met pas en œuvre l'intégralité de FIPA-ACL, mais reprend le principe de contrats explicites : type de tâche, contexte, sortie, statut et corrélation.
+
+\subsection{Avantages et limites}
+
+Une architecture SMA peut apporter :
 
 \begin{itemize}
-    \item \textbf{fin de support :} certaines versions ne reçoivent plus de correctifs ni d'assistance officielle ;
-    \item \textbf{sécurité :} les composants obsolètes peuvent conserver des vulnérabilités connues ou dépendre de bibliothèques qui ne sont plus maintenues ;
-    \item \textbf{compatibilité :} les plateformes cloud, systèmes d'exploitation, outils de construction et services managés évoluent autour de versions officiellement prises en charge ;
-    \item \textbf{maintenabilité :} l'accumulation d'API dépréciées, de configurations historiques et de dépendances incompatibles augmente la dette technique ;
-    \item \textbf{évolutivité :} les nouvelles versions facilitent l'intégration de fonctionnalités, d'outils et de pratiques de développement plus récents ;
-    \item \textbf{industrialisation :} les organisations doivent pouvoir appliquer des trajectoires similaires à plusieurs applications sans reconstruire entièrement la démarche pour chaque projet.
+    \item \textbf{modularité :} chaque agent possède une responsabilité limitée ;
+    \item \textbf{scalabilité organisationnelle :} les capacités peuvent être développées séparément ;
+    \item \textbf{robustesse :} une défaillance peut être isolée et examinée ;
+    \item \textbf{distribution des responsabilités :} proposition, review et exécution sont séparées ;
+    \item \textbf{flexibilité :} un agent ou un modèle peut être remplacé sans refonte complète ;
+    \item \textbf{gestion du contexte :} chaque agent reçoit seulement les informations utiles.
 \end{itemize}
 
-La migration doit ainsi être considérée comme une activité de maîtrise du cycle de vie logiciel. Elle cherche à préserver le comportement attendu de l'application tout en faisant évoluer son environnement technique.
+La multiplication des agents introduit néanmoins des coûts : davantage de contrats, d'états, de latence, d'appels LLM et de risques d'incohérence. La documentation LangChain rappelle qu'une tâche complexe ne nécessite pas automatiquement plusieurs agents ; un agent unique bien outillé peut parfois suffire \cite{langchain-multiagent}. Le recours au SMA doit donc être justifié par la spécialisation réelle des rôles et les contraintes de gouvernance.
 
-\subsection{Cycle général d'une migration}
+% ============================================================
+\section{Orchestration d'agents}
+% ============================================================
 
-Une migration structurée peut être représentée par les phases suivantes :
+\subsection{Orchestration, chorégraphie, coordination et planification}
+
+\begin{table}[H]
+    \centering
+    \small
+    \arrayrulecolor{cgigray}
+    \rowcolors{2}{cgilight!55}{white}
+    \begin{tabularx}{\textwidth}{|>{\bfseries\RaggedRight\arraybackslash}p{3.1cm}|>{\RaggedRight\arraybackslash}X|>{\RaggedRight\arraybackslash}p{4.1cm}|}
+        \hline
+        \rowcolor{cgilight!95}
+        \textbf{Notion} & \textbf{Définition} & \textbf{Application au projet} \\
+        \hline
+        Orchestration & Un composant central décide de l'ordre, des transitions et des participants. & Modèle principal de la Migration Factory. \\
+        \hline
+        Chorégraphie & Les participants réagissent à des messages selon un protocole partagé sans contrôleur unique. & Non retenue comme modèle principal. \\
+        \hline
+        Coordination & Ensemble des mécanismes évitant les conflits et respectant les dépendances. & États, gates, contrats, priorités et idempotence. \\
+        \hline
+        Planification & Construction d'une séquence de tâches permettant d'atteindre un objectif. & Trajectoire de versions et plan de migration. \\
+        \hline
+    \end{tabularx}
+    \caption{Distinction entre orchestration, chorégraphie, coordination et planification}
+    \label{tab:notions-orchestration-ch2}
+    \rowcolors{2}{white}{white}
+    \arrayrulecolor{black}
+\end{table}
+
+La chorégraphie de services décrit des interactions observables entre participants qui connaissent un protocole commun, sans qu'un seul service pilote toutes les actions \cite{w3c-choreography}. La Migration Factory suit au contraire un état central et des transitions contrôlées ; elle relève donc d'une orchestration centralisée complétée par des agents spécialisés.
+
+\subsection{Modèles d'organisation}
+
+Quatre modèles sont courants :
+
+\begin{itemize}
+    \item \textbf{orchestrateur central :} toutes les tâches passent par un coordinateur ;
+    \item \textbf{agents distribués :} les agents se coordonnent directement ;
+    \item \textbf{architecture hiérarchique :} des superviseurs délèguent à des sous-agents ;
+    \item \textbf{architecture hybride :} l'orchestration centralise les états sensibles tandis que les agents conservent une autonomie locale.
+\end{itemize}
+
+Le projet adopte le quatrième modèle. L'orchestrateur choisit le prochain nœud selon l'état. L'agent traite sa responsabilité localement. Les services déterministes appliquent les commandes. Le développeur intervient sur les décisions sensibles.
+
+\subsection{Mécanismes d'orchestration}
+
+Les principaux mécanismes sont :
+
+\begin{itemize}
+    \item routage d'une tâche vers l'agent approprié ;
+    \item séquencement et dépendances entre étapes ;
+    \item gestion des priorités et tentatives ;
+    \item mémoire ou état partagé ;
+    \item supervision et journalisation ;
+    \item interruption et reprise ;
+    \item gestion des erreurs et compensation ;
+    \item replanification à partir d'une nouvelle preuve.
+\end{itemize}
+
+LangGraph permet de construire des workflows personnalisés combinant logique déterministe et comportements agentiques, avec un état persistant et des interruptions humaines \cite{langgraph-persistence,langchain-multiagent}. Ces propriétés correspondent au besoin de la Migration Factory, sans faire de LangGraph la source d'autorité métier.
+
+% ============================================================
+\section{Plateformes et architectures intelligentes}
+% ============================================================
+
+\subsection{Architecture en couches}
+
+Une plateforme agentique de production ne se réduit pas à une conversation entre modèles. Elle associe généralement :
+
+\begin{itemize}
+    \item une interface utilisateur ;
+    \item une API et des services applicatifs ;
+    \item un orchestrateur ;
+    \item des agents et des outils ;
+    \item une persistance de l'état ;
+    \item un magasin d'artefacts ;
+    \item des mécanismes de sécurité, d'observabilité et d'évaluation.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \resizebox{0.9\textwidth}{!}{%
+    \begin{tikzpicture}[
+        layer/.style={draw=cgiblue,rounded corners=3pt,fill=cgilight!55,minimum width=12.5cm,minimum height=1.0cm,align=center,font=\small\bfseries},
+        arr/.style={-{Latex[length=2mm]},thick,draw=cgigray}
+    ]
+        \node[layer] (ui) {Interface et API};
+        \node[layer,below=0.35cm of ui] (orch) {Orchestration, routage et gestion des états};
+        \node[layer,below=0.35cm of orch] (agents) {Agents spécialisés et services déterministes};
+        \node[layer,below=0.35cm of agents] (infra) {Persistance, artefacts, outils externes et observabilité};
+        \draw[arr] (ui) -- (orch);
+        \draw[arr] (orch) -- (agents);
+        \draw[arr] (agents) -- (infra);
+    \end{tikzpicture}%
+    }
+    \caption{Architecture en couches d'une plateforme agentique}
+    \label{fig:plateforme-agentique-ch2}
+\end{figure}
+
+\subsection{Microservices, API et bus de messages}
+
+Les agents peuvent être intégrés sous forme de modules internes, de services séparés ou de processus distribués. Les API définissent les contrats synchrones. Les événements et files de messages facilitent les traitements asynchrones, le découplage et la reprise. Une architecture microservices n'est cependant pas obligatoire pour obtenir un SMA : le critère essentiel est la séparation des responsabilités et des interactions, non le nombre de processus déployés.
+
+Dans les prototypes, les agents et services sont intégrés au backend et coordonnés par le workflow. Les événements persistés jouent un rôle d'observabilité et de reconstruction. Une future industrialisation pourrait séparer certains composants ou utiliser une file de messages, mais cela n'est pas nécessaire pour le périmètre local actuel.
+
+\subsection{Humain dans la boucle}
+
+L'intégration d'un humain répond à trois objectifs : valider une décision à risque, apporter une information absente et arrêter une trajectoire incorrecte. Le contrôle humain ne doit pas être symbolique. Il doit porter sur un artefact précis, présenter les conséquences et enregistrer la décision.
+
+% ============================================================
+\section{Migration logicielle : motivations, types et processus}
+% ============================================================
+
+\subsection{Définitions}
+
+\begin{table}[H]
+    \centering
+    \small
+    \arrayrulecolor{cgigray}
+    \rowcolors{2}{cgilight!55}{white}
+    \begin{tabularx}{\textwidth}{|>{\bfseries\RaggedRight\arraybackslash}p{3.3cm}|>{\RaggedRight\arraybackslash}X|}
+        \hline
+        \rowcolor{cgilight!95}
+        \textbf{Notion} & \textbf{Définition} \\
+        \hline
+        Mise à niveau & Passage à une version plus récente d'un composant ou d'un runtime. \\
+        \hline
+        Migration & Transformation contrôlée d'un système source vers une cible, incluant dépendances, configuration, code et validation. \\
+        \hline
+        Modernisation & Démarche plus large intégrant migration, architecture, sécurité et dette technique. \\
+        \hline
+        Refactorisation & Amélioration interne du code sans changement intentionnel du comportement métier. \\
+        \hline
+    \end{tabularx}
+    \caption{Notions relatives à la transformation logicielle}
+    \label{tab:notions-migration-ch2}
+    \rowcolors{2}{white}{white}
+    \arrayrulecolor{black}
+\end{table}
+
+\subsection{Pourquoi migrer ?}
+
+Les migrations sont déclenchées par la fin de support, les vulnérabilités, l'incompatibilité avec les plateformes, la dette technique, les exigences de maintenabilité et l'accès à de nouvelles capacités. Le coût de l'inaction augmente lorsque les versions anciennes deviennent plus difficiles à compiler, tester ou déployer.
+
+\subsection{Types de migration}
+
+On distingue notamment :
+
+\begin{itemize}
+    \item migration de runtime ou de langage ;
+    \item migration de framework ;
+    \item mise à niveau de dépendances ;
+    \item migration de plateforme ou de cloud ;
+    \item migration d'architecture ;
+    \item migration de données ;
+    \item combinaison progressive de plusieurs transformations.
+\end{itemize}
+
+\subsection{Processus général}
 
 \begin{figure}[H]
     \centering
     \resizebox{0.98\textwidth}{!}{%
     \begin{tikzpicture}[
-        step/.style={draw=cgiblue!45,fill=cgiblue!5,rounded corners=2mm,minimum width=2.55cm,minimum height=1.15cm,align=center,font=\small\bfseries},
-        validate/.style={draw=cgired!65,fill=cgired!5,rounded corners=2mm,minimum width=2.55cm,minimum height=1.15cm,align=center,font=\small\bfseries},
-        arr/.style={-{Latex[length=2.2mm]},thick,color=cgigray}
+        step/.style={draw=cgiblue,rounded corners=3pt,fill=cgilight!55,minimum width=2.6cm,minimum height=1.0cm,align=center,font=\small\bfseries},
+        arr/.style={-{Latex[length=2mm]},thick,draw=cgigray}
     ]
-        \node[step] (inventory) {Inventaire et\\analyse};
-        \node[step,right=0.35cm of inventory] (target) {Définition de\\la cible};
-        \node[step,right=0.35cm of target] (plan) {Planification\\par étapes};
-        \node[step,right=0.35cm of plan] (transform) {Transformations\\techniques};
-        \node[validate,right=0.35cm of transform] (build) {Installation,\\build et tests};
-        \node[step,right=0.35cm of build] (repair) {Diagnostic et\\réparation};
-        \node[validate,right=0.35cm of repair] (accept) {Validation et\\livraison};
-        \draw[arr] (inventory) -- (target);
-        \draw[arr] (target) -- (plan);
-        \draw[arr] (plan) -- (transform);
-        \draw[arr] (transform) -- (build);
-        \draw[arr] (build) -- (repair);
-        \draw[arr] (repair) -- (accept);
-        \draw[arr,rounded corners=4mm] (repair.south) -- ++(0,-0.62) -| (transform.south);
+        \node[step] (inventory) {Inventaire};
+        \node[step,right=0.35cm of inventory] (target) {Cible};
+        \node[step,right=0.35cm of target] (plan) {Plan};
+        \node[step,right=0.35cm of plan] (transform) {Transformation};
+        \node[step,right=0.35cm of transform] (build) {Build et tests};
+        \node[step,right=0.35cm of build] (repair) {Réparation};
+        \node[step,right=0.35cm of repair] (report) {Validation};
+        \draw[arr] (inventory)--(target);
+        \draw[arr] (target)--(plan);
+        \draw[arr] (plan)--(transform);
+        \draw[arr] (transform)--(build);
+        \draw[arr] (build)--(repair);
+        \draw[arr] (repair)--(report);
+        \draw[arr,rounded corners=4pt] (repair.south)--++(0,-0.65)-|(transform.south);
     \end{tikzpicture}%
     }
-    \caption{Cycle général d'une migration applicative}
-    \label{fig:cycle-general-migration}
+    \caption{Processus général d'une migration applicative}
+    \label{fig:processus-migration-ch2}
 \end{figure}
 
-Ce cycle est rarement strictement linéaire. Une erreur de compilation, un test en échec ou une incompatibilité de dépendances peut imposer un retour vers la phase de transformation. La capacité à conserver l'état, les preuves et les décisions de chaque itération devient alors essentielle.
+\subsection{Spécificités Java/Spring Boot}
+
+Une migration Spring Boot associe versions de Java, Spring Boot, Spring Framework, dépendances, plugins Maven ou Gradle, propriétés et espaces de noms. La documentation Spring recommande d'examiner les notes de chaque version traversée et de progresser par étapes compatibles \cite{spring-boot-upgrading}.
+
+Le projet couvre Spring Boot 2.1 vers 2.7, 2.7 vers 3.5 et 3.5 vers 4.0, avec Java 11, 17 et 21. Les difficultés portent notamment sur les API dépréciées, la transition \texttt{javax} vers \texttt{jakarta}, les plugins, la configuration et les bibliothèques tierces.
+
+\subsection{Spécificités Angular}
+
+Angular dépend simultanément d'Angular CLI, Node.js, npm, TypeScript, RxJS et des bibliothèques du projet. La documentation officielle publie une matrice de compatibilité et recommande de franchir les versions majeures successivement avec l'Update Guide et \texttt{ng update} \cite{angular-versions,angular-update}.
+
+Le périmètre couvre Angular 18 vers 19, 19 vers 20 et 20 vers 21. Chaque étape nécessite un profil Node/npm compatible, une installation propre, un build et les tests disponibles.
 
 % ============================================================
-\section{Spécificités des écosystèmes étudiés}
+\section{Étude de l'existant et travaux proches}
 % ============================================================
 
-\subsection{Migration Java et Spring Boot}
+\subsection{Processus manuel de référence}
 
-Une application Spring Boot est liée à plusieurs couches de compatibilité : version de Java, version de Spring Boot, version de Spring Framework, dépendances gérées, plugins Maven ou Gradle, API utilisées et bibliothèques tierces. Une modification de la version principale peut donc entraîner des changements dans le code, les propriétés de configuration, les imports, les annotations et les tests.
+Dans un processus traditionnel, le développeur analyse le projet, consulte les guides, modifie les manifestes et le code, exécute les commandes, lit les journaux puis répète le cycle. Les outils existent, mais l'état, les preuves et les décisions restent dispersés. Cette organisation limite la reproductibilité, le suivi de plusieurs migrations et la capitalisation des corrections.
 
-La documentation officielle de Spring Boot recommande de consulter les guides de migration et les notes de publication correspondant aux versions traversées. Lorsqu'une application saute plusieurs versions, les notes intermédiaires doivent également être examinées. Spring Boot fournit par ailleurs un module temporaire, \texttt{spring-boot-properties-migrator}, permettant de détecter certaines propriétés renommées ou supprimées pendant une mise à niveau.\footnote{Spring, \textit{Upgrading Spring Boot}, \url{https://docs.spring.io/spring-boot/upgrading.html}.}
+\subsection{Travaux et plateformes étudiés}
 
-Dans le périmètre actuel du projet, la trajectoire étudiée est progressive :
+Huit solutions représentatives ont été retenues afin de couvrir la migration déterministe, l'assistance intelligente, la réparation et l'orchestration multi-agents.
 
-\begin{center}
-\textbf{Spring Boot 2.1}
-$\rightarrow$
-\textbf{2.7}
-$\rightarrow$
-\textbf{3.5}
-$\rightarrow$
-\textbf{4.0}
-\end{center}
+\paragraph{OpenRewrite.}
+OpenRewrite applique des recettes composables sur des arbres sémantiques préservant le format. Les recettes peuvent réaliser des migrations de frameworks et produire des différences examinables \cite{openrewrite-recipes}. Son principal avantage est le déterminisme ; sa limite est la dépendance aux recettes disponibles.
 
-Cette trajectoire accompagne également l'évolution de Java 11 vers Java 17, puis Java 21. La progression par étapes réduit la distance technologique entre deux validations successives et permet d'identifier plus précisément l'origine d'une incompatibilité.
+\paragraph{Angular CLI et \texttt{ng update}.}
+L'outil natif Angular applique les migrations officielles entre versions et met à jour les dépendances prises en charge. Il reste toutefois centré sur l'écosystème Angular et ne pilote pas à lui seul l'ensemble du processus de gouvernance.
 
-Les difficultés typiques concernent notamment :
+\paragraph{Dependabot.}
+Dependabot détecte des versions de dépendances et ouvre des pull requests pour mettre à jour les manifestes. La validation dépend ensuite des tests et de la revue de l'équipe \cite{dependabot}. Il automatise l'entretien des dépendances, non une migration complète de framework.
 
-\begin{itemize}
-    \item la compatibilité entre Java, Spring Boot et les bibliothèques tierces ;
-    \item le remplacement d'API supprimées ou dépréciées ;
-    \item les changements de configuration et de conventions ;
-    \item la transition de certains espaces de noms \texttt{javax.*} vers \texttt{jakarta.*} ;
-    \item les modifications de plugins Maven, de dépendances gérées et de tests ;
-    \item les différences de comportement détectées uniquement à la compilation ou à l'exécution.
-\end{itemize}
+\paragraph{Amazon Q Developer Code Transformation.}
+Amazon Q peut analyser un projet Maven, produire un plan, transformer le code Java, relancer des builds et tests, puis présenter un diff à accepter. Les scénarios supportés, les contraintes d'environnement et les limites de taille restent définis par le service \cite{amazonq-transform}.
 
-\subsection{Migration Angular}
+\paragraph{GitHub Copilot Modernization.}
+GitHub Copilot Modernization propose des workflows structurés d'évaluation, de planification, de transformation et de validation pour Java et d'autres environnements. Les fonctions récentes prennent en charge plusieurs scénarios Spring Boot et des workflows multi-agents \cite{copilot-modernization}.
 
-La migration Angular implique simultanément le framework, Angular CLI, TypeScript, Node.js, npm et les bibliothèques du projet. Une version Angular n'est donc pas indépendante de son environnement d'exécution et de sa chaîne d'outillage.
+\paragraph{SWE-agent.}
+SWE-agent fournit à un agent LLM une interface spécialisée pour naviguer dans un dépôt, modifier des fichiers et exécuter des tests. Son évaluation sur SWE-bench montre l'importance de l'interface agent--ordinateur, mais son objectif est la résolution autonome d'issues plutôt que la gouvernance d'une trajectoire de migration \cite{swe-agent}.
 
-Angular fournit un guide de mise à jour interactif et la commande \texttt{ng update}. La documentation officielle recommande une progression d'une version majeure à la suivante et précise que les chemins de mise à jour dépendent des versions source et cible.\footnote{Angular, \textit{Keeping your Angular projects up-to-date}, \url{https://angular.dev/update}.}\footnote{Angular, \textit{Versioning and releases}, \url{https://angular.dev/reference/releases}.}
+\paragraph{AutoGen.}
+AutoGen organise des conversations entre agents configurables combinant LLM, outils et interventions humaines. Le framework illustre plusieurs patrons de collaboration et de review, mais laisse au concepteur la responsabilité de la persistance, de la sécurité et de l'intégration métier \cite{autogen-paper}.
 
-Le périmètre actuel est organisé autour des transitions :
+\paragraph{LangGraph.}
+LangGraph fournit un graphe d'exécution avec état, routage, checkpoints et interruptions. Il est adapté aux workflows hybrides, mais ne définit pas les règles de migration, les agents ou la gouvernance ; ces éléments doivent être conçus par l'application.
 
-\begin{center}
-\textbf{Angular 18}
-$\rightarrow$
-\textbf{19}
-$\rightarrow$
-\textbf{20}
-$\rightarrow$
-\textbf{21}
-\end{center}
+\subsection{Comparaison synthétique}
 
-La vision d'évolution consiste à prendre en charge des applications plus anciennes, à partir d'Angular 11, en appliquant successivement les migrations majeures nécessaires. Cette progression exige la gestion de plusieurs versions de Node.js, des installations reproductibles et une validation à chaque étape.
+\scriptsize
+\begin{longtable}{|>{\bfseries\RaggedRight\arraybackslash}p{2.8cm}|>{\RaggedRight\arraybackslash}p{2.6cm}|>{\RaggedRight\arraybackslash}p{2.5cm}|>{\RaggedRight\arraybackslash}p{2.5cm}|>{\RaggedRight\arraybackslash}p{2.5cm}|>{\RaggedRight\arraybackslash}p{3.2cm}|}
+    \caption{Comparaison des travaux et plateformes proches}\label{tab:travaux-proches-ch2}\\
+    \hline
+    \rowcolor{cgilight!95}
+    \textbf{Travail} & \textbf{Domaine} & \textbf{Agents} & \textbf{Orchestration} & \textbf{Évaluation} & \textbf{Limite principale} \\
+    \hline
+    \endfirsthead
+    \hline
+    \rowcolor{cgilight!95}
+    \textbf{Travail} & \textbf{Domaine} & \textbf{Agents} & \textbf{Orchestration} & \textbf{Évaluation} & \textbf{Limite principale} \\
+    \hline
+    \endhead
+    OpenRewrite & Refactorisation et migration & Aucun LLM requis & Pipeline de recettes & Diff et tests du projet & Cas limités au catalogue de recettes \\
+    \hline
+    Angular CLI & Mise à niveau Angular & Aucun agent explicite & Séquence officielle de migrations & Build et tests externes & Périmètre Angular uniquement \\
+    \hline
+    Dependabot & Dépendances & Bot spécialisé & Planification périodique & Revue de PR et CI & Pas de migration applicative complète \\
+    \hline
+    Amazon Q & Transformation Java & Agent de transformation & Service géré, plan et itérations & Build, tests et diff & Scénarios et quotas supportés \\
+    \hline
+    Copilot Modernization & Modernisation applicative & Agents spécialisés & Workflow agentique structuré & Build, tests, plan et rapport & Service propriétaire et périmètre supporté \\
+    \hline
+    SWE-agent & Résolution d'issues & Agent d'exécution & Boucle autonome avec outils & SWE-bench, pass@1 & Gouvernance métier limitée \\
+    \hline
+    AutoGen & Applications multi-agents & Agents conversationnels & Conversations et patterns configurables & Benchmarks et études de cas & Infrastructure métier à construire \\
+    \hline
+    LangGraph & Orchestration agentique & Définis par l'application & Graphe d'état et checkpoints & Traces et tests applicatifs & Ne fournit pas les agents métier \\
+    \hline
+    Migration Factory & Migration Java et Angular & Agents spécialisés et reviewers & Orchestration centrale hybride & Build, tests, preuves, décisions et rapports & Prototype local à industrialiser \\
+    \hline
+\end{longtable}
+\normalsize
 
-Les difficultés principales comprennent :
-
-\begin{itemize}
-    \item les matrices de compatibilité entre Angular, Node.js et TypeScript ;
-    \item les migrations générées par Angular CLI et les changements restant manuels ;
-    \item les conflits entre dépendances directes, transitives et \textit{peer dependencies} ;
-    \item les scripts de cycle de vie exécutés pendant l'installation npm ;
-    \item les différences entre \texttt{npm install} et une installation propre fondée sur le fichier de verrouillage ;
-    \item les régressions révélées par le build, le typage TypeScript, les linters ou les tests.
-\end{itemize}
-
-\subsection{Conséquence : spécialisation des chaînes de migration}
-
-Les deux écosystèmes partagent un cycle général similaire, mais leurs outils, contraintes de versions, formats de projet et modes de validation diffèrent. Cette observation justifie l'organisation du projet en deux systèmes et deux dépôts spécialisés. Le système Java/Spring Boot et le système Angular conservent leurs propres backends, frontends, orchestrations, agents et workflows de validation. Ils partagent une vision d'ingénierie, mais pas une chaîne d'exécution unique.
-
-% ============================================================
-\section{Étude du processus existant}
-% ============================================================
-
-\subsection{Organisation générale avant industrialisation}
-
-Avant la mise en place de la Migration Factory, une migration est principalement conduite par un ou plusieurs développeurs expérimentés. La démarche s'appuie sur la documentation officielle, l'expérience de l'équipe, les outils de développement, les gestionnaires de dépendances et les commandes de build propres au projet.
-
-Le développeur commence par examiner la structure de l'application, les versions utilisées et les dépendances déclarées. Il définit ensuite une cible, modifie les fichiers de configuration et adapte progressivement le code. Après chaque ensemble de changements, il relance l'installation, la compilation et les tests. Les échecs sont analysés à partir des journaux, puis corrigés manuellement.
-
-\subsection{Déroulement technique du processus manuel}
-
-Le processus de référence peut être résumé comme suit :
-
-\begin{enumerate}
-    \item récupérer ou copier le projet source ;
-    \item identifier les versions du langage, du framework et de l'outil de build ;
-    \item consulter les guides de migration et les notes de publication ;
-    \item choisir une version cible et, lorsque nécessaire, des étapes intermédiaires ;
-    \item modifier les dépendances, plugins et fichiers de configuration ;
-    \item appliquer les adaptations de code identifiées ;
-    \item installer les dépendances et lancer la compilation ;
-    \item exécuter les tests disponibles ;
-    \item analyser les erreurs, rechercher leur cause et appliquer une correction ;
-    \item répéter le cycle jusqu'à l'obtention d'un résultat acceptable ;
-    \item documenter les changements et préparer la livraison.
-\end{enumerate}
+\subsection{Carte de positionnement}
 
 \begin{figure}[H]
     \centering
-    \resizebox{0.95\textwidth}{!}{%
+    \resizebox{0.93\textwidth}{!}{%
     \begin{tikzpicture}[
-        proc/.style={draw=cgilight,fill=white,rounded corners=2mm,minimum width=2.75cm,minimum height=1.2cm,align=center,font=\small\bfseries},
-        human/.style={draw=cgired!60,fill=cgired!5,rounded corners=2mm,minimum width=2.75cm,minimum height=1.2cm,align=center,font=\small\bfseries},
-        arr/.style={-{Latex[length=2.2mm]},thick,color=cgigray}
+        root/.style={draw=cgired,rounded corners=3pt,fill=white,minimum width=4.1cm,minimum height=1.0cm,align=center,font=\small\bfseries},
+        cat/.style={draw=cgiblue,rounded corners=3pt,fill=cgilight!55,minimum width=4.1cm,minimum height=1.0cm,align=center,font=\small\bfseries},
+        item/.style={draw=cgigray,rounded corners=3pt,fill=white,text width=3.7cm,minimum height=1.2cm,align=center,font=\scriptsize},
+        arr/.style={-{Latex[length=2mm]},thick,draw=cgigray}
     ]
-        \node[human] (analyse) {Analyse par\\le développeur};
-        \node[proc,right=0.45cm of analyse] (docs) {Consultation des\\guides et notes};
-        \node[human,right=0.45cm of docs] (edit) {Modifications\\manuelles};
-        \node[proc,right=0.45cm of edit] (run) {Installation,\\build et tests};
-        \node[human,right=0.45cm of run] (debug) {Lecture des logs\\et diagnostic};
-        \node[proc,right=0.45cm of debug] (result) {Validation ou\\nouvel échec};
-        \draw[arr] (analyse) -- (docs);
-        \draw[arr] (docs) -- (edit);
-        \draw[arr] (edit) -- (run);
-        \draw[arr] (run) -- (debug);
-        \draw[arr] (debug) -- (result);
-        \draw[arr,rounded corners=4mm] (result.south) -- ++(0,-0.7) -| (edit.south);
+        \node[root] (root) {Écosystème étudié};
+        \node[cat,below left=1.2cm and 3.8cm of root] (det) {Migration déterministe};
+        \node[cat,below=1.2cm of root] (ai) {Assistance intelligente};
+        \node[cat,below right=1.2cm and 3.8cm of root] (mas) {Orchestration multi-agents};
+        \node[item,below=0.55cm of det] {OpenRewrite\\Angular CLI\\Dependabot};
+        \node[item,below=0.55cm of ai] {Amazon Q\\Copilot Modernization\\SWE-agent};
+        \node[item,below=0.55cm of mas] {AutoGen\\LangGraph\\FIPA};
+        \draw[arr] (root)--(det);
+        \draw[arr] (root)--(ai);
+        \draw[arr] (root)--(mas);
     \end{tikzpicture}%
     }
-    \caption{Processus traditionnel de migration étudié}
-    \label{fig:processus-migration-manuel}
+    \caption{Regroupement des approches étudiées}
+    \label{fig:mindmap-etat-art-ch2}
 \end{figure}
 
-\subsection{Informations et preuves disponibles}
+% ============================================================
+\section{Positionnement de la Migration Factory}
+% ============================================================
 
-Dans une démarche manuelle, les informations utiles sont souvent réparties entre plusieurs emplacements : terminal, historique Git, tickets Jira, documentation, messages d'équipe et notes individuelles. Les commandes exécutées, les versions réellement utilisées, les erreurs rencontrées et les raisons d'une correction ne sont pas toujours regroupées dans un dossier de preuve cohérent.
+La Migration Factory se situe à l'intersection des trois familles. Elle utilise les transformations déterministes lorsque les règles sont connues, les agents lorsque le problème demande une analyse contextuelle, et un orchestrateur pour maintenir l'ordre, l'état et les décisions.
 
-Cette dispersion ne signifie pas que les outils sont absents. Git, les systèmes de tickets, les outils de build et les plateformes de communication apportent chacun une partie de la traçabilité. La limite réside dans l'absence d'une représentation unifiée du déroulement de la migration, reliant état, commande, résultat, preuve, décision et changement de code.
-
-\subsection{Limites techniques identifiées}
-
-L'analyse du processus existant met en évidence les limites suivantes :
+Sa contribution principale n'est pas de proposer un nouveau modèle de langage ni de remplacer les outils existants. Elle consiste à les organiser dans une architecture multi-agents gouvernée qui :
 
 \begin{itemize}
-    \item \textbf{forte dépendance à l'expertise :} la qualité et la vitesse de la migration dépendent de la disponibilité de profils maîtrisant simultanément la version source, la version cible et les outils associés ;
-    \item \textbf{diagnostic répétitif :} une part importante du temps est consacrée à relancer des commandes, relire les journaux et rechercher la cause d'erreurs proches ;
-    \item \textbf{reproductibilité limitée :} deux développeurs peuvent suivre des séquences différentes et produire des résultats difficiles à comparer ;
-    \item \textbf{risque sur la source :} des opérations réalisées directement dans le projet peuvent compliquer le retour à un état antérieur lorsque l'isolation n'est pas systématique ;
-    \item \textbf{gestion complexe des environnements :} les migrations progressives exigent plusieurs versions de Java, Node.js, Maven, npm ou d'autres outils ;
-    \item \textbf{validation fragmentée :} installation, compilation, tests et contrôles statiques ne sont pas toujours exécutés selon une politique uniforme ;
-    \item \textbf{capitalisation insuffisante :} une correction utile pour une application n'est pas automatiquement transformée en règle réutilisable ou en connaissance accessible.
+    \item spécialise les agents par responsabilité ;
+    \item sépare proposition, review, décision et exécution ;
+    \item associe les sorties aux preuves et empreintes ;
+    \item protège la source par des espaces isolés ;
+    \item valide par les commandes réelles de l'écosystème ;
+    \item conserve l'état et permet la reprise ;
+    \item fournit une vue de pilotage au développeur.
 \end{itemize}
-
-\subsection{Limites organisationnelles}
-
-Les limites ne sont pas uniquement techniques :
-
-\begin{itemize}
-    \item le suivi de plusieurs migrations simultanées devient difficile ;
-    \item les responsables disposent d'une visibilité limitée sur l'état réel, les blocages et les risques ;
-    \item l'estimation de l'avancement dépend fortement de comptes rendus manuels ;
-    \item les décisions importantes ne sont pas toujours reliées aux preuves qui les ont motivées ;
-    \item la revue des correctifs peut intervenir tardivement, après un grand nombre de modifications ;
-    \item le coût d'une migration est difficile à comparer avec celui d'une autre application.
-\end{itemize}
-
-Ces constats montrent que l'enjeu ne consiste pas seulement à transformer automatiquement du code. Il faut également orchestrer le processus, contrôler les environnements, conserver les preuves et organiser les décisions humaines.
-
-% ============================================================
-\section{Étude des solutions existantes}
-% ============================================================
-
-\subsection{Guides officiels et outils natifs}
-
-Les frameworks fournissent généralement des notes de publication, des guides de migration et des commandes de mise à jour. Ces ressources constituent la première source d'autorité pour comprendre les changements attendus.
-
-Dans l'écosystème Spring Boot, les guides de mise à niveau documentent les versions traversées et certains changements de propriétés. Dans Angular, le guide interactif et \texttt{ng update} proposent un chemin adapté aux versions source et cible.\footnote{Angular, \textit{ng update}, \url{https://angular.dev/cli/update}.}
-
-Ces outils sont indispensables, mais ils restent centrés sur le framework. Ils ne prennent pas entièrement en charge les dépendances spécifiques, les conventions internes, les tests du projet, les erreurs d'environnement ou la gouvernance de l'exécution.
-
-\subsection{Outils de gestion des dépendances}
-
-Des outils tels que Dependabot peuvent détecter des dépendances obsolètes et proposer des mises à jour sous forme de requêtes de fusion. GitHub distingue les mises à jour de versions et les mises à jour de sécurité, puis laisse l'équipe vérifier les notes de publication et les tests avant fusion.\footnote{GitHub, \textit{Dependabot version updates}, \url{https://docs.github.com/en/code-security/concepts/supply-chain-security/dependabot-version-updates}.}
-
-Cette automatisation est utile pour l'entretien continu des dépendances. Elle ne constitue toutefois pas un moteur complet de migration de framework : elle ne construit pas nécessairement une trajectoire multi-étapes, ne pilote pas l'environnement de build et ne résout pas les incompatibilités applicatives révélées après la mise à jour.
-
-\subsection{Refactorisation déterministe}
-
-Les moteurs de refactorisation automatisée appliquent des règles connues à une représentation structurée du code. OpenRewrite, par exemple, s'appuie sur des arbres sémantiques préservant le format et organise les transformations en \textit{recipes}. Ces recettes peuvent être composées pour réaliser une migration plus large et produire des différences de code examinables.\footnote{OpenRewrite, \textit{Introduction to OpenRewrite}, \url{https://docs.openrewrite.org/}.}\footnote{OpenRewrite, \textit{Recipes}, \url{https://docs.openrewrite.org/concepts-and-explanations/recipes}.}
-
-Les avantages de cette famille d'outils sont la reproductibilité, la rapidité et la possibilité de tester les transformations. Leur limite principale est leur dépendance aux règles disponibles. Une erreur spécifique à une application ou une combinaison inattendue de dépendances peut rester hors du périmètre couvert.
-
-\subsection{Assistants fondés sur les LLM}
-
-Les grands modèles de langage peuvent interpréter des journaux, analyser des extraits de code, expliquer une incompatibilité et proposer un correctif. Ils peuvent ainsi réduire le temps consacré à l'exploration d'un problème et produire une première proposition adaptée au contexte fourni.
-
-Cependant, leur sortie est probabiliste. Une proposition peut contenir une API inexistante, une hypothèse incorrecte, un changement trop large ou un diff non applicable. Le cadre de gestion des risques liés à l'intelligence artificielle du NIST recommande d'intégrer les considérations de confiance et de risque dans la conception, l'utilisation et l'évaluation des systèmes d'IA.\footnote{NIST, \textit{AI Risk Management Framework}, \url{https://www.nist.gov/itl/ai-risk-management-framework}.}\footnote{NIST, \textit{Artificial Intelligence Risk Management Framework: Generative Artificial Intelligence Profile}, \url{https://doi.org/10.6028/NIST.AI.600-1}.}
-
-Dans le contexte d'une migration, un LLM doit donc être utilisé comme mécanisme d'assistance et de proposition, non comme autorité autonome capable de modifier librement la base de code.
-
-\subsection{Outils de CI, builds et tests}
-
-Les outils de build, les tests automatisés, les linters et les pipelines d'intégration continue permettent de vérifier qu'un changement respecte des critères techniques. Ils apportent une preuve d'exécution concrète, mais ne décident pas seuls de la transformation à appliquer ni de la pertinence métier d'un correctif.
-
-Ils constituent par conséquent une composante essentielle d'une Migration Factory, sans suffire à eux seuls pour orchestrer le cycle complet.
-
-\subsection{Synthèse comparative des approches}
-
-\begin{table}[H]
-    \centering
-    \scriptsize
-    \arrayrulecolor{cgigray}
-    \rowcolors{2}{cgilight!55}{white}
-    \begin{tabularx}{\textwidth}{|>{\bfseries\RaggedRight\arraybackslash}p{2.75cm}|>{\centering\arraybackslash}p{1.65cm}|>{\centering\arraybackslash}p{1.75cm}|>{\centering\arraybackslash}p{1.65cm}|>{\centering\arraybackslash}p{1.75cm}|>{\RaggedRight\arraybackslash}X|}
-        \hline
-        \rowcolor{cgilight!95}
-        \textbf{Approche} & \textbf{Analyse contextuelle} & \textbf{Transformation automatique} & \textbf{Validation réelle} & \textbf{Gouvernance intégrée} & \textbf{Limite principale} \\
-        \hline
-        Processus manuel & Élevée & Faible & Variable & Humaine mais peu structurée & Temps, coût, reproductibilité et passage à l'échelle. \\
-        \hline
-        Guides officiels & Ciblée sur le framework & Partielle & Non & Non & Ne couvrent pas tout le contexte applicatif. \\
-        \hline
-        Mise à jour de dépendances & Faible & Ciblée sur les manifests & Dépend du pipeline & Revue de PR & Ne constitue pas une migration complète. \\
-        \hline
-        Recettes déterministes & Faible à moyenne & Élevée pour les cas connus & Possible & Partielle & Dépendance au catalogue de règles. \\
-        \hline
-        Assistant LLM isolé & Élevée si le contexte est suffisant & Proposition possible & Non garantie & Faible & Non-déterminisme et risque de proposition incorrecte. \\
-        \hline
-        Migration Factory proposée & Analyse hybride & Déterministe et assistée & Intégrée au workflow & Explicite et traçable & Complexité de conception et nécessité de maintenir les profils. \\
-        \hline
-    \end{tabularx}
-    \caption{Comparaison des principales approches de migration}
-    \label{tab:comparaison-approches-migration}
-    \rowcolors{2}{white}{white}
-    \arrayrulecolor{black}
-\end{table}
-
-Cette comparaison montre qu'aucune famille d'outils ne couvre seule l'ensemble du besoin : compréhension du projet, chemin multi-étapes, transformation, exécution contrôlée, réparation, preuve et décision humaine.
-
-% ============================================================
-\section{Principes de la solution cible}
-% ============================================================
-
-\subsection{Positionnement de la Migration Factory}
-
-La Migration Factory ne cherche pas à remplacer les outils existants. Elle vise à les encapsuler dans un processus gouverné et à compléter leurs limites par une orchestration explicite et une assistance intelligente.
-
-Le socle cible repose sur les principes suivants :
-
-\begin{itemize}
-    \item \textbf{spécialisation par écosystème :} deux systèmes indépendants pour Java/Spring Boot et Angular ;
-    \item \textbf{autorité déterministe :} l'état du workflow, les commandes, les transitions et l'application des changements restent contrôlés par des composants vérifiables ;
-    \item \textbf{isolation :} le projet source demeure protégé et les opérations sont exécutées dans des workspaces dédiés ;
-    \item \textbf{progression par étapes :} chaque transition de version est validée avant de poursuivre ;
-    \item \textbf{preuve par l'exécution :} installation, compilation, tests et contrôles produisent des résultats persistés ;
-    \item \textbf{assistance encadrée :} les agents et les LLM analysent, expliquent et proposent sans disposer d'une autorité directe sur les modifications ;
-    \item \textbf{réparation gouvernée :} une proposition de correctif est révisée, présentée au développeur, puis appliquée uniquement après autorisation ;
-    \item \textbf{traçabilité :} commandes, événements, fichiers, preuves, décisions et résultats sont reliés au run de migration ;
-    \item \textbf{pilotage :} le développeur et les responsables disposent d'une vue sur l'avancement, les blocages et les validations.
-\end{itemize}
-
-\subsection{Processus cible}
-
-\begin{figure}[H]
-    \centering
-    \resizebox{0.99\textwidth}{!}{%
-    \begin{tikzpicture}[
-        det/.style={draw=cgiblue!50,fill=cgiblue!6,rounded corners=2mm,minimum width=2.6cm,minimum height=1.25cm,align=center,font=\small\bfseries},
-        ai/.style={draw=emsigreen!70!black,fill=emsigreen!6,rounded corners=2mm,minimum width=2.6cm,minimum height=1.25cm,align=center,font=\small\bfseries},
-        human/.style={draw=cgired!70,fill=cgired!6,rounded corners=2mm,minimum width=2.6cm,minimum height=1.25cm,align=center,font=\small\bfseries},
-        arr/.style={-{Latex[length=2.2mm]},thick,color=cgigray}
-    ]
-        \node[det] (config) {Configuration et\\workspace};
-        \node[ai,right=0.38cm of config] (analysis) {Analyse et\\plan enrichis};
-        \node[det,right=0.38cm of analysis] (transform) {Transformations\\contrôlées};
-        \node[det,right=0.38cm of transform] (validate) {Installation,\\build et tests};
-        \node[ai,right=0.38cm of validate] (proposal) {Diagnostic et\\proposition};
-        \node[human,right=0.38cm of proposal] (gate) {Révision et\\décision humaine};
-        \node[det,right=0.38cm of gate] (finish) {Application,\\revalidation et preuve};
-        \draw[arr] (config) -- (analysis);
-        \draw[arr] (analysis) -- (transform);
-        \draw[arr] (transform) -- (validate);
-        \draw[arr] (validate) -- (proposal);
-        \draw[arr] (proposal) -- (gate);
-        \draw[arr] (gate) -- (finish);
-        \draw[arr,rounded corners=4mm] (finish.south) -- ++(0,-0.68) -| (validate.south);
-    \end{tikzpicture}%
-    }
-    \caption{Processus cible combinant déterminisme, LLM et gouvernance humaine}
-    \label{fig:processus-cible-migration}
-\end{figure}
-
-\subsection{Bénéfices attendus}
-
-La solution cible vise à apporter les bénéfices suivants :
-
-\begin{itemize}
-    \item réduction du temps consacré aux opérations répétitives ;
-    \item accélération du diagnostic et des cycles de réparation ;
-    \item meilleure reproductibilité entre plusieurs applications ;
-    \item conservation d'un historique exploitable pour les audits et les analyses ;
-    \item capacité à piloter plusieurs migrations avec une visibilité homogène ;
-    \item sécurisation des modifications grâce à l'isolation et aux gates humaines ;
-    \item capitalisation progressive des règles, des preuves et des corrections ;
-    \item diminution de la dépendance à une intervention experte sur chaque opération, sans supprimer l'expertise humaine des décisions importantes.
-\end{itemize}
-
-\subsection{Analyse comparative entre l'existant et la cible}
-
-\begin{table}[H]
-    \centering
-    \small
-    \arrayrulecolor{cgigray}
-    \rowcolors{2}{cgilight!60}{white}
-    \begin{tabularx}{\textwidth}{|>{\bfseries\RaggedRight\arraybackslash}p{3.25cm}|>{\RaggedRight\arraybackslash}X|>{\RaggedRight\arraybackslash}X|}
-        \hline
-        \rowcolor{cgilight!95}
-        \textbf{Critère} & \textbf{Processus existant} & \textbf{Approche cible} \\
-        \hline
-        Analyse du projet & Réalisée manuellement et dépendante de l'expérience du développeur. & Analyse structurée, déterministe et enrichie par des agents spécialisés. \\
-        \hline
-        Chemin de migration & Défini au cas par cas, avec une capitalisation limitée. & Trajectoire progressive, persistée et adaptée au profil technologique. \\
-        \hline
-        Exécution & Commandes lancées manuellement dans des environnements variables. & Commandes encapsulées, contrôlées et associées à un profil d'exécution. \\
-        \hline
-        Isolation & Dépend des pratiques individuelles et de Git. & Workspaces dédiés, source originale protégée et changements vérifiés. \\
-        \hline
-        Transformation & Principalement manuelle, complétée ponctuellement par des outils. & Recettes déterministes complétées par des propositions LLM gouvernées. \\
-        \hline
-        Gestion des échecs & Lecture manuelle des logs et recherche ad hoc. & Contexte de réparation structuré, proposition, révision, décision et revalidation. \\
-        \hline
-        Validation & Séquence variable selon le projet et le développeur. & Politique explicite d'installation, compilation, tests et contrôles. \\
-        \hline
-        Traçabilité & Répartie entre terminal, Git, tickets et documentation. & État, événements, preuves, décisions et résultats reliés au run. \\
-        \hline
-        Pilotage & Suivi manuel et visibilité partielle. & Cockpit de suivi des phases, blocages, preuves et résultats. \\
-        \hline
-        Passage à l'échelle & Fortement limité par la disponibilité des experts. & Exécution plus standardisée et possibilité de suivre plusieurs migrations. \\
-        \hline
-    \end{tabularx}
-    \caption{Comparaison entre le processus existant et l'approche cible}
-    \label{tab:comparaison-existant-cible}
-    \rowcolors{2}{white}{white}
-    \arrayrulecolor{black}
-\end{table}
-
-% ============================================================
-\section{Périmètre retenu pour le projet}
-% ============================================================
-
-L'étude préalable conduit à retenir un périmètre progressif et vérifiable. Le premier système concerne les applications Java/Spring Boot, avec une trajectoire allant de Spring Boot 2.1 à 4.0 par étapes intermédiaires et une évolution associée des versions de Java. Le second système concerne Angular 18 à 21, avec une vision d'extension future vers les applications à partir d'Angular 11.
-
-Le projet ne vise pas à automatiser arbitrairement toutes les migrations possibles. Il cherche d'abord à établir une méthode réutilisable : profils spécialisés, orchestration déterministe, agents encadrés, workspaces isolés, preuves techniques, validation réelle et contrôle humain. La généralisation à d'autres technologies dépendra ensuite de la définition de nouveaux profils et de nouvelles politiques d'exécution.
 
 \section*{Conclusion}
 \addcontentsline{toc}{section}{Conclusion}
 
-Ce chapitre a présenté les fondements nécessaires à la compréhension d'une migration logicielle et les particularités des écosystèmes Java/Spring Boot et Angular. L'étude du processus existant a mis en évidence une forte dépendance à l'expertise, des cycles de débogage répétitifs, une traçabilité fragmentée et une difficulté à industrialiser plusieurs migrations simultanées.
+Ce chapitre a présenté les notions nécessaires à la compréhension d'une architecture multi-agents appliquée au génie logiciel. Un agent combine un objectif, un contexte, des capacités et des règles d'interaction. Un SMA coordonne plusieurs agents spécialisés, mais introduit aussi des coûts de communication, d'état et de gouvernance. Le modèle retenu par le projet est hybride et centralement orchestré : les agents contribuent à l'analyse et à la proposition, tandis que les services déterministes et le développeur conservent l'autorité.
 
-L'analyse des guides officiels, des outils de mise à jour de dépendances, des moteurs de refactorisation déterministe, des assistants LLM et des mécanismes de validation montre que chaque famille répond à une partie du problème sans couvrir seule l'ensemble du cycle. Ces constats justifient une approche hybride : encapsuler les opérations vérifiables dans un workflow déterministe, utiliser les agents et les LLM pour accélérer l'analyse et la proposition, puis maintenir une gouvernance humaine explicite avant toute modification sensible.
-
-Le chapitre suivant traduira cette étude en besoins fonctionnels et non fonctionnels, en acteurs, en cas d'utilisation et en exigences de conception pour les deux systèmes de la Migration Factory.
+L'étude de la migration et des travaux proches montre qu'aucune solution examinée ne réunit à elle seule spécialisation multi-agents, trajectoires Java et Angular, isolation, preuves, réparation gouvernée et supervision humaine. Le chapitre suivant traduit ce positionnement en une conception détaillée de l'architecture SMA, de ses agents, de son orchestrateur et de ses interactions.
