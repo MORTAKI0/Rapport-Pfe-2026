@@ -1,0 +1,290 @@
+\chapter{Évaluation, résultats et perspectives}
+
+\section*{Introduction}
+\addcontentsline{toc}{section}{Introduction}
+
+Les chapitres précédents ont présenté les besoins, l'état de l'art, la conception multi-agents et l'implémentation des deux systèmes. Le présent chapitre évalue les résultats disponibles sans confondre preuve observée, appréciation qualitative et mesure encore absente.
+
+Le cadre d'évaluation s'inspire d'ISO/IEC 25010, qui propose neuf caractéristiques pour spécifier et évaluer la qualité d'un produit logiciel \cite{iso25010}. Les aspects liés aux modèles génératifs sont également examinés selon une logique de maîtrise des risques cohérente avec le NIST AI RMF et son profil consacré à l'IA générative \cite{nist-airmf,nist-genai}.
+
+% ============================================================
+\section{Objectifs et protocole d'évaluation}
+% ============================================================
+
+L'évaluation cherche à répondre aux questions suivantes :
+
+\begin{itemize}
+    \item le processus protège-t-il la source et limite-t-il les écritures aux espaces isolés ?
+    \item les étapes produisent-elles des preuves exploitables ?
+    \item les agents respectent-ils leurs limites d'autorité ?
+    \item les décisions humaines sont-elles liées aux artefacts examinés ?
+    \item les transformations sont-elles réellement validées par compilation ou construction et tests ?
+    \item l'orchestrateur peut-il suspendre, reprendre et traiter les échecs ?
+    \item le système réduit-il les opérations manuelles répétitives sans masquer les limites restantes ?
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \resizebox{0.96\textwidth}{!}{%
+    \begin{tikzpicture}[
+        step/.style={draw=cgiblue,rounded corners=3pt,fill=cgilight!55,minimum width=3.1cm,minimum height=1.05cm,align=center,font=\small\bfseries},
+        arr/.style={-{Latex[length=2mm]},thick,draw=cgigray}
+    ]
+        \node[step] (scenario) {Définir le scénario};
+        \node[step,right=0.5cm of scenario] (execute) {Exécuter la migration};
+        \node[step,right=0.5cm of execute] (collect) {Collecter états et preuves};
+        \node[step,right=0.5cm of collect] (measure) {Mesurer les critères};
+        \node[step,right=0.5cm of measure] (analyse) {Analyser les limites};
+        \draw[arr] (scenario)--(execute);
+        \draw[arr] (execute)--(collect);
+        \draw[arr] (collect)--(measure);
+        \draw[arr] (measure)--(analyse);
+    \end{tikzpicture}%
+    }
+    \caption{Protocole d'évaluation retenu}
+    \label{fig:protocole-evaluation-ch5}
+\end{figure}
+
+Le protocole idéal prévoit plusieurs applications, plusieurs répétitions et une comparaison avec un processus manuel. La version actuelle du rapport dispose surtout de preuves d'intégration, de scénarios de démonstration et d'observations qualitatives. Les métriques non encore collectées sont explicitement signalées.
+
+% ============================================================
+\section{Critères et métriques}
+% ============================================================
+
+\scriptsize
+\begin{longtable}{|>{\bfseries\RaggedRight\arraybackslash}p{2.8cm}|>{\RaggedRight\arraybackslash}p{4.3cm}|>{\RaggedRight\arraybackslash}p{3.5cm}|>{\RaggedRight\arraybackslash}p{3.6cm}|}
+    \caption{Critères d'évaluation et disponibilité des mesures}\label{tab:metriques-ch5}\\
+    \hline
+    \rowcolor{cgilight!95}
+    \textbf{Dimension} & \textbf{Métrique ou preuve} & \textbf{Disponibilité actuelle} & \textbf{Collecte à compléter} \\
+    \hline
+    \endfirsthead
+    \hline
+    \rowcolor{cgilight!95}
+    \textbf{Dimension} & \textbf{Métrique ou preuve} & \textbf{Disponibilité actuelle} & \textbf{Collecte à compléter} \\
+    \hline
+    \endhead
+    Exactitude fonctionnelle & Stage atteint, compilation/construction et tests. & Disponible par exécution. & Agrégation sur plusieurs applications. \\
+    \hline
+    Fiabilité & Nombre d'échecs, reprises et états terminaux. & Événements disponibles. & Taux de réussite et répétitions contrôlées. \\
+    \hline
+    Intégrité & Empreinte source avant/après et confinement des chemins. & Mécanismes présents. & Rapport automatisé de vérification. \\
+    \hline
+    Traçabilité & Proportion d'actions liées à une preuve et un identifiant. & Avancée en Java. & Mesure automatique de couverture. \\
+    \hline
+    Efficacité & Durée par stage, attente humaine et appels LLM. & Partiellement journalisée. & Tableau consolidé et comparaison manuelle. \\
+    \hline
+    Qualité des agents & Sorties acceptées, révisions, rejets et erreurs de schéma. & Artefacts disponibles. & Taux d'acceptation par agent. \\
+    \hline
+    Réparation & Tentatives, correctifs appliqués et validations réussies. & Disponible en Java. & Échantillon plus large et Angular. \\
+    \hline
+    Utilisabilité & Actions nécessaires, blocage visible et prochaine action. & Observation du cockpit. & Questionnaire utilisateur structuré. \\
+    \hline
+    Coût & Tokens, appels et coût monétaire. & Consommation partielle. & Agrégation complète par migration. \\
+    \hline
+\end{longtable}
+\normalsize
+
+% ============================================================
+\section{Résultats Java/Spring Boot}
+% ============================================================
+
+\subsection{Couverture fonctionnelle}
+
+La déclinaison Java constitue le système le plus complet. Elle couvre la qualification, l'analyse, la planification, les points de validation, les espaces isolés, les transformations, Maven, les tests, la réparation gouvernée, le cockpit, l'assistant et le rapport final.
+
+Le parcours progressif réduit la distance entre deux validations. Une migration n'est pas considérée comme réussie parce qu'un agent l'affirme : le statut dépend des commandes exécutées, de leur code de sortie et des tests disponibles.
+
+\subsection{Preuves d'intégration}
+
+Une campagne d'intégration liée au nouveau frontend et à l'assistant a produit les résultats suivants :
+
+\begin{table}[H]
+    \centering
+    \small
+    \arrayrulecolor{cgigray}
+    \rowcolors{2}{cgilight!55}{white}
+    \begin{tabularx}{\textwidth}{|>{\bfseries\RaggedRight\arraybackslash}p{4.2cm}|>{\RaggedRight\arraybackslash}p{3.2cm}|>{\RaggedRight\arraybackslash}X|}
+        \hline
+        \rowcolor{cgilight!95}
+        \textbf{Vérification} & \textbf{Résultat observé} & \textbf{Interprétation} \\
+        \hline
+        Suite backend & 607 réussites, 4 tests ignorés & Preuve ponctuelle de non-régression backend sur cette intégration. \\
+        \hline
+        Vérification statique frontend & Réussie & Contrats TypeScript cohérents pour le périmètre modifié. \\
+        \hline
+        Analyse de conformité frontend & Réussie & Aucune erreur bloquante dans la commande exécutée. \\
+        \hline
+        Construction frontend & Réussie & Application compilable pour la campagne considérée. \\
+        \hline
+        Tests frontend & 12 échecs au baseline, 11 après intégration & Comparaison utilisée pour séparer défauts préexistants et nouvelle régression. \\
+        \hline
+    \end{tabularx}
+    \caption{Résultats d'une campagne d'intégration Java}
+    \label{tab:resultats-integration-java-ch5}
+    \rowcolors{2}{white}{white}
+    \arrayrulecolor{black}
+\end{table}
+
+Ces chiffres ne constituent pas un benchmark général. Ils concernent une campagne précise et doivent être accompagnés du commit, de la configuration et des commandes lors de la version finale du rapport.
+
+\subsection{Boucle de réparation}
+
+La réparation Java met en œuvre la proposition, la révision, la décision humaine, l'application déterministe et la revalidation. Les principaux résultats qualitatifs sont :
+
+\begin{itemize}
+    \item les propositions sont représentées par des diffs examinables ;
+    \item les empreintes empêchent l'approbation d'une version obsolète ;
+    \item les correctifs sont appliqués uniquement dans l'espace isolé ;
+    \item la compilation et les tests sont relancés après chaque application ;
+    \item le nombre de tentatives est limité et l'épuisement est persisté.
+\end{itemize}
+
+Le taux de réussite des réparations, la durée moyenne et le nombre moyen de tentatives ne sont pas encore consolidés sur un échantillon suffisant.
+
+% ============================================================
+\section{Résultats Angular}
+% ============================================================
+
+\subsection{État d'avancement}
+
+Une migration manuelle d'Angular 18 vers Angular 20 a d'abord été réalisée afin de comprendre les commandes, les transformations et les validations. Les agents d'analyse, de révision, de planification et de transformation ont ensuite été développés.
+
+Le système prépare une progression Angular 18 $\rightarrow$ 19 $\rightarrow$ 20 $\rightarrow$ 21, avec résolution des compatibilités Node.js, npm et TypeScript. Les espaces de stage excluent les dépendances installées et les sorties régénérables.
+
+\subsection{Résolution d'un blocage de compatibilité}
+
+Un essai a été bloqué parce que le runtime observé Node.js 22.23.1/npm 10.9.8 n'était pas reconnu par le catalogue initial du premier stage. La correction a introduit un catalogue versionné acceptant explicitement la paire validée, tout en conservant l'ancienne version pour la reproductibilité.
+
+Ce cas démontre l'intérêt de profils versionnés et de preuves de compatibilité. Il ne démontre pas encore la réussite complète du parcours Angular 18 vers 21.
+
+\subsection{Limites actuelles}
+
+Au moment de la rédaction :
+
+\begin{itemize}
+    \item l'intégration du processus de bout en bout est en cours ;
+    \item la construction et les tests sont encore validés sur des scénarios ciblés ;
+    \item la réparation gouvernée n'est pas encore intégrée complètement ;
+    \item le reporting et l'assistant doivent être consolidés ;
+    \item aucune série quantitative comparable au système Java n'est disponible.
+\end{itemize}
+
+% ============================================================
+\section{Analyse qualitative par caractéristique de qualité}
+% ============================================================
+
+\begin{table}[H]
+    \centering
+    \small
+    \arrayrulecolor{cgigray}
+    \rowcolors{2}{cgilight!55}{white}
+    \begin{tabularx}{\textwidth}{|>{\bfseries\RaggedRight\arraybackslash}p{3.2cm}|>{\RaggedRight\arraybackslash}p{5.4cm}|>{\RaggedRight\arraybackslash}X|}
+        \hline
+        \rowcolor{cgilight!95}
+        \textbf{Caractéristique} & \textbf{Apport observé} & \textbf{Limite actuelle} \\
+        \hline
+        Adéquation fonctionnelle & Processus couvrant analyse, planification, transformation et validation. & Couverture Angular encore partielle. \\
+        \hline
+        Fiabilité & États persistés, préconditions, reprises et preuves. & Certaines opérations concurrentes et reprises restent partielles. \\
+        \hline
+        Efficacité & Automatisation d'opérations répétitives et assistance au diagnostic. & Durées et coûts non consolidés. \\
+        \hline
+        Compatibilité & Profils de versions explicites et trajectoires par stages. & Installation automatique des runtimes absente. \\
+        \hline
+        Utilisabilité & Cockpit, événements, blocages et actions disponibles. & Validation utilisateur structurée à réaliser. \\
+        \hline
+        Sécurité & Source protégée, chemins bornés et autorité déterministe. & Pas d'authentification ni de rôles. \\
+        \hline
+        Maintenabilité & Agents et services séparés, deux dépôts spécialisés. & Duplication de principes à maintenir. \\
+        \hline
+        Portabilité & Profils documentés et exécution locale. & Orientation Windows et scripts PowerShell importants. \\
+        \hline
+    \end{tabularx}
+    \caption{Analyse qualitative selon des caractéristiques d'ISO/IEC 25010}
+    \label{tab:qualite-iso25010-ch5}
+    \rowcolors{2}{white}{white}
+    \arrayrulecolor{black}
+\end{table}
+
+% ============================================================
+\section{Comparaison avec le processus manuel}
+% ============================================================
+
+\begin{table}[H]
+    \centering
+    \small
+    \arrayrulecolor{cgigray}
+    \rowcolors{2}{cgilight!55}{white}
+    \begin{tabularx}{\textwidth}{|>{\bfseries\RaggedRight\arraybackslash}p{3.5cm}|>{\RaggedRight\arraybackslash}p{5cm}|>{\RaggedRight\arraybackslash}X|}
+        \hline
+        \rowcolor{cgilight!95}
+        \textbf{Dimension} & \textbf{Processus manuel} & \textbf{Migration Factory} \\
+        \hline
+        Trajectoire & Construite au cas par cas. & Profils et stages explicites. \\
+        \hline
+        Commandes & Exécutées directement par le développeur. & Manifestes construits par le backend. \\
+        \hline
+        Isolation & Dépend des pratiques individuelles. & Espaces dédiés et source externe protégée. \\
+        \hline
+        Diagnostic & Lecture et recherche manuelles. & Contexte structuré et assistance agentique. \\
+        \hline
+        Réparation & Correction directe puis nouvel essai. & Proposition, révision, décision, application et revalidation. \\
+        \hline
+        Traçabilité & Dispersée entre terminal, Git et tickets. & États, événements, preuves et décisions reliés. \\
+        \hline
+        Mesure & Souvent limitée à la réussite finale. & Possibilité de mesurer stages, commandes, appels et tentatives. \\
+        \hline
+    \end{tabularx}
+    \caption{Comparaison qualitative avec le processus manuel}
+    \label{tab:comparaison-manuel-factory-ch5}
+    \rowcolors{2}{white}{white}
+    \arrayrulecolor{black}
+\end{table}
+
+Cette comparaison exprime les capacités du système ; elle ne remplace pas une expérience chronométrée sur deux groupes comparables. Une telle étude reste à réaliser avant de quantifier un gain de productivité.
+
+% ============================================================
+\section{Limites de l'évaluation}
+% ============================================================
+
+Les limites principales sont les suivantes :
+
+\begin{itemize}
+    \item nombre limité de scénarios complets et reproductibles ;
+    \item absence de benchmark manuel contrôlé ;
+    \item métriques de durée et de coût LLM incomplètes ;
+    \item maturité différente entre Java et Angular ;
+    \item scénarios Maven réels principalement manuels ou en recette utilisateur ;
+    \item absence de chaîne CI commune dans les dépôts des prototypes ;
+    \item absence de politique globale unique de lint ;
+    \item absence d'authentification et de test multi-utilisateur ;
+    \item captures finales et rapports de démonstration encore à intégrer au document.
+\end{itemize}
+
+Ces limites empêchent d'annoncer un pourcentage global de gain de temps ou de réussite. Le rapport conserve donc une distinction entre résultats vérifiés et bénéfices attendus.
+
+% ============================================================
+\section{Perspectives}
+% ============================================================
+
+Les priorités d'évolution sont :
+
+\begin{itemize}
+    \item finaliser le parcours Angular et sa réparation ;
+    \item automatiser la collecte de durée, tokens, coûts et interventions ;
+    \item constituer un jeu de projets Java et Angular reproductibles ;
+    \item exécuter plusieurs répétitions et publier les configurations ;
+    \item ajouter authentification, rôles et journal d'audit ;
+    \item remplacer les hypothèses locales par une persistance adaptée au multi-instance ;
+    \item ajouter une chaîne CI et une politique de qualité homogène ;
+    \item étendre la démarche à d'autres frameworks par profils spécialisés ;
+    \item étudier la capitalisation des réparations validées sous forme de règles déterministes.
+\end{itemize}
+
+\section*{Conclusion}
+\addcontentsline{toc}{section}{Conclusion}
+
+L'évaluation montre que la déclinaison Java valide les principaux mécanismes de gouvernance, d'isolation, de réparation et de traçabilité. Angular confirme la capacité du modèle à s'adapter à un second écosystème, mais son parcours complet et ses métriques restent à consolider.
+
+Le principal apport du projet est une organisation contrôlée des agents et des outils, plutôt qu'une autonomie totale. Les preuves disponibles sont encourageantes, mais elles ne permettent pas encore de quantifier un gain global. Une campagne expérimentale plus large, reproductible et instrumentée constitue la prochaine étape nécessaire à l'industrialisation.
