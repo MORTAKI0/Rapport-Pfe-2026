@@ -1,0 +1,55 @@
+% ============================================================
+\section{Contraintes d'intégration des modèles dans l'environnement CGI}
+% ============================================================
+
+Le choix du fournisseur de modèles ne constitue pas uniquement une décision d'implémentation. Il répond également à une contrainte d'intégration dans l'environnement technologique du client. CGI utilisant principalement les services Microsoft Azure, la déclinaison Java/Spring Boot de la Migration Factory s'appuie sur Azure OpenAI pour l'accès aux grands modèles de langage.
+
+L'objectif n'est pas d'imposer un modèle unique géré ou embarqué par la plateforme. La solution doit permettre à l'organisation de connecter les modèles qu'elle a elle-même déployés et gouvernés dans sa ressource Azure. Le backend reçoit alors une configuration externalisée comprenant l'endpoint de la ressource, le mécanisme d'authentification et les noms des déploiements associés aux rôles agentiques. Azure distingue en effet la ressource, son endpoint et les déploiements nommés appelés par les applications \cite{azure-foundry-endpoints}.
+
+\begin{figure}[H]
+    \centering
+    \resizebox{0.92\textwidth}{!}{%
+    \begin{tikzpicture}[
+        box/.style={draw=cgiblue,rounded corners=3pt,fill=cgilight!55,text width=4.2cm,minimum height=1.25cm,align=center,font=\small},
+        azure/.style={draw=cgired,rounded corners=3pt,fill=white,text width=4.6cm,minimum height=1.25cm,align=center,font=\small},
+        arr/.style={-{Latex[length=2mm]},thick,draw=cgigray}
+    ]
+        \node[azure] (resource) {\textbf{Ressource Azure contrôlée par CGI}\\endpoint, authentification et déploiements de modèles};
+        \node[box,right=1.3cm of resource] (backend) {\textbf{Backend Migration Factory}\\configuration externalisée et routage par rôle};
+        \node[box,right=1.3cm of backend] (agents) {\textbf{Agents spécialisés}\\proposition, révision, réparation et assistance};
+        \draw[arr] (resource)--node[above,font=\scriptsize]{configuration et appels sécurisés} (backend);
+        \draw[arr] (backend)--node[above,font=\scriptsize]{réponse structurée} (agents);
+    \end{tikzpicture}%
+    }
+    \caption{Principe d'intégration des déploiements Azure contrôlés par CGI}
+    \label{fig:integration-azure-contexte-ch1}
+\end{figure}
+
+Cette orientation correspond à une logique d'\textit{apport de ses propres déploiements Azure} : l'organisation ne téléverse pas nécessairement un modèle dans la Migration Factory ; elle fournit les références nécessaires pour consommer des modèles déjà déployés dans son environnement.
+
+\subsection{Exigences complémentaires}
+
+\begin{table}[H]
+    \centering
+    \small
+    \arrayrulecolor{cgigray}
+    \rowcolors{2}{cgilight!55}{white}
+    \begin{tabularx}{\textwidth}{|>{\bfseries\RaggedRight\arraybackslash}p{1.4cm}|>{\RaggedRight\arraybackslash}p{3.1cm}|>{\RaggedRight\arraybackslash}X|>{\RaggedRight\arraybackslash}p{4.3cm}|}
+        \hline
+        \rowcolor{cgilight!95}
+        \textbf{ID} & \textbf{Nature} & \textbf{Exigence} & \textbf{Critère de vérification} \\
+        \hline
+        BF-15 & Fonctionnelle & Permettre à CGI de connecter ses propres déploiements de modèles Azure sans modifier le code applicatif. & Changer le nom d'un déploiement par configuration et vérifier que le rôle correspondant utilise la nouvelle valeur. \\
+        \hline
+        BNF-13 & Configurabilité & L'endpoint, l'authentification et les déploiements doivent être externalisés. & Vérifier qu'aucune valeur propre à une ressource cliente n'est codée en dur dans les agents. \\
+        \hline
+        BNF-14 & Confidentialité & Les clés, endpoints complets et identifiants sensibles ne doivent pas être exposés par l'interface ou les projections publiques. & Inspecter les réponses API, journaux et artefacts publics et vérifier le masquage des valeurs sensibles. \\
+        \hline
+    \end{tabularx}
+    \caption{Exigences liées à l'intégration Azure OpenAI}
+    \label{tab:exigences-azure-ch1}
+    \rowcolors{2}{white}{white}
+    \arrayrulecolor{black}
+\end{table}
+
+Le code de la déclinaison Java confirme actuellement cette orientation. Pour Angular, Azure constitue une cible cohérente avec l'environnement client, mais son utilisation effective doit rester distinguée de l'intégration Java tant qu'elle n'est pas confirmée par une version auditée du dépôt Angular.
