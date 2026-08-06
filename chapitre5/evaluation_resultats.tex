@@ -1,11 +1,11 @@
-\chapter{Évaluation, résultats et perspectives}
+\chapter{Évaluation, démonstrations, résultats et perspectives}
 
 \section*{Introduction}
 \addcontentsline{toc}{section}{Introduction}
 
-Les chapitres précédents ont présenté les besoins, l'état de l'art, la conception multi-agents et l'implémentation des deux systèmes. Le présent chapitre évalue les résultats disponibles sans confondre preuve observée, appréciation qualitative et mesure encore absente.
+Les chapitres précédents ont présenté les besoins, l'état de l'art, la conception multi-agents et l'implémentation des deux systèmes. Le présent chapitre évalue les résultats disponibles sans confondre preuve observée, validation par démonstration, appréciation qualitative et mesure encore absente.
 
-Le cadre d'évaluation s'inspire d'ISO/IEC 25010, qui propose neuf caractéristiques pour spécifier et évaluer la qualité d'un produit logiciel \cite{iso25010}. Les aspects liés aux modèles génératifs sont également examinés selon une logique de maîtrise des risques cohérente avec le NIST AI RMF et son profil consacré à l'IA générative \cite{nist-airmf,nist-genai}.
+Le cadre d'évaluation s'inspire d'ISO/IEC 25010, qui propose neuf caractéristiques pour spécifier et évaluer la qualité d'un produit logiciel \cite{iso25010}. Les aspects liés aux modèles génératifs sont également examinés selon une logique de maîtrise des risques cohérente avec le NIST AI RMF et son profil consacré à l'IA générative \cite{nist-airmf,nist-genai}. L'état présenté est arrêté au \textbf{6 août 2026}.
 
 % ============================================================
 \section{Objectifs et protocole d'évaluation}
@@ -86,6 +86,79 @@ Le protocole idéal prévoit plusieurs applications, plusieurs répétitions et 
 \normalsize
 
 % ============================================================
+\section{Validation progressive par les démonstrations CGI}
+% ============================================================
+
+Les démonstrations ont joué un double rôle : vérifier qu'un scénario pouvait être présenté de bout en bout pour le périmètre considéré et recueillir des observations permettant d'orienter l'incrément suivant. Elles constituent des preuves de maturité et de validation par les parties prenantes, mais elles ne remplacent pas une campagne expérimentale reproductible.
+
+\scriptsize
+\begin{longtable}{|>{\bfseries\RaggedRight\arraybackslash}p{2cm}|>{\centering\arraybackslash}p{2.1cm}|>{\RaggedRight\arraybackslash}p{3.6cm}|>{\RaggedRight\arraybackslash}p{4.8cm}|>{\RaggedRight\arraybackslash}p{2.7cm}|}
+    \caption{Jalons de démonstration Java et Angular}\label{tab:demonstrations-ch5}\\
+    \hline
+    \rowcolor{cgilight!95}
+    \textbf{Jalon} & \textbf{Date} & \textbf{Public} & \textbf{Périmètre présenté} & \textbf{Statut / conclusion} \\
+    \hline
+    \endfirsthead
+    \hline
+    \rowcolor{cgilight!95}
+    \textbf{Jalon} & \textbf{Date} & \textbf{Public} & \textbf{Périmètre présenté} & \textbf{Statut / conclusion} \\
+    \hline
+    \endhead
+    Java J1 & 25 mai 2026 & Première audience CGI & Première preuve de concept Java/Spring Boot en ligne de commande. & Réalisé ; faisabilité technique validée. \\
+    \hline
+    Java J2 & 3 juin 2026 & Audience élargie avec davantage de responsables et directeurs CGI & Version CLI corrigée, enrichie et stabilisée. & Réalisé ; approche consolidée. \\
+    \hline
+    Java J3 & 19 juin 2026 & Responsables et directeurs CGI & Control Tower full stack : backend, frontend, cockpit, persistance et chatbot. & Réalisé ; passage à une plateforme intégrée. \\
+    \hline
+    Angular A1 & 11 août 2026 & Parties prenantes CGI & Première version d'avancement Angular 18 vers 21. & Planifié à la date de référence. \\
+    \hline
+    Java J4 & Septembre 2026 & Public à confirmer & V1 Java : nouveau frontend, réparation gouvernée et agents LLM améliorés. & Planifié. \\
+    \hline
+    Angular A2 & Septembre 2026 & Public à confirmer & Extension progressive de la migration Angular 11 vers 21. & Planifié. \\
+    \hline
+\end{longtable}
+\normalsize
+
+\subsection{Effet des observations sur l'évolution du produit}
+
+Les changements apportés après une démonstration ne sont pas tous des demandes explicites des directeurs. Certains résultent de retours recueillis, d'autres d'une décision technique interne prise après l'observation des limites de l'incrément.
+
+\begin{table}[H]
+    \centering
+    \small
+    \arrayrulecolor{cgigray}
+    \rowcolors{2}{cgilight!55}{white}
+    \begin{tabularx}{\textwidth}{|>{\bfseries\RaggedRight\arraybackslash}p{4.2cm}|>{\RaggedRight\arraybackslash}p{4.1cm}|>{\RaggedRight\arraybackslash}X|}
+        \hline
+        \rowcolor{cgilight!95}
+        \textbf{Observation ou besoin} & \textbf{Origine} & \textbf{Évolution associée} \\
+        \hline
+        Suivi difficile d'un workflow uniquement en CLI & Observation de l'usage et retours de démonstration & Création du backend, de la persistance et du cockpit. \\
+        \hline
+        Manque de visibilité sur les étapes et blocages & Retour fonctionnel et décision interne & Ajout d'événements, d'états, de projections et de vues du pipeline. \\
+        \hline
+        Besoin d'explications contextualisées & Besoin utilisateur observé & Intégration du chatbot puis enrichissement de l'assistant. \\
+        \hline
+        Risque d'application directe d'une proposition LLM & Décision d'architecture et de gouvernance & Séparation proposeur/réviseur, empreinte et approbation humaine. \\
+        \hline
+        Interface devenue insuffisante face à la richesse du workflow & Décision technique interne & Conception d'un nouveau frontend orienté cockpit. \\
+        \hline
+        Périmètre limité à Java/Spring Boot & Objectif de généralisation & Création d'un système Angular indépendant. \\
+        \hline
+        Périmètre Angular 18--21 trop restreint pour certains cas réels & Évolution de l'objectif fonctionnel & Extension planifiée vers Angular 11--21. \\
+        \hline
+    \end{tabularx}
+    \caption{Lien entre observations, décisions et évolutions du produit}
+    \label{tab:observations-evolutions-ch5}
+    \rowcolors{2}{white}{white}
+    \arrayrulecolor{black}
+\end{table}
+
+\subsection{Portée d'une validation par démonstration}
+
+Une démonstration prouve qu'un scénario a été suffisamment intégré pour être présenté et examiné par les parties prenantes. Elle peut valider une orientation, révéler un problème d'utilisabilité et déclencher une adaptation du backlog. Elle ne démontre pas automatiquement un taux de réussite général, une performance moyenne, une sécurité de production ou une réduction mesurée du temps de migration. Ces conclusions nécessitent des expériences répétées, des configurations publiées et des métriques consolidées.
+
+% ============================================================
 \section{Résultats Java/Spring Boot}
 % ============================================================
 
@@ -143,14 +216,55 @@ La réparation Java met en œuvre la proposition, la révision, la décision hum
 Le taux de réussite des réparations, la durée moyenne et le nombre moyen de tentatives ne sont pas encore consolidés sur un échantillon suffisant.
 
 % ============================================================
-\section{Résultats Angular}
+\section{Résultats et feuille de route Angular}
 % ============================================================
 
 \subsection{État d'avancement}
 
-Une migration manuelle d'Angular 18 vers Angular 20 a d'abord été réalisée afin de comprendre les commandes, les transformations et les validations. Les agents d'analyse, de révision, de planification et de transformation ont ensuite été développés.
+Le développement Angular a commencé à la mi-juillet 2026, autour du 16 juillet. Une migration manuelle d'Angular 18 vers Angular 20 a d'abord été réalisée afin de comprendre les commandes, les transformations et les validations. Les agents d'analyse, de révision, de planification et de transformation ont ensuite été développés.
 
-Le système prépare une progression Angular 18 $\rightarrow$ 19 $\rightarrow$ 20 $\rightarrow$ 21, avec résolution des compatibilités Node.js, npm et TypeScript. Les espaces de stage excluent les dépendances installées et les sorties régénérables.
+Le premier périmètre prépare une progression Angular 18 $\rightarrow$ 19 $\rightarrow$ 20 $\rightarrow$ 21, avec résolution des compatibilités Node.js, npm et TypeScript. Les espaces de stage excluent les dépendances installées et les sorties régénérables. Une première démonstration d'avancement est planifiée pour le 11 août 2026.
+
+\subsection{Extension visée d'Angular 11 vers Angular 21}
+
+L'objectif de septembre consiste à étendre la trajectoire aux applications Angular 11. Il ne s'agit pas d'un saut direct vers Angular 21. La documentation officielle précise qu'une mise à jour traversant plusieurs versions majeures doit être réalisée une version majeure à la fois \cite{angular-update,angular-releases}.
+
+\begin{figure}[H]
+    \centering
+    \resizebox{0.98\textwidth}{!}{%
+    \begin{tikzpicture}[
+        ver/.style={draw=cgiblue,rounded corners=3pt,fill=cgilight!55,minimum width=1.55cm,minimum height=0.85cm,align=center,font=\small\bfseries},
+        current/.style={draw=emsigreen!70!black,rounded corners=3pt,fill=emsigreen!10,minimum width=1.55cm,minimum height=0.85cm,align=center,font=\small\bfseries},
+        arr/.style={-{Latex[length=1.8mm]},thick,draw=cgigray}
+    ]
+        \node[ver] (v11) {11};
+        \node[ver,right=0.35cm of v11] (v12) {12};
+        \node[ver,right=0.35cm of v12] (v13) {13};
+        \node[ver,right=0.35cm of v13] (v14) {14};
+        \node[ver,right=0.35cm of v14] (v15) {15};
+        \node[ver,right=0.35cm of v15] (v16) {16};
+        \node[ver,below=1.1cm of v16] (v17) {17};
+        \node[current,left=0.35cm of v17] (v18) {18};
+        \node[current,left=0.35cm of v18] (v19) {19};
+        \node[current,left=0.35cm of v19] (v20) {20};
+        \node[current,left=0.35cm of v20] (v21) {21};
+        \draw[arr] (v11)--(v12);
+        \draw[arr] (v12)--(v13);
+        \draw[arr] (v13)--(v14);
+        \draw[arr] (v14)--(v15);
+        \draw[arr] (v15)--(v16);
+        \draw[arr] (v16.south)--(v17.north);
+        \draw[arr] (v17)--(v18);
+        \draw[arr] (v18)--(v19);
+        \draw[arr] (v19)--(v20);
+        \draw[arr] (v20)--(v21);
+    \end{tikzpicture}%
+    }
+    \caption{Trajectoire progressive visée pour Angular 11 vers Angular 21}
+    \label{fig:roadmap-angular-11-21-ch5}
+\end{figure}
+
+Chaque transition devra posséder un profil de compatibilité, un espace de travail isolé, une installation propre, une construction et l'exécution des tests disponibles. Les versions 18 à 21, représentées en vert, correspondent au premier périmètre étudié ; les versions 11 à 17 constituent l'extension planifiée.
 
 \subsection{Résolution d'un blocage de compatibilité}
 
@@ -164,9 +278,11 @@ Au moment de la rédaction :
 
 \begin{itemize}
     \item l'intégration du processus de bout en bout est en cours ;
+    \item la démonstration A1 du 11 août reste planifiée ;
     \item la construction et les tests sont encore validés sur des scénarios ciblés ;
     \item la réparation gouvernée n'est pas encore intégrée complètement ;
     \item le reporting et l'assistant doivent être consolidés ;
+    \item l'extension Angular 11--21 reste un objectif de septembre ;
     \item aucune série quantitative comparable au système Java n'est disponible.
 \end{itemize}
 
@@ -259,10 +375,10 @@ Les limites principales sont les suivantes :
     \item absence de chaîne CI commune dans les dépôts des prototypes ;
     \item absence de politique globale unique de lint ;
     \item absence d'authentification et de test multi-utilisateur ;
-    \item captures finales et rapports de démonstration encore à intégrer au document.
+    \item captures finales et comptes rendus de démonstration encore à intégrer au document.
 \end{itemize}
 
-Ces limites empêchent d'annoncer un pourcentage global de gain de temps ou de réussite. Le rapport conserve donc une distinction entre résultats vérifiés et bénéfices attendus.
+Ces limites empêchent d'annoncer un pourcentage global de gain de temps ou de réussite. Le rapport conserve donc une distinction entre résultats vérifiés, validation par présentation et bénéfices attendus.
 
 % ============================================================
 \section{Perspectives}
@@ -271,20 +387,22 @@ Ces limites empêchent d'annoncer un pourcentage global de gain de temps ou de r
 Les priorités d'évolution sont :
 
 \begin{itemize}
-    \item finaliser le parcours Angular et sa réparation ;
+    \item réaliser la démonstration Angular 18--21 prévue le 11 août ;
+    \item consolider la V1 Java pour la démonstration de septembre ;
+    \item étendre progressivement Angular 11 vers Angular 21 ;
+    \item finaliser la réparation, l'assistant et le reporting Angular ;
     \item automatiser la collecte de durée, tokens, coûts et interventions ;
     \item constituer un jeu de projets Java et Angular reproductibles ;
     \item exécuter plusieurs répétitions et publier les configurations ;
     \item ajouter authentification, rôles et journal d'audit ;
     \item remplacer les hypothèses locales par une persistance adaptée au multi-instance ;
     \item ajouter une chaîne CI et une politique de qualité homogène ;
-    \item étendre la démarche à d'autres frameworks par profils spécialisés ;
     \item étudier la capitalisation des réparations validées sous forme de règles déterministes.
 \end{itemize}
 
 \section*{Conclusion}
 \addcontentsline{toc}{section}{Conclusion}
 
-L'évaluation montre que la déclinaison Java valide les principaux mécanismes de gouvernance, d'isolation, de réparation et de traçabilité. Angular confirme la capacité du modèle à s'adapter à un second écosystème, mais son parcours complet et ses métriques restent à consolider.
+L'évaluation montre que la déclinaison Java valide les principaux mécanismes de gouvernance, d'isolation, de réparation et de traçabilité. Les trois démonstrations Java réalisées matérialisent le passage d'un prototype CLI à une plateforme full stack. Angular confirme la capacité du modèle à s'adapter à un second écosystème, mais sa première démonstration, son parcours complet et ses métriques restent à consolider.
 
 Le principal apport du projet est une organisation contrôlée des agents et des outils, plutôt qu'une autonomie totale. Les preuves disponibles sont encourageantes, mais elles ne permettent pas encore de quantifier un gain global. Une campagne expérimentale plus large, reproductible et instrumentée constitue la prochaine étape nécessaire à l'industrialisation.
