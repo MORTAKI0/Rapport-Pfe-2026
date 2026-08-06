@@ -1,0 +1,62 @@
+% ============================================================
+\section{Passerelle d'accès aux modèles et routage par rôle}
+% ============================================================
+
+L'accès aux modèles est conçu comme une capacité d'infrastructure distincte des agents. Un agent ne manipule ni la clé d'authentification ni l'endpoint Azure. Il exprime un rôle et fournit un contexte borné ; le backend sélectionne ensuite le déploiement correspondant, construit la requête et valide la réponse avant de la rendre au workflow.
+
+Cette séparation poursuit quatre objectifs : limiter l'exposition des secrets, éviter le couplage d'un agent à un modèle précis, permettre des déploiements différents selon les responsabilités et produire un échec contrôlé lorsqu'une configuration est absente ou indisponible.
+
+\begin{figure}[H]
+    \centering
+    \resizebox{0.96\textwidth}{!}{%
+    \begin{tikzpicture}[
+        azure/.style={draw=cgired,rounded corners=3pt,fill=white,text width=4.6cm,minimum height=1.2cm,align=center,font=\small},
+        box/.style={draw=cgiblue,rounded corners=3pt,fill=cgilight!55,text width=4.2cm,minimum height=1.2cm,align=center,font=\small},
+        agent/.style={draw=emsigreen!70!black,rounded corners=3pt,fill=emsigreen!8,text width=4.2cm,minimum height=1.2cm,align=center,font=\small},
+        arr/.style={-{Latex[length=2mm]},thick,draw=cgigray}
+    ]
+        \node[azure] (resource) {\textbf{Ressource Azure CGI}\\déploiements proposeur, réviseur, assistant et secours};
+        \node[box,below=0.8cm of resource] (adapter) {\textbf{Adaptateur backend Azure OpenAI}\\endpoint, authentification et transport};
+        \node[box,below=0.8cm of adapter] (router) {\textbf{Routeur de modèles par rôle}\\sélection du déploiement configuré};
+        \node[agent,below left=0.8cm and 0.6cm of router] (roles) {\textbf{Agents}\\analyse, proposition, révision, réparation, assistance};
+        \node[box,below right=0.8cm and 0.6cm of router] (controls) {\textbf{Contrôles}\\schéma, redaction, journalisation et état d'échec};
+        \draw[arr] (resource)--(adapter);
+        \draw[arr] (adapter)--(router);
+        \draw[arr] (router)--(roles);
+        \draw[arr] (router)--(controls);
+    \end{tikzpicture}%
+    }
+    \caption{Passerelle Azure OpenAI et routage des déploiements par rôle}
+    \label{fig:passerelle-azure-ch3}
+\end{figure}
+
+\begin{table}[H]
+    \centering
+    \small
+    \arrayrulecolor{cgigray}
+    \rowcolors{2}{cgilight!55}{white}
+    \begin{tabularx}{\textwidth}{|>{\bfseries\RaggedRight\arraybackslash}p{3.8cm}|>{\RaggedRight\arraybackslash}X|>{\centering\arraybackslash}p{3.1cm}|}
+        \hline
+        \rowcolor{cgilight!95}
+        \textbf{Composant} & \textbf{Responsabilité} & \textbf{Information sensible} \\
+        \hline
+        Ressource Azure de CGI & Héberger et gouverner les modèles déployés. & Oui \\
+        \hline
+        Configuration backend & Référencer endpoint, authentification et déploiements. & Oui \\
+        \hline
+        Routeur par rôle & Associer une responsabilité agentique au déploiement configuré. & Nom interne uniquement \\
+        \hline
+        Agent & Fournir le contexte, le rôle et le schéma de sortie attendu. & Non \\
+        \hline
+        Contrôles de sortie & Vérifier le schéma, nettoyer les résumés et persister le statut. & Non après redaction \\
+        \hline
+        Frontend & Afficher un état de disponibilité et des informations non sensibles. & Non \\
+        \hline
+    \end{tabularx}
+    \caption{Répartition des responsabilités autour de la passerelle Azure}
+    \label{tab:responsabilites-azure-ch3}
+    \rowcolors{2}{white}{white}
+    \arrayrulecolor{black}
+\end{table}
+
+Dans la déclinaison Java observée, le routeur distingue notamment les rôles de proposition, de révision et d'assistance, avec un déploiement de secours optionnel. L'authentification effectivement utilisée par le client courant repose sur une clé API. Microsoft Entra ID constitue une évolution d'industrialisation recommandée, mais ne doit pas être présenté comme pleinement opérationnel tant que ce mode n'est pas validé dans le runtime du projet \cite{azure-entra-auth}.
