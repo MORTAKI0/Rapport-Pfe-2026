@@ -3,9 +3,9 @@
 \section*{Introduction}
 \addcontentsline{toc}{section}{Introduction}
 
-Ce chapitre situe le projet dans son environnement professionnel et précise le problème auquel il répond. Il présente l'organisme d'accueil, le domaine de la modernisation applicative, les utilisateurs visés, les acteurs logiciels et les services techniques mobilisés. Il formalise ensuite la problématique, les besoins fonctionnels et non fonctionnels, les objectifs ainsi que la méthodologie suivie.
+Ce chapitre situe le projet dans son environnement professionnel et précise le besoin auquel il répond. Il présente l'organisme d'accueil, le domaine de la modernisation applicative, les utilisateurs visés, les catégories de composants mobilisées, la problématique, les exigences, les objectifs et la méthodologie suivie.
 
-L'analyse des besoins est organisée conformément aux principes d'ISO/IEC/IEEE 29148, qui recommande de relier les attentes des parties prenantes à des exigences compréhensibles, vérifiables et traçables \cite{iso29148}. Dans ce rapport, la spécification distingue systématiquement ce qui est attendu du système, ce qui est déjà présent dans les prototypes et ce qui relève encore de l'industrialisation.
+La spécification s'appuie sur les principes d'ISO/IEC/IEEE 29148 : une exigence doit être compréhensible, reliée à une partie prenante et associée à un moyen de vérification \cite{iso29148}. Le rapport distingue donc l'objectif du produit, l'état observé dans les deux prototypes et les évolutions d'industrialisation.
 
 % ============================================================
 \section{Présentation de l'organisme d'accueil}
@@ -17,26 +17,18 @@ Fondée en 1976 au Québec, CGI figure parmi les principales entreprises mondial
 
 \begin{figure}[H]
     \centering
-    \IfFileExists{logos/cgi.png}{%
-        \includegraphics[width=4.3cm]{logos/cgi.png}%
-    }{%
-        \fbox{\parbox[c][1.8cm][c]{4.2cm}{\centering\bfseries CGI}}%
-    }
+    \IfFileExists{logos/cgi.png}{\includegraphics[width=4.3cm]{logos/cgi.png}}{\fbox{\parbox[c][1.8cm][c]{4.2cm}{\centering\bfseries CGI}}}
     \caption{Logo de CGI}
     \label{fig:logo-cgi-ch1}
 \end{figure}
 
-L'offre de CGI couvre notamment le conseil, l'intégration de systèmes, le développement et la maintenance d'applications, les services managés, le cloud, la cybersécurité, les données et l'intelligence artificielle. Cette diversité place l'évolution des systèmes existants et la modernisation des applications parmi les enjeux récurrents de ses activités.
+L'offre de CGI couvre notamment le conseil, l'intégration de systèmes, le développement et la maintenance d'applications, les services managés, le cloud, la cybersécurité, les données et l'intelligence artificielle. La modernisation des applications s'inscrit naturellement dans ces activités, car elle vise à prolonger la durée de vie des systèmes et à réduire leur dette technique.
 
 \subsection{CGI Technologies et Solutions Maroc}
 
 CGI dispose au Maroc de centres implantés à Rabat, Casablanca et Fès. Le site officiel de l'entreprise indique que ces centres regroupent plus de 1\,300 professionnels et fournissent des services applicatifs, d'infrastructure et de support sur des technologies modernes et historiques \cite{cgi-maroc}. Le stage s'est déroulé au centre de Rabat, situé à Technopolis, Sala Al Jadida.
 
-Cet environnement constitue un cadre pertinent pour le projet. Les équipes peuvent être amenées à maintenir des applications reposant sur des générations différentes de langages, de frameworks et d'outils. La migration ne représente donc pas uniquement une opération ponctuelle : elle s'inscrit dans une démarche plus large de maintien en condition opérationnelle, de réduction de la dette technique et de préparation des applications à de nouveaux environnements.
-
-\subsection{Cadre du stage}
-
-Le projet est une initiative interne de CGI Technologies et Solutions Maroc. L'équipe opérationnelle est composée de trois développeurs. Elle est accompagnée par deux référents fonctionnels, un expert technique et les responsables intervenant lors des revues et démonstrations.
+Le projet est une initiative interne. L'équipe opérationnelle comprend trois développeurs, accompagnés par deux référents fonctionnels, un expert technique et les responsables intervenant lors des revues et démonstrations.
 
 \begin{table}[H]
     \centering
@@ -48,13 +40,13 @@ Le projet est une initiative interne de CGI Technologies et Solutions Maroc. L'�
         \rowcolor{cgilight!95}
         \textbf{Partie prenante} & \textbf{Contribution au projet} \\
         \hline
-        Trois développeurs & Analyse, conception, développement, intégration, tests et expérimentation des deux systèmes. \\
+        Équipe de développement & Analyse, conception, implémentation, intégration, tests et expérimentation. \\
         \hline
-        Deux référents fonctionnels & Clarification des attentes, suivi du backlog et retour sur les incréments. \\
+        Référents fonctionnels & Clarification des attentes, suivi du backlog et retour sur les incréments. \\
         \hline
         Expert technique & Examen des orientations, des risques et de la cohérence de l'architecture. \\
         \hline
-        Direction et responsables CGI & Priorisation, suivi de l'avancement et évaluation des démonstrations. \\
+        Responsables CGI & Priorisation, suivi de l'avancement et appréciation des démonstrations. \\
         \hline
     \end{tabularx}
     \caption{Parties prenantes du projet}
@@ -67,131 +59,92 @@ Le projet est une initiative interne de CGI Technologies et Solutions Maroc. L'�
 \section{Présentation du projet}
 % ============================================================
 
-\subsection{Domaine d'application}
+\subsection{Domaine et finalité}
 
-Le projet relève de la \textbf{modernisation logicielle}, de l'\textbf{intelligence artificielle appliquée au génie logiciel} et de l'\textbf{orchestration de systèmes multi-agents}. Il vise à assister la migration progressive d'applications anciennes vers des versions plus récentes de leurs langages, frameworks et dépendances.
-
-La solution, appelée \textbf{Migration Factory}, combine trois catégories de mécanismes :
+Le projet relève de la modernisation logicielle, de l'intelligence artificielle appliquée au génie logiciel et de l'orchestration de systèmes multi-agents. La solution, appelée \textbf{Migration Factory}, vise à conduire des migrations progressives, contrôlées et traçables en combinant :
 
 \begin{itemize}
-    \item des services déterministes chargés des commandes, des transformations connues, des validations et de la persistance ;
-    \item des agents spécialisés intervenant sur l'analyse, la planification, la transformation, la révision, le diagnostic et l'assistance ;
-    \item un contrôle humain conservé aux points où une décision peut modifier le code ou engager la suite du processus.
+    \item des \textbf{agents intelligents} pour les tâches nécessitant interprétation, raisonnement, planification, révision ou assistance ;
+    \item des \textbf{services déterministes} pour les états, transitions, commandes, chemins, écritures, validations et preuves ;
+    \item des \textbf{outils d'exécution} propres aux écosystèmes, tels que Maven, OpenRewrite, npm et Angular CLI ;
+    \item une \textbf{supervision humaine} aux points où une décision peut engager la suite du processus ou modifier le code.
 \end{itemize}
 
-La première déclinaison concerne Java et Spring Boot. La seconde concerne Angular. Les deux systèmes reposent sur des principes similaires, mais sont développés dans des dépôts indépendants afin de conserver les outils, règles de compatibilité et cycles d'évolution propres à chaque écosystème.
+La première déclinaison concerne Java/Spring Boot. La seconde concerne Angular. Elles reposent sur les mêmes principes de gouvernance, mais sont développées dans deux dépôts indépendants afin de préserver leurs runtimes, leurs outils et leurs trajectoires de versions.
 
 \subsection{Utilisateurs cibles}
 
-L'utilisateur opérationnel actuel est le \textbf{développeur chargé de la migration}. Il fournit l'application, configure les versions, contrôle les prérequis, lance l'exécution, suit les étapes, examine les preuves et prend les décisions nécessaires.
+L'utilisateur opérationnel actuel est le \textbf{développeur chargé de la migration}. Il fournit l'application, configure les versions, contrôle les prérequis, lance l'exécution, examine les preuves et prend les décisions nécessaires.
 
-Les prototypes sont encore utilisés en interne pour des essais sur des applications réelles. Ils ne sont pas déployés auprès d'utilisateurs externes et ne comportent actuellement ni comptes, ni authentification, ni séparation de rôles. Cette absence est acceptable pour une expérimentation locale, mais elle devra être corrigée avant toute utilisation partagée.
+Dans une version industrialisée, d'autres rôles pourraient être distingués : reviewer technique, responsable de migration, administrateur de plateforme et lecteur de rapports. Ces rôles constituent une cible d'évolution ; ils ne sont pas implémentés dans les prototypes locaux actuels, qui ne possèdent ni comptes, ni authentification, ni contrôle d'accès par rôle.
 
-\subsection{Acteurs humains, agents et services externes}
+\subsection{Classification des acteurs et composants}
 
-La vue de contexte distingue cinq catégories. Cette séparation évite de confondre un utilisateur, un agent logiciel, un service interne et un outil externe.
+La figure~\ref{fig:contexte-acteurs-services-ch1} sépare les catégories afin de ne pas transformer artificiellement tout composant du workflow en agent.
 
 \begin{figure}[H]
     \centering
-    \resizebox{0.96\textwidth}{!}{%
+    \resizebox{0.98\textwidth}{!}{%
     \begin{tikzpicture}[
-        center/.style={draw=cgired,rounded corners=4pt,fill=white,minimum width=5.2cm,minimum height=1.4cm,align=center,font=\bfseries},
-        actor/.style={draw=cgiblue,rounded corners=3pt,fill=cgilight!55,text width=4.4cm,minimum height=1.4cm,align=center,font=\small},
-        agent/.style={draw=emsigreen!70!black,rounded corners=3pt,fill=emsigreen!8,text width=4.4cm,minimum height=1.4cm,align=center,font=\small},
-        service/.style={draw=cgigray,rounded corners=3pt,fill=white,text width=4.4cm,minimum height=1.4cm,align=center,font=\small},
+        center/.style={draw=cgired,rounded corners=4pt,fill=white,minimum width=5cm,minimum height=1.35cm,align=center,font=\bfseries},
+        actor/.style={draw=cgiblue,rounded corners=3pt,fill=cgilight!55,text width=4cm,minimum height=1.35cm,align=center,font=\small},
+        agent/.style={draw=emsigreen!70!black,rounded corners=3pt,fill=emsigreen!8,text width=4cm,minimum height=1.35cm,align=center,font=\small},
+        service/.style={draw=cgigray,rounded corners=3pt,fill=white,text width=4cm,minimum height=1.35cm,align=center,font=\small},
         arr/.style={<->,thick,draw=cgigray}
     ]
-        \node[center] (mf) {Migration Factory\\Java/Spring Boot et Angular};
-        \node[actor,above left=1.2cm and 1.1cm of mf] (human) {\textbf{Acteur humain}\\Développeur chargé de la migration};
-        \node[agent,above right=1.2cm and 1.1cm of mf] (agents) {\textbf{Agents logiciels}\\Analyse, planification, transformation, révision, réparation et assistant};
-        \node[service,below left=1.2cm and 1.1cm of mf] (tools) {\textbf{Outils techniques}\\Maven, OpenRewrite, JDK, npm, Angular CLI et outils de tests};
-        \node[service,below right=1.2cm and 1.1cm of mf] (external) {\textbf{Services externes}\\Fournisseur LLM, dépôts de dépendances et système de fichiers local};
-        \draw[arr] (human) -- (mf);
-        \draw[arr] (agents) -- (mf);
-        \draw[arr] (tools) -- (mf);
-        \draw[arr] (external) -- (mf);
+        \node[center] (mf) {Migration Factory};
+        \node[actor,above left=1.25cm and 2.8cm of mf] (human) {\textbf{Acteur humain}\\Développeur};
+        \node[agent,above right=1.25cm and 2.8cm of mf] (agents) {\textbf{Agents intelligents internes}\\Analyse, planification, révision, transformation agentique, réparation, assistant};
+        \node[service,below left=1.25cm and 2.8cm of mf] (det) {\textbf{Services déterministes internes}\\Transitions, profils, exécution, stockage, rapports};
+        \node[service,below=1.25cm of mf] (tools) {\textbf{Outils d'exécution}\\JDK, Maven, OpenRewrite, Node.js, npm, Angular CLI};
+        \node[service,below right=1.25cm and 2.8cm of mf] (external) {\textbf{Services réseau externes}\\Fournisseur LLM et dépôts de dépendances};
+        \draw[arr] (human)--(mf);
+        \draw[arr] (agents)--(mf);
+        \draw[arr] (det)--(mf);
+        \draw[arr] (tools)--(mf);
+        \draw[arr] (external)--(mf);
     \end{tikzpicture}%
     }
-    \caption{Vue de contexte des acteurs et services du système}
+    \caption{Vue de contexte et classification des acteurs et composants}
     \label{fig:contexte-acteurs-services-ch1}
 \end{figure}
 
-Les agents sont internes à la plateforme. Ils n'accèdent pas directement à l'environnement sans médiation : les commandes, écritures et transitions restent contrôlées par le backend et par des services déterministes. Les fournisseurs LLM, gestionnaires de dépendances et outils de construction sont considérés comme des services techniques externes à la logique métier.
+Le système de fichiers local appartient à l'infrastructure d'exécution ; il n'est pas considéré comme un service externe. Les agents n'accèdent pas librement au terminal ou aux fichiers : les services déterministes médiatisent les commandes, les écritures et les transitions.
 
 \subsection{Fonctionnalités existantes}
 
-Le système Java/Spring Boot est le plus mature. Il prend déjà en charge une trajectoire progressive allant de Spring Boot 2.1 vers 2.7, puis 3.5 et 4.0, avec l'utilisation de Java 11, 17 et 21 selon les étapes. Il comprend notamment :
+Le système Java/Spring Boot est le plus mature. Il prend en charge une trajectoire progressive Spring Boot 2.1 $\rightarrow$ 2.7 $\rightarrow$ 3.5 $\rightarrow$ 4.0, avec Java 11, 17 et 21 selon les étapes. Il comprend la qualification, l'analyse, la planification, les décisions humaines, les espaces de travail isolés, les transformations, Maven, les tests, une boucle de réparation, un cockpit, un assistant et un rapport final.
 
-\begin{itemize}
-    \item la configuration d'une migration à partir d'un chemin local ;
-    \item la vérification des profils Java et Maven ;
-    \item l'analyse de l'application et la production d'un plan ;
-    \item des points de décision humaine ;
-    \item la préparation d'un espace de travail isolé ;
-    \item l'application de transformations déterministes ;
-    \item la compilation et l'exécution des tests ;
-    \item une boucle de réparation avec proposition, révision, approbation et revalidation ;
-    \item un cockpit de suivi, un assistant et un rapport final.
-\end{itemize}
-
-Le système Angular est en développement actif. Son périmètre initial couvre Angular 18 vers 19, 19 vers 20 et 20 vers 21. Les agents d'analyse, de révision, de planification et de transformation ont été développés. L'intégration du processus complet, les validations d'exécution, l'assistant et la boucle de réparation sont en cours de consolidation.
-
-\subsection{Problèmes observés et besoins d'automatisation}
-
-Avant la Migration Factory, la migration repose principalement sur un développeur expérimenté qui consulte les guides, modifie les dépendances, adapte le code, relance les commandes et corrige successivement les erreurs. Cette approche présente plusieurs limites :
-
-\begin{itemize}
-    \item temps important consacré aux opérations répétitives ;
-    \item dépendance à une expertise rare et difficile à mobiliser sur plusieurs projets ;
-    \item difficulté à reproduire exactement les commandes et décisions ;
-    \item dispersion des preuves entre terminal, tickets, documentation et historique Git ;
-    \item risques de modification directe de la source ;
-    \item faible visibilité sur l'état réel d'une migration ;
-    \item cycles de diagnostic et de correction difficiles à capitaliser.
-\end{itemize}
-
-Le besoin d'intelligence apparaît lorsque les règles connues ne suffisent plus : interprétation d'un journal complexe, rapprochement de plusieurs erreurs, proposition d'un plan ou adaptation à un contexte applicatif particulier. L'intelligence ne remplace toutefois pas les validations déterministes ; elle complète les opérations reproductibles et reste soumise à des limites d'autorité.
+Le système Angular est en développement actif autour d'Angular 18 $\rightarrow$ 19 $\rightarrow$ 20 $\rightarrow$ 21. Les agents principaux d'analyse, de révision, de planification et de transformation sont développés. L'intégration du processus complet, les validations d'exécution, l'assistant, la réparation et le reporting sont encore consolidés.
 
 % ============================================================
 \section{Problématique traitée}
 % ============================================================
 
-\subsection{Complexité des tâches et besoin de coordination}
+\subsection{Constats et besoin de coordination}
 
-Une migration combine des tâches hétérogènes et interdépendantes : inventaire, détection de versions, résolution de compatibilités, planification, transformation, gestion des dépendances, compilation, tests, diagnostic, réparation et production de preuves. Chaque étape consomme les résultats de la précédente et peut imposer un retour en arrière.
-
-La complexité ne provient donc pas uniquement de chaque tâche prise séparément. Elle provient de leur coordination :
-
-\begin{itemize}
-    \item sélectionner le bon agent ou service selon l'état courant ;
-    \item transmettre un contexte suffisant sans exposer tout le projet ;
-    \item conserver l'ordre des opérations et leurs résultats ;
-    \item suspendre le processus lorsqu'une décision humaine est requise ;
-    \item reprendre après approbation, interruption ou erreur ;
-    \item empêcher qu'un résultat obsolète soit appliqué ;
-    \item replanifier lorsqu'une hypothèse ou une compatibilité est invalidée.
-\end{itemize}
+Une migration combine inventaire, détection de versions, résolution de compatibilités, planification, transformation, installation, compilation, tests, diagnostic, réparation et production de preuves. La difficulté provient autant de ces tâches que de leur coordination : choisir le bon traitement, transmettre le contexte utile, préserver l'ordre, suspendre à un point de validation, reprendre après décision et empêcher l'application d'un résultat obsolète.
 
 \begin{figure}[H]
     \centering
     \resizebox{0.97\textwidth}{!}{%
     \begin{tikzpicture}[
-        box/.style={draw=cgiblue,rounded corners=3pt,fill=cgilight!55,minimum width=3.2cm,minimum height=1.05cm,align=center,font=\small\bfseries},
-        risk/.style={draw=cgired,rounded corners=3pt,fill=white,minimum width=3.2cm,minimum height=1.05cm,align=center,font=\small\bfseries},
+        box/.style={draw=cgiblue,rounded corners=3pt,fill=cgilight!55,minimum width=3cm,minimum height=1cm,align=center,font=\small\bfseries},
+        risk/.style={draw=cgired,rounded corners=3pt,fill=white,minimum width=3cm,minimum height=1cm,align=center,font=\small\bfseries},
         arr/.style={-{Latex[length=2mm]},thick,draw=cgigray}
     ]
         \node[box] (analyse) {Analyse};
-        \node[box,right=0.5cm of analyse] (plan) {Planification};
-        \node[box,right=0.5cm of plan] (transform) {Transformation};
-        \node[box,right=0.5cm of transform] (validate) {Compilation et tests};
-        \node[risk,right=0.5cm of validate] (failure) {Échec ou décision};
-        \node[box,right=0.5cm of failure] (repair) {Réparation ou reprise};
-        \draw[arr] (analyse) -- (plan);
-        \draw[arr] (plan) -- (transform);
-        \draw[arr] (transform) -- (validate);
-        \draw[arr] (validate) -- (failure);
-        \draw[arr] (failure) -- (repair);
-        \draw[arr,rounded corners=4pt] (repair.south) -- ++(0,-0.7) -| (plan.south);
+        \node[box,right=0.45cm of analyse] (plan) {Planification};
+        \node[box,right=0.45cm of plan] (transform) {Transformation};
+        \node[box,right=0.45cm of transform] (validate) {Compilation et tests};
+        \node[risk,right=0.45cm of validate] (failure) {Échec ou décision};
+        \node[box,right=0.45cm of failure] (repair) {Réparation ou reprise};
+        \draw[arr] (analyse)--(plan);
+        \draw[arr] (plan)--(transform);
+        \draw[arr] (transform)--(validate);
+        \draw[arr] (validate)--(failure);
+        \draw[arr] (failure)--(repair);
+        \draw[arr,rounded corners=4pt] (repair.south)--++(0,-0.7)-|(plan.south);
     \end{tikzpicture}%
     }
     \caption{Dépendances et boucles de coordination d'une migration}
@@ -200,19 +153,9 @@ La complexité ne provient donc pas uniquement de chaque tâche prise séparéme
 
 \subsection{Limites d'une architecture monolithique ou d'un agent unique}
 
-Une architecture monolithique concentrant toutes les responsabilités dans un seul module ou un seul agent simplifierait l'apparence initiale du système, mais créerait plusieurs difficultés :
+Un agent unique devrait simultanément comprendre le projet, planifier, transformer, exécuter, valider et se corriger. Cette concentration entraîne un contexte trop large, une séparation insuffisante entre proposition et autorité, une faible testabilité et une propagation accrue des erreurs. Elle complique également l'adaptation à deux écosystèmes différents.
 
-\begin{itemize}
-    \item un contexte trop large mélangeant code, dépendances, journaux, règles et objectifs ;
-    \item des responsabilités difficiles à isoler et à tester ;
-    \item une concentration excessive de l'autorité entre analyse, décision et exécution ;
-    \item une faible capacité à remplacer un modèle, un agent ou une politique ;
-    \item une propagation plus importante des erreurs ;
-    \item une traçabilité insuffisante des contributions intermédiaires ;
-    \item une évolution plus difficile lorsque Java et Angular nécessitent des outils différents.
-\end{itemize}
-
-La solution retient donc une architecture multi-agents \textbf{hybride, spécialisée et centralement orchestrée}. Les agents possèdent des objectifs limités et des contrats explicites. L'orchestrateur organise leur séquence, tandis que les services déterministes conservent l'autorité sur l'exécution.
+Le projet retient donc une architecture multi-agents hybride, spécialisée et centralement orchestrée. Les agents possèdent des objectifs bornés ; l'orchestrateur organise leur séquence ; les services déterministes conservent l'autorité sur l'exécution.
 
 \subsection{Problématique générale}
 
@@ -221,91 +164,97 @@ La solution retient donc une architecture multi-agents \textbf{hybride, spécial
 Comment concevoir et mettre en œuvre une architecture multi-agents hybride capable de coordonner l'analyse, la planification, la transformation, la validation et la réparation de migrations Java/Spring Boot et Angular, tout en préservant l'intégrité du code source, la traçabilité des décisions, la reproductibilité des opérations et le contrôle du développeur ?
 \end{quote}
 
-\subsection{Besoins fonctionnels}
+% ============================================================
+\section{Besoins fonctionnels}
+% ============================================================
 
 \scriptsize
-\begin{longtable}{|>{\bfseries\RaggedRight\arraybackslash}p{1.25cm}|>{\RaggedRight\arraybackslash}p{8.2cm}|>{\centering\arraybackslash}p{2.3cm}|>{\centering\arraybackslash}p{2.4cm}|}
-    \caption{Besoins fonctionnels du système}\label{tab:bf-ch1}\\
+\begin{longtable}{|>{\bfseries\RaggedRight\arraybackslash}p{1cm}|>{\RaggedRight\arraybackslash}p{6.1cm}|>{\RaggedRight\arraybackslash}p{3.2cm}|>{\RaggedRight\arraybackslash}p{3.2cm}|}
+    \caption{Besoins fonctionnels et maturité des deux systèmes}\label{tab:bf-ch1}\\
     \hline
     \rowcolor{cgilight!95}
-    \textbf{ID} & \textbf{Besoin} & \textbf{Portée} & \textbf{État global} \\
+    \textbf{ID} & \textbf{Besoin} & \textbf{Java/Spring Boot} & \textbf{Angular} \\
     \hline
     \endfirsthead
     \hline
     \rowcolor{cgilight!95}
-    \textbf{ID} & \textbf{Besoin} & \textbf{Portée} & \textbf{État global} \\
+    \textbf{ID} & \textbf{Besoin} & \textbf{Java/Spring Boot} & \textbf{Angular} \\
     \hline
     \endhead
-    BF-01 & Configurer l'application source, la cible, les versions et les profils d'exécution. & Commun & Java avancé ; Angular en intégration \\
+    BF-01 & Configurer la source, la cible et les profils d'exécution. & Implémenté & En intégration \\
     \hline
-    BF-02 & Vérifier les chemins, runtimes, outils et compatibilités avant le lancement. & Commun & Implémenté avec niveaux de maturité différents \\
+    BF-02 & Vérifier chemins, runtimes, outils et compatibilités. & Implémenté & En validation \\
     \hline
-    BF-03 & Analyser la structure, les dépendances, la configuration, les tests et les risques. & Commun & Implémenté \\
+    BF-03 & Analyser structure, dépendances, configuration, tests et risques. & Intégré & Agent implémenté ; intégration en cours \\
     \hline
-    BF-04 & Construire une trajectoire progressive et un plan de migration vérifiable. & Commun & Implémenté \\
+    BF-04 & Construire une trajectoire progressive et un plan révisé. & Intégré & Agents implémentés \\
     \hline
-    BF-05 & Permettre au développeur d'approuver, rejeter ou demander une révision. & Commun & Java avancé ; Angular en intégration \\
+    BF-05 & Approuver, rejeter ou demander une révision. & Avancé & En intégration \\
     \hline
-    BF-06 & Créer un espace isolé et préserver l'application source. & Commun & Implémenté \\
+    BF-06 & Créer un espace isolé sans modifier la source. & Validé & Implémenté ; validation globale en cours \\
     \hline
-    BF-07 & Appliquer les transformations propres à l'écosystème. & Spécifique & Java avancé ; Angular en validation \\
+    BF-07 & Appliquer les transformations propres à l'écosystème. & Avancé & Implémenté ; essais en cours \\
     \hline
-    BF-08 & Exécuter l'installation, la compilation ou la construction et les tests. & Commun & Java avancé ; Angular en validation \\
+    BF-08 & Installer, compiler ou construire et exécuter les tests. & Intégré & En validation \\
     \hline
-    BF-09 & Conserver les échecs et produire un contexte de diagnostic borné. & Commun & Java implémenté ; Angular planifié \\
+    BF-09 & Conserver les échecs et construire un contexte de diagnostic. & Implémenté & À intégrer \\
     \hline
-    BF-10 & Générer, réviser, approuver et revalider une réparation. & Commun & Java implémenté ; Angular planifié \\
+    BF-10 & Proposer, réviser, approuver et revalider une réparation. & Implémenté & Planifié \\
     \hline
-    BF-11 & Afficher les étapes, événements, preuves, décisions et blocages. & Commun & Java avancé ; Angular en intégration \\
+    BF-11 & Afficher étapes, événements, preuves, décisions et blocages. & Avancé & En intégration \\
     \hline
-    BF-12 & Annuler ou reprendre une exécution selon les transitions autorisées. & Commun & Partiel \\
+    BF-12 & Annuler ou reprendre selon les transitions autorisées. & Partiel & En développement \\
     \hline
-    BF-13 & Produire un rapport final relié aux preuves techniques. & Commun & Java implémenté ; Angular en développement \\
+    BF-13 & Produire un rapport final relié aux preuves. & Implémenté & En développement \\
     \hline
-    BF-14 & Gérer ultérieurement les identités, rôles et autorisations. & Industrialisation & Non implémenté \\
+    BF-14 & Gérer identités, rôles et autorisations. & Non implémenté & Non implémenté \\
     \hline
 \end{longtable}
 \normalsize
 
-\subsection{Besoins non fonctionnels}
+% ============================================================
+\section{Besoins non fonctionnels}
+% ============================================================
 
-\begin{longtable}{|>{\bfseries\RaggedRight\arraybackslash}p{1.5cm}|>{\RaggedRight\arraybackslash}p{3.6cm}|>{\RaggedRight\arraybackslash}p{8.0cm}|}
-    \caption{Besoins non fonctionnels du système}\label{tab:bnf-ch1}\\
+\scriptsize
+\begin{longtable}{|>{\bfseries\RaggedRight\arraybackslash}p{1cm}|>{\RaggedRight\arraybackslash}p{2.5cm}|>{\RaggedRight\arraybackslash}p{5.1cm}|>{\RaggedRight\arraybackslash}p{5.1cm}|}
+    \caption{Exigences non fonctionnelles et critères de vérification}\label{tab:bnf-ch1}\\
     \hline
     \rowcolor{cgilight!95}
-    \textbf{ID} & \textbf{Caractéristique} & \textbf{Exigence} \\
+    \textbf{ID} & \textbf{Caractéristique} & \textbf{Exigence} & \textbf{Critère de vérification} \\
     \hline
     \endfirsthead
     \hline
     \rowcolor{cgilight!95}
-    \textbf{ID} & \textbf{Caractéristique} & \textbf{Exigence} \\
+    \textbf{ID} & \textbf{Caractéristique} & \textbf{Exigence} & \textbf{Critère de vérification} \\
     \hline
     \endhead
-    BNF-01 & Intégrité & Le projet source ne doit pas être modifié par le processus de migration. \\
+    BNF-01 & Intégrité & La source externe ne doit pas être modifiée. & Comparer son empreinte avant et après l'exécution. \\
     \hline
-    BNF-02 & Isolation & Les écritures et commandes doivent rester limitées à l'espace de travail autorisé. \\
+    BNF-02 & Isolation & Les écritures doivent rester dans l'espace autorisé. & Refuser tout chemin sortant du répertoire de l'exécution. \\
     \hline
-    BNF-03 & Traçabilité & Chaque état, action, décision, artefact et résultat doit être rattaché à une exécution. \\
+    BNF-03 & Traçabilité & Chaque action doit être rattachée à une migration. & Vérifier identifiant, horodatage, producteur et référence de preuve. \\
     \hline
-    BNF-04 & Reproductibilité & Les profils, commandes et paramètres essentiels doivent être persistés. \\
+    BNF-04 & Reproductibilité & Les paramètres et commandes essentiels doivent être persistés. & Reconstituer le profil et le manifeste d'une commande exécutée. \\
     \hline
-    BNF-05 & Fiabilité & Une étape ne doit progresser qu'après validation de ses préconditions et résultats. \\
+    BNF-05 & Fiabilité & Une étape ne progresse qu'après validation. & Contrôler préconditions, code de sortie et résultats de tests. \\
     \hline
-    BNF-06 & Reprise & Une interruption ne doit pas entraîner la perte de l'état validé. \\
+    BNF-06 & Reprise & Une interruption ne doit pas supprimer l'état validé. & Reprendre depuis un état persistant autorisé. \\
     \hline
-    BNF-07 & Idempotence & La répétition d'une requête protégée ne doit pas appliquer deux fois la même action. \\
+    BNF-07 & Idempotence & Une requête protégée ne doit pas être appliquée deux fois. & Répéter la même clé et vérifier l'absence d'effet supplémentaire. \\
     \hline
-    BNF-08 & Confidentialité & Les secrets et chemins sensibles doivent être exclus ou masqués avant un appel LLM. \\
+    BNF-08 & Confidentialité & Le contexte LLM doit exclure ou masquer les secrets connus. & Contrôler les règles d'exclusion et les extraits transmis. \\
     \hline
-    BNF-09 & Gouvernance & Un modèle ne doit pas exécuter directement une commande ou appliquer seul un correctif sensible. \\
+    BNF-09 & Gouvernance & Un agent ne doit pas appliquer seul un changement sensible. & Vérifier l'existence des contrôles déterministes et de la décision humaine. \\
     \hline
-    BNF-10 & Maintenabilité & Les agents, contrats et profils doivent pouvoir évoluer indépendamment. \\
+    BNF-10 & Maintenabilité & Agents, services et profils doivent rester séparables. & Remplacer un agent ou un profil sans modifier l'ensemble du workflow. \\
     \hline
-    BNF-11 & Utilisabilité & L'interface doit indiquer l'état courant, le blocage et la prochaine action autorisée. \\
+    BNF-11 & Utilisabilité & Le cockpit doit montrer l'état, le blocage et l'action suivante. & Vérifier ces informations dans la projection affichée. \\
     \hline
-    BNF-12 & Évolutivité & L'architecture doit permettre l'ajout de nouveaux profils, agents et écosystèmes sans refonte complète. \\
+    BNF-12 & Évolutivité & De nouveaux profils doivent être ajoutables sans refonte globale. & Ajouter un profil versionné et vérifier sa résolution isolée. \\
     \hline
 \end{longtable}
+\normalsize
 
 % ============================================================
 \section{Objectifs du projet}
@@ -317,45 +266,30 @@ L'objectif général consiste à concevoir, implémenter et évaluer une archite
 
 \subsection{Objectifs spécifiques}
 
-Les objectifs spécifiques sont les suivants :
-
 \begin{itemize}
-    \item identifier les types d'agents nécessaires aux différentes phases ;
-    \item définir pour chaque agent son objectif, ses entrées, ses sorties et ses limites d'autorité ;
+    \item identifier les agents nécessaires et distinguer les services déterministes ;
+    \item définir objectifs, entrées, sorties, autonomie et limites d'autorité ;
     \item concevoir une architecture SMA hybride et centralement orchestrée ;
-    \item formaliser les contrats de communication entre agents, services et orchestrateur ;
-    \item mettre en œuvre la gestion des états, des priorités, des interruptions et des reprises ;
-    \item intégrer les outils déterministes propres à Java/Spring Boot et Angular ;
-    \item construire une boucle de réparation fondée sur la proposition, la révision, l'approbation et la revalidation ;
-    \item fournir un cockpit permettant de superviser le système et d'examiner les preuves ;
-    \item évaluer la qualité du processus à partir de scénarios, de résultats de build et de tests, du nombre d'interventions et des cycles de correction ;
-    \item préparer l'extension de la démarche à d'autres versions, frameworks et contextes d'exploitation.
+    \item formaliser les contrats de communication et les artefacts échangés ;
+    \item gérer états, interruptions, reprises et replanifications ;
+    \item intégrer les outils propres à Java/Spring Boot et Angular ;
+    \item construire une boucle de réparation gouvernée ;
+    \item fournir un cockpit de supervision ;
+    \item évaluer le processus à partir de preuves, de tests et de métriques disponibles ;
+    \item préparer l'extension à d'autres écosystèmes.
 \end{itemize}
 
 % ============================================================
 \section{Méthodologie générale}
 % ============================================================
 
-Le projet a été conduit selon une démarche Agile inspirée de Scrum. Le travail est organisé en sprints de deux semaines comprenant la sélection des éléments du backlog, des points quotidiens, une revue ou démonstration et une rétrospective interne. Le Scrum Guide formalise ces événements comme des mécanismes d'inspection et d'adaptation \cite{scrum-guide}.
+Le projet a été conduit selon une démarche Agile inspirée de Scrum, avec des sprints de deux semaines, des points quotidiens, des revues ou démonstrations et une rétrospective interne \cite{scrum-guide}. Jira est utilisé pour le backlog, Microsoft Teams pour les échanges, GitHub pour le versionnement et les revues, et Confluence pour la documentation.
 
-La démarche technique suit un cycle court :
-
-\begin{enumerate}
-    \item observer un problème de migration réel ;
-    \item formaliser le besoin et les critères d'acceptation ;
-    \item concevoir le composant, l'agent ou le contrat nécessaire ;
-    \item implémenter la fonctionnalité dans le dépôt concerné ;
-    \item vérifier les tests unitaires et d'intégration ;
-    \item exécuter un scénario représentatif ;
-    \item présenter le résultat et intégrer les retours ;
-    \item documenter les décisions et limites observées.
-\end{enumerate}
-
-Jira est utilisé pour le backlog et les tickets, Microsoft Teams pour les échanges et réunions, GitHub pour le versionnement et les revues, et Confluence pour la documentation. Le développement de Java/Spring Boot a servi de premier terrain de validation. Angular a ensuite été introduit dans un dépôt indépendant afin de vérifier que les principes pouvaient être adaptés à un second écosystème sans imposer une base de code universelle.
+La démarche technique suit un cycle court : observer un problème, formuler l'exigence, concevoir le composant, l'implémenter, vérifier les tests, exécuter un scénario, présenter le résultat et intégrer les retours. Java/Spring Boot a servi de premier terrain de validation ; Angular a ensuite permis de vérifier l'adaptation du modèle à un second écosystème.
 
 \section*{Conclusion}
 \addcontentsline{toc}{section}{Conclusion}
 
-Ce chapitre a présenté CGI Technologies et Solutions Maroc, le domaine de la modernisation applicative et le contexte dans lequel la Migration Factory a été développée. Il a distingué les utilisateurs, les agents internes, les services déterministes et les outils externes. L'analyse a montré que le problème ne réside pas seulement dans la transformation du code, mais dans la coordination d'activités interdépendantes, la gestion des états, la maîtrise des erreurs et la séparation de l'autorité.
+Ce chapitre a présenté le contexte professionnel, les utilisateurs, les catégories de composants, les problèmes observés et les besoins de la Migration Factory. La distinction entre agents intelligents, services déterministes, outils d'exécution et services externes clarifie les frontières du système. Les exigences sont désormais associées à la maturité de chaque dépôt et, pour les qualités critiques, à un critère de vérification.
 
-Les besoins et objectifs définis conduisent à retenir une architecture multi-agents hybride, spécialisée, centralement orchestrée et gouvernée par le développeur. Le chapitre suivant présente les fondements théoriques relatifs aux agents, aux systèmes multi-agents, à l'orchestration et à la migration, puis compare les principaux travaux et outils proches du projet.
+Le chapitre suivant présente les fondements théoriques relatifs aux agents, aux systèmes multi-agents, à l'orchestration et à la migration, puis compare les travaux et plateformes proches du projet.
