@@ -3,13 +3,17 @@
 \section*{Introduction}
 \addcontentsline{toc}{section}{Introduction}
 
-Le chapitre précédent a montré que la Migration Factory se situe à l'intersection de la migration déterministe, de l'assistance intelligente et de l'orchestration multi-agents. Le présent chapitre décrit la conception du système multi-agents (SMA) retenu pour coordonner ces capacités.
+Le chapitre précédent a montré que la Migration Factory se situe à l'intersection de la migration déterministe, de l'assistance intelligente et de l'orchestration multi-agents. Le présent chapitre franchit l'étape suivante : il transforme ce positionnement conceptuel en \textbf{décisions de conception} propres au projet. Il ne s'agit plus seulement d'identifier les capacités utiles, mais de déterminer comment répartir les responsabilités, limiter l'autorité des agents, organiser les échanges, persister l'état et garantir qu'une décision probabiliste ne puisse pas contourner les contrôles techniques.
 
-La description suit plusieurs points de vue conformément à ISO/IEC/IEEE 42010 : contexte, fonctions, comportement, information, déploiement et gouvernance \cite{iso42010}. Les diagrammes utilisent les principes d'UML 2.5.1 \cite{omguml}. L'objectif est de montrer les décisions structurantes, sans reproduire toutes les classes du code.
+La conception doit répondre simultanément à plusieurs contraintes. Une migration impose un ordre de stages et de validations ; les outils d'exécution diffèrent entre Java/Spring Boot et Angular ; certains traitements nécessitent du raisonnement contextuel ; les commandes, écritures et changements sensibles doivent rester vérifiables ; enfin, le développeur doit pouvoir interrompre, réviser et reprendre le processus à partir d'un état traçable. Ces contraintes conduisent à séparer les agents intelligents, l'orchestrateur, les services déterministes, la persistance et les points de décision humaine.
+
+La description suit plusieurs points de vue conformément à ISO/IEC/IEEE 42010 : contexte, fonctions, comportement, information, déploiement et gouvernance \cite{iso42010}. Les diagrammes utilisent les principes d'UML 2.5.1 \cite{omguml}. L'objectif est de montrer les décisions structurantes et leurs justifications, puis de relier ces décisions aux workflows Java et Angular, sans reproduire toutes les classes du code.
 
 % ============================================================
 \section{Points de vue architecturaux}
 % ============================================================
+
+Une architecture de cette nature ne peut pas être comprise à partir d'un seul diagramme. La vue fonctionnelle répond à la question \og qui fait quoi ? \fg{}, la vue comportementale montre \og dans quel ordre et sous quelles conditions ? \fg{}, tandis que les vues informationnelle, de déploiement et de gouvernance précisent respectivement les données échangées, l'environnement d'exécution et les limites d'autorité. Le tableau suivant associe chaque préoccupation à la représentation utilisée dans le rapport.
 
 \begin{table}[H]
     \centering
@@ -43,6 +47,8 @@ La description suit plusieurs points de vue conformément à ISO/IEC/IEEE 42010 
 % ============================================================
 \section{Choix du modèle SMA}
 % ============================================================
+
+Le choix du modèle SMA résulte des contraintes identifiées précédemment plutôt que d'une préférence pour une architecture multi-agents en elle-même. Trois alternatives ont été écartées comme modèle principal : un agent unique concentrant analyse, transformation et exécution ; une chorégraphie entièrement distribuée où chaque composant ferait progresser le workflow localement ; et une automatisation exclusivement déterministe, insuffisante pour certaines analyses contextuelles. Le modèle retenu cherche donc un compromis entre spécialisation du raisonnement, contrôle central de la progression et exécution vérifiable.
 
 \subsection{Architecture hybride et centralement orchestrée}
 
