@@ -286,6 +286,8 @@ SWE-agent évalue l'effet d'une interface agent--ordinateur sur la résolution d
 
 \subsection{Comparaison synthétique}
 
+La comparaison suivante ne cherche pas à établir un classement global entre des solutions de nature différente. Elle examine plutôt cinq dimensions utiles au projet : le domaine couvert, la présence ou non d'agents, le mode de coordination, les preuves produites et la principale limite au regard d'une migration gouvernée de bout en bout. Cette grille permet de distinguer les capacités directement réutilisables des fonctions qui doivent être combinées ou complétées dans la Migration Factory.
+
 \scriptsize
 \begin{longtable}{|>{\bfseries\RaggedRight\arraybackslash}p{2.2cm}|>{\RaggedRight\arraybackslash}p{2.4cm}|>{\RaggedRight\arraybackslash}p{2.9cm}|>{\RaggedRight\arraybackslash}p{3.2cm}|>{\RaggedRight\arraybackslash}p{4.1cm}|}
     \caption{Comparaison des travaux et plateformes proches}\label{tab:travaux-proches-ch2}\\
@@ -322,7 +324,13 @@ SWE-agent évalue l'effet d'une interface agent--ordinateur sur la résolution d
 \end{longtable}
 \normalsize
 
+Le tableau met en évidence des approches complémentaires. Les outils déterministes tels qu'OpenRewrite ou Angular CLI offrent une forte reproductibilité pour des transformations connues, mais ne couvrent pas seuls l'analyse contextuelle, la gouvernance ou la réparation complexe. Les solutions de modernisation assistées par IA ajoutent une capacité d'interprétation et de génération, mais leur périmètre, leur niveau d'autonomie et leurs mécanismes de contrôle varient. Les frameworks d'orchestration comme AutoGen ou LangGraph fournissent quant à eux des mécanismes de coordination, sans définir la sémantique métier d'une migration ni les critères techniques de validation.
+
+La Migration Factory reprend donc plusieurs principes sans chercher à reproduire une solution existante : \textbf{exécution déterministe} pour les opérations vérifiables, \textbf{agents spécialisés} pour le raisonnement contextualisé, \textbf{orchestration persistante} pour l'ordre et les reprises, et \textbf{supervision humaine} pour les décisions sensibles. Son positionnement repose ainsi sur l'assemblage gouverné de capacités que le corpus traite souvent séparément.
+
 \subsection{Carte de positionnement}
+
+La carte de positionnement regroupe les solutions étudiées par \textbf{famille de contribution} plutôt que par technologie ou éditeur. Elle permet de visualiser les écosystèmes intellectuels et techniques auxquels se rattache la solution : transformation déterministe, assistance intelligente et réparation, orchestration multi-agents, ainsi que standards de communication et d'interaction.
 
 \begin{figure}[H]
     \centering
@@ -351,6 +359,10 @@ SWE-agent évalue l'effet d'une interface agent--ordinateur sur la résolution d
     \caption{Regroupement des approches, plateformes et standards étudiés}
     \label{fig:mindmap-etat-art-ch2}
 \end{figure}
+
+Ces quatre familles ne constituent pas des écosystèmes concurrents au sens strict. La \textbf{migration déterministe} apporte des règles répétables et des outils proches du code ; l'\textbf{assistance et la réparation intelligentes} apportent une capacité d'adaptation lorsque les règles préétablies sont insuffisantes ; l'\textbf{orchestration multi-agents} fournit des structures pour spécialiser les rôles, partager un état et coordonner plusieurs raisonnements ; enfin, les \textbf{standards et protocoles} fournissent des principes de communication, de responsabilité et d'interopérabilité.
+
+La réflexion menée dans ce projet consiste précisément à ne pas remplacer un de ces écosystèmes par un autre. Une migration industrielle nécessite à la fois des transformations reproductibles, une adaptation au contexte applicatif, une coordination explicite et des mécanismes de contrôle. La conception retenue cherche donc à faire coopérer ces familles tout en maintenant une frontière nette entre ce qui relève du raisonnement probabiliste et ce qui doit rester déterministe et vérifiable.
 
 % ============================================================
 \section{Positionnement de la Migration Factory}
