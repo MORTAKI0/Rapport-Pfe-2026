@@ -50,11 +50,9 @@ Une architecture de cette nature ne peut pas être comprise à partir d'un seul 
 
 Le choix du modèle SMA résulte des contraintes identifiées précédemment plutôt que d'une préférence pour une architecture multi-agents en elle-même. Trois alternatives ont été écartées comme modèle principal : un agent unique concentrant analyse, transformation et exécution ; une chorégraphie entièrement distribuée où chaque composant ferait progresser le workflow localement ; et une automatisation exclusivement déterministe, insuffisante pour certaines analyses contextuelles. Le modèle retenu cherche donc un compromis entre spécialisation du raisonnement, contrôle central de la progression et exécution vérifiable.
 
-\subsection{Architecture hybride et centralement orchestrée}
+La Migration Factory adopte ainsi une architecture \textbf{hybride, spécialisée et centralement orchestrée}. Elle est hybride parce qu'elle associe agents fondés sur des LLM, services déterministes, outils externes et supervision humaine. Elle est spécialisée parce que chaque agent possède un objectif limité. Elle est centralement orchestrée parce que la progression dépend d'un état persistant et de transitions contrôlées.
 
-La Migration Factory adopte une architecture \textbf{hybride, spécialisée et centralement orchestrée}. Elle est hybride parce qu'elle associe agents fondés sur des LLM, services déterministes, outils externes et supervision humaine. Elle est spécialisée parce que chaque agent possède un objectif limité. Elle est centralement orchestrée parce que la progression dépend d'un état persistant et de transitions contrôlées.
-
-Ce choix répond à quatre contraintes :
+Ce choix répond à quatre contraintes principales :
 
 \begin{itemize}
     \item l'ordre des étapes de migration ne peut pas dépendre d'une conversation libre ;
@@ -88,9 +86,15 @@ Ce choix répond à quatre contraintes :
     \label{fig:modele-sma-ch3}
 \end{figure}
 
-\subsection{Deux dépôts spécialisés}
+Cette architecture commune est ensuite \textbf{déclinée dans deux dépôts spécialisés}, l'un pour Java/Spring Boot et l'autre pour Angular. Ce choix ne vise pas à dupliquer arbitrairement la solution ; il répond à la différence structurelle entre les deux écosystèmes.
 
-Le modèle est décliné dans deux systèmes indépendants. Java/Spring Boot utilise JDK, Maven, \texttt{pom.xml} et OpenRewrite. Angular utilise Node.js, npm, Angular CLI, \texttt{package.json} et TypeScript. Les principes de gouvernance sont partagés, mais ni les services d'exécution ni les agents spécialisés ne sont imposés comme une base de code commune.
+La première différence concerne les \textbf{runtimes et chaînes d'outils}. Java/Spring Boot s'appuie sur des JDK, Maven, \texttt{pom.xml}, des plugins Maven et des transformations telles qu'OpenRewrite. Angular dépend de Node.js, npm, Angular CLI, \texttt{package.json}, TypeScript et RxJS. Leurs mécanismes de résolution des dépendances, leurs commandes et leurs matrices de compatibilité ne sont donc pas interchangeables.
+
+La deuxième différence concerne le \textbf{cycle de validation}. Une étape Java est principalement qualifiée par le profil JDK/Maven, la compilation et les tests Maven. Une étape Angular doit également résoudre une combinaison compatible Angular--Node.js--npm--TypeScript, effectuer une installation reproductible des dépendances, construire l'application et exécuter les tests disponibles. Les causes d'échec, les journaux utiles et les stratégies de réparation ne sont par conséquent pas identiques.
+
+Enfin, conserver deux dépôts limite le \textbf{couplage conditionnel} dans l'orchestrateur et les services d'exécution. Une modification du catalogue Node.js ou d'une stratégie npm ne doit pas imposer une régression au moteur Maven, et inversement. Cette séparation réduit le rayon d'impact des changements, facilite les tests propres à chaque écosystème et autorise des rythmes d'évolution indépendants.
+
+Les deux systèmes partagent néanmoins la même \textbf{architecture de référence} : spécialisation des agents, orchestration persistante, services déterministes responsables de l'exécution, espaces de travail isolés, preuves liées aux états et décisions humaines sur les opérations sensibles. La généralisation recherchée porte donc sur ces principes et contrats de gouvernance, et non sur l'imposition d'une base de code d'exécution unique.
 
 % ============================================================
 \section{Agents et services déterministes}
