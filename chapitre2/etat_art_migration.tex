@@ -244,7 +244,37 @@ Angular associe Angular CLI, Node.js, npm, TypeScript et RxJS. La documentation 
 
 \subsection{Processus manuel de référence}
 
-Dans le processus traditionnel, le développeur analyse le projet, consulte les guides, modifie manifestes et code, exécute les commandes, lit les journaux et recommence. L'état, les preuves et les décisions restent dispersés, ce qui limite la reproductibilité et le suivi de plusieurs migrations.
+Avant d'introduire les outils et plateformes étudiés, il est utile de représenter le fonctionnement d'une migration conduite principalement de manière manuelle. Le développeur alterne entre compréhension du projet, consultation de documentation, modification du code et des manifestes, exécution des outils, lecture des erreurs et nouvelle correction. Ce cycle se répète jusqu'à l'obtention d'un état jugé acceptable.
+
+\begin{figure}[H]
+    \centering
+    \resizebox{0.97\textwidth}{!}{%
+    \begin{tikzpicture}[
+        step/.style={draw=cgiblue,rounded corners=3pt,fill=cgilight!55,text width=3.0cm,minimum height=1.05cm,align=center,font=\small\bfseries},
+        risk/.style={draw=cgired,rounded corners=3pt,fill=white,text width=3.0cm,minimum height=1.05cm,align=center,font=\small\bfseries},
+        arr/.style={-{Latex[length=2mm]},thick,draw=cgigray}
+    ]
+        \node[step] (analyse) {Analyser le projet};
+        \node[step,right=0.45cm of analyse] (guides) {Consulter guides et documentation};
+        \node[step,right=0.45cm of guides] (modify) {Modifier manifestes et code};
+        \node[step,right=0.45cm of modify] (commands) {Exécuter les commandes};
+        \node[risk,below=1.05cm of commands] (logs) {Lire journaux et erreurs};
+        \node[step,left=0.45cm of logs] (diagnose) {Diagnostiquer et corriger};
+        \draw[arr] (analyse)--(guides);
+        \draw[arr] (guides)--(modify);
+        \draw[arr] (modify)--(commands);
+        \draw[arr] (commands)--(logs);
+        \draw[arr] (logs)--(diagnose);
+        \draw[arr,rounded corners=5pt] (diagnose.west)--++(-0.7,0)|-(analyse.south);
+    \end{tikzpicture}%
+    }
+    \caption{Boucle typique d'une migration conduite manuellement}
+    \label{fig:processus-manuel-reference-ch2}
+\end{figure}
+
+La difficulté ne réside pas uniquement dans la répétition des opérations. Dans un processus peu instrumenté, l'\textbf{état de progression} peut être réparti entre le terminal, les notes du développeur, les branches Git et les tickets ; les \textbf{preuves techniques} restent dissociées des décisions qui en découlent ; et les raisons d'une correction ne sont pas toujours rattachées à la commande ou à l'erreur qui l'a motivée.
+
+Cette dispersion a plusieurs conséquences. Elle réduit la \textbf{reproductibilité}, car un autre développeur doit reconstruire la séquence exacte des versions, commandes et modifications. Elle limite l'\textbf{auditabilité}, puisqu'il devient difficile d'établir pourquoi une décision a été prise et sur quelle preuve. Elle complique également la \textbf{reprise} après interruption, le transfert du travail entre intervenants et le \textbf{pilotage de plusieurs migrations en parallèle}, faute d'un état consolidé et comparable. Ces limites motivent, dans la Migration Factory, la persistance des états, événements, preuves et décisions ainsi que leur rattachement à une migration identifiée.
 
 \subsection{Corpus étudié}
 
