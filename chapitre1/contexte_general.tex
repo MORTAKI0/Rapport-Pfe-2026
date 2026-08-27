@@ -328,9 +328,64 @@ Le projet a été conduit selon une démarche Agile inspirée de Scrum, avec des
 
 Le cycle de travail associe backlog, sélection d'un périmètre, conception, implémentation, tests, démonstration et adaptation. Les présentations réalisées devant les parties prenantes sont qualifiées dans ce rapport de \textbf{jalons de démonstration et de validation}. Elles ne sont assimilées à une Sprint Review que lorsque l'équipe et les parties prenantes ont effectivement inspecté le résultat et ajusté la suite du backlog.
 
-\subsection{Planification rétrospective}
+\subsection{Planification prévisionnelle et rétrospective}
 
-Le diagramme de Gantt est rétrospectif : il décrit l'évolution réellement observée ou, pour les éléments futurs, les objectifs explicitement planifiés. Cette représentation macroscopique est compatible avec une conduite itérative ; ISO 21502 reconnaît les approches prédictives, incrémentales, itératives, adaptatives et hybrides, y compris les approches agiles \cite{iso21502}.
+La conduite Agile du projet n'empêche pas de représenter les grandes périodes de travail et les jalons attendus. Deux vues sont distinguées ci-dessous. La première est une \textbf{reconstitution prévisionnelle} construite à partir des jalons initialement fixés et des grandes phases documentées dans le backlog ; aucun diagramme de Gantt prévisionnel original n'a été retrouvé parmi les artefacts de suivi consultés. La seconde est une vue \textbf{rétrospective}, qui décrit l'enchaînement effectivement observé et les objectifs encore planifiés à la date de référence du rapport. Cette distinction évite de présenter a posteriori le déroulement réel comme s'il avait été entièrement prévu dès le départ.
+
+\paragraph{Planification prévisionnelle reconstituée.}
+La vue suivante représente le cadrage macroscopique attendu : valider d'abord la faisabilité Java, consolider progressivement la plateforme, puis adapter les mêmes principes à Angular avant les jalons de septembre.
+
+\scriptsize
+\begin{table}[H]
+    \centering
+    \arrayrulecolor{cgigray}
+    \begin{tabularx}{\textwidth}{|>{\RaggedRight\arraybackslash}p{4.9cm}|c|c|c|c|c|>{\RaggedRight\arraybackslash}X|}
+        \hline
+        \rowcolor{cgilight!95}
+        \textbf{Activité ou jalon prévu} & \textbf{Mai} & \textbf{Juin} & \textbf{Juil.} & \textbf{Août} & \textbf{Sept.} & \textbf{Nature} \\
+        \hline
+        Cadrage, analyse et preuve de concept Java & \cellcolor{cgiblue!50} & & & & & Phase Java \\
+        \hline
+        Première démonstration Java & \cellcolor{cgired!25}\textbf{◆} & & & & & Jalon \\
+        \hline
+        Stabilisation du pipeline Java et validation élargie & \cellcolor{cgiblue!35} & \cellcolor{cgiblue!50} & & & & Phase Java \\
+        \hline
+        Passage à une plateforme backend/frontend et démonstration & & \cellcolor{cgiblue!50} & & & & Phase Java / jalon \\
+        \hline
+        Consolidation de la V1 Java, réparation et amélioration LLM & & \cellcolor{cgiblue!35} & \cellcolor{cgiblue!50} & \cellcolor{cgiblue!50} & \cellcolor{cgiblue!25} & Phase Java \\
+        \hline
+        Étude puis premier périmètre Angular 18--21 & & & \cellcolor{emsigreen!35} & \cellcolor{emsigreen!35} & & Phase Angular \\
+        \hline
+        Première démonstration Angular & & & & \cellcolor{cgired!25}\textbf{◆} & & Jalon \\
+        \hline
+        Extension progressive Angular 11--21 & & & & \cellcolor{emsigreen!25} & \cellcolor{emsigreen!35} & Phase Angular \\
+        \hline
+        Jalons Java V1 et Angular 11--21 & & & & & \cellcolor{cgired!25}\textbf{◆} & Jalon \\
+        \hline
+        Rédaction et validation du rapport & & & \cellcolor{cgigray!20} & \cellcolor{cgigray!30} & \cellcolor{cgigray!20} & Documentation \\
+        \hline
+    \end{tabularx}
+    \caption{Diagramme de Gantt prévisionnel reconstitué du projet Migration Factory}
+    \label{tab:gantt-previsionnel-ch1}
+    \arrayrulecolor{black}
+\end{table}
+\normalsize
+
+\begin{center}
+\begin{tikzpicture}[font=\scriptsize,baseline]
+    \draw[fill=cgiblue!45,draw=cgigray] (0,0) rectangle (0.45,0.28);
+    \node[anchor=west] at (0.55,0.14) {Activités Java};
+    \draw[fill=emsigreen!30,draw=cgigray] (3.35,0) rectangle (3.80,0.28);
+    \node[anchor=west] at (3.90,0.14) {Activités Angular};
+    \draw[fill=cgigray!25,draw=cgigray] (7.15,0) rectangle (7.60,0.28);
+    \node[anchor=west] at (7.70,0.14) {Rédaction};
+    \draw[fill=cgired!25,draw=cgigray] (9.65,0) rectangle (10.10,0.28);
+    \node[anchor=west] at (10.20,0.14) {◆ Jalon};
+\end{tikzpicture}
+\end{center}
+
+\paragraph{Planification rétrospective.}
+Le diagramme suivant décrit l'évolution réellement observée ou, pour les éléments encore futurs à la date de référence du rapport, les objectifs explicitement planifiés. Cette représentation macroscopique est compatible avec une conduite itérative ; ISO 21502 reconnaît les approches prédictives, incrémentales, itératives, adaptatives et hybrides, y compris les approches agiles \cite{iso21502}.
 
 \scriptsize
 \begin{table}[H]
@@ -374,7 +429,18 @@ Le diagramme de Gantt est rétrospectif : il décrit l'évolution réellement ob
 \end{table}
 \normalsize
 
-La légende du tableau est la suivante : les cellules bleues représentent les activités Java, les cellules vertes les activités Angular, les cellules grises la rédaction, et le symbole \textbf{◆} un jalon de démonstration.
+\begin{center}
+\begin{tikzpicture}[font=\scriptsize,baseline]
+    \draw[fill=cgiblue!45,draw=cgigray] (0,0) rectangle (0.45,0.28);
+    \node[anchor=west] at (0.55,0.14) {Activités Java};
+    \draw[fill=emsigreen!30,draw=cgigray] (3.35,0) rectangle (3.80,0.28);
+    \node[anchor=west] at (3.90,0.14) {Activités Angular};
+    \draw[fill=cgigray!25,draw=cgigray] (7.15,0) rectangle (7.60,0.28);
+    \node[anchor=west] at (7.70,0.14) {Rédaction};
+    \draw[fill=cgired!25,draw=cgigray] (9.65,0) rectangle (10.10,0.28);
+    \node[anchor=west] at (10.20,0.14) {◆ Jalon};
+\end{tikzpicture}
+\end{center}
 
 \subsection{Itérations, incréments et jalons de validation}
 
