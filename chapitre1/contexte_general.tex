@@ -303,17 +303,19 @@ L'objectif général consiste à concevoir, implémenter et évaluer une archite
 
 \subsection{Objectifs spécifiques}
 
+Afin d'atteindre l'objectif général, les objectifs spécifiques sont formulés comme des résultats que le projet doit produire ou rendre possibles. Ils sont présentés dans l'ordre logique de construction de la solution :
+
 \begin{itemize}
-    \item identifier les agents nécessaires et distinguer les services déterministes ;
-    \item définir objectifs, entrées, sorties, autonomie et limites d'autorité ;
-    \item concevoir une architecture SMA hybride et centralement orchestrée ;
-    \item formaliser les contrats de communication et les artefacts échangés ;
-    \item gérer états, interruptions, reprises et replanifications ;
-    \item intégrer les outils propres à Java/Spring Boot et Angular ;
-    \item construire une boucle de réparation gouvernée ;
-    \item fournir un cockpit de supervision ;
-    \item évaluer le processus à partir de preuves, de tests, de démonstrations et de métriques disponibles ;
-    \item préparer l'extension à d'autres versions et écosystèmes.
+    \item Identifier les rôles agentiques nécessaires et distinguer les responsabilités qui doivent rester confiées aux services déterministes ;
+    \item Définir, pour chaque agent, son objectif, ses entrées, ses traitements, ses sorties, son niveau d'autonomie et ses limites d'autorité ;
+    \item Concevoir une architecture SMA hybride, spécialisée et centralement orchestrée, compatible avec une supervision humaine ;
+    \item Formaliser les contrats de communication, les artefacts échangés et les règles de traçabilité entre agents, orchestrateur et services ;
+    \item Définir les mécanismes de gestion du cycle de vie d'une migration, notamment les états, transitions, interruptions, reprises et replanifications ;
+    \item Implémenter l'architecture SMA dans les écosystèmes Java/Spring Boot et Angular en respectant les contraintes propres à leurs runtimes et outils ;
+    \item Mettre en œuvre une boucle de réparation gouvernée intégrant proposition, révision, décision humaine, application contrôlée et revalidation ;
+    \item Mettre en place un cockpit de supervision permettant de suivre les étapes, les preuves, les blocages, les décisions et les actions autorisées ;
+    \item Valider le fonctionnement de la solution à partir de tests, de scénarios de migration, de démonstrations et des métriques effectivement disponibles ;
+    \item Préparer l'extensibilité de la Migration Factory vers de nouvelles versions, de nouveaux profils de migration et d'autres écosystèmes.
 \end{itemize}
 
 % ============================================================
