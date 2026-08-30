@@ -43,6 +43,8 @@ Le routeur sélectionne le déploiement correspondant au rôle demandé. Les tes
 
 \subsection{Chaîne d'appel et contrôle préalable}
 
+Après avoir défini les paramètres externalisés et le routage par rôle, il convient de préciser comment une requête traverse effectivement le backend. La chaîne suivante met en évidence les contrôles appliqués avant l'appel au modèle, la sélection du déploiement correspondant au rôle demandé, puis la validation de la réponse avant sa restitution au reste du système. Elle relie ainsi la configuration décrite précédemment aux mécanismes de sûreté et de traçabilité de l'exécution.
+
 \begin{figure}[H]
     \centering
     \resizebox{0.96\textwidth}{!}{%
