@@ -600,7 +600,11 @@ Le cockpit présente le résumé, le pipeline, le stage sélectionné, l'analyse
 Ces emplacements rendent explicites les preuves visuelles encore à fournir. Aucune capture fictive n'est présentée comme résultat.
 
 % ============================================================
-\section{Authentification, sécurité et limites d'exploitation}
+\section{Robustesse, sécurité et validation technique}
+
+Après avoir présenté l'exécution fonctionnelle du système, il reste à examiner les conditions qui influencent sa robustesse et son aptitude à être industrialisé. Cette partie regroupe les mécanismes de sécurité déjà présents, les difficultés techniques rencontrées et les preuves de validation disponibles, afin de distinguer clairement les protections implémentées des limites encore ouvertes.
+
+\subsection{Authentification, sécurité et limites d'exploitation}
 % ============================================================
 
 Les prototypes ne comportent pas d'authentification, de comptes ou de contrôle d'accès par rôle. Le système Java limite l'API au poste local, contrôle l'origine de requêtes mutatives et utilise un identifiant client statique ; ces mécanismes ne constituent pas une identité fiable.
@@ -610,7 +614,7 @@ Une industrialisation devra ajouter authentification forte, rôles, autorisation
 Les contextes LLM sont bornés et nettoyés. La rédaction demeure fondée sur des règles et ne garantit pas la détection de toute valeur sensible intégrée arbitrairement dans le code.
 
 % ============================================================
-\section{Difficultés techniques et corrections}
+\subsection{Difficultés techniques et corrections}
 % ============================================================
 
 \begin{table}[H]
@@ -641,7 +645,7 @@ Les contextes LLM sont bornés et nettoyés. La rédaction demeure fondée sur d
 \end{table}
 
 % ============================================================
-\section{Preuves techniques disponibles}
+\subsection{Preuves techniques disponibles}
 % ============================================================
 
 Une campagne d'intégration Java liée au nouveau frontend et à l'assistant a produit 607 tests backend réussis et 4 ignorés. La vérification statique des types, l'analyse de conformité et la construction du frontend ont réussi. Les tests frontend comportaient 12 échecs au baseline et 11 après intégration ; cette comparaison a été utilisée pour distinguer les défauts préexistants d'une régression introduite.
