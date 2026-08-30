@@ -328,6 +328,8 @@ L'impact principal de ces résultats concerne donc l'\textbf{industrialisation}.
 
 % ============================================================
 \section{Comparaison avec le processus manuel}
+
+La comparaison avec le processus manuel vise à évaluer la valeur opérationnelle de la Factory à partir d'un même enchaînement de tâches : préparer l'environnement, déterminer la trajectoire, exécuter les transformations, diagnostiquer les échecs, corriger puis revalider. L'enjeu n'est pas d'opposer une automatisation complète à un travail humain, puisque le développeur conserve un rôle de décision dans la solution proposée. Il s'agit plutôt d'identifier quelles opérations restent entièrement manuelles dans une migration classique, lesquelles sont structurées ou automatisées par la Factory, et comment cette transformation modifie la traçabilité, la reproductibilité et le risque d'erreur.
 % ============================================================
 
 \begin{table}[H]
@@ -360,6 +362,29 @@ L'impact principal de ces résultats concerne donc l'\textbf{industrialisation}.
     \rowcolors{2}{white}{white}
     \arrayrulecolor{black}
 \end{table}
+
+Le tableau montre que la différence principale ne réside pas uniquement dans le nombre de commandes exécutées automatiquement. Elle concerne surtout la manière dont ces commandes sont replacées dans un processus explicite. Dans une migration manuelle, la trajectoire peut être reconstruite à partir de notes, de tickets, de l'historique du terminal et de l'expérience du développeur. Avec la Factory, la trajectoire devient un objet du système : elle est découpée en stages, associée à des préconditions et reliée à des validations. Cette formalisation rend l'avancement plus lisible et réduit la dépendance à la mémoire individuelle.
+
+La même différence apparaît dans la gestion des échecs. Lorsqu'une commande échoue manuellement, le développeur doit identifier le contexte pertinent, relire les journaux, rechercher la cause probable, modifier l'environnement ou le code puis relancer les vérifications. La Factory ne supprime pas ce raisonnement, mais elle cherche à préparer automatiquement le contexte nécessaire : commande exécutée, code de sortie, journaux, stage, profil de runtime, fichiers concernés et état de la migration. Les agents peuvent ensuite exploiter ce contexte pour proposer une interprétation ou un correctif, tandis que les services déterministes conservent l'autorité sur l'application et la revalidation.
+
+\paragraph{Illustration par un cas Angular réel.}
+
+Un cas observé pendant la mise en œuvre Angular illustre cette différence. La migration progressive devait enchaîner plusieurs versions majeures avec, pour chaque stage, une combinaison compatible d'Angular, Node.js, npm et TypeScript. Lors d'un essai, le runtime disponible sur la machine utilisait Node.js~22.23.1 et npm~10.9.8, alors que le catalogue initial du premier stage ne reconnaissait qu'une combinaison plus ancienne. Le problème n'était donc pas directement une erreur dans le code de l'application : le workflow était bloqué avant la transformation parce que le runtime ne satisfaisait pas les conditions de qualification définies par la Factory.
+
+Dans une approche manuelle, le développeur aurait dû constater l'échec, revenir aux messages de la commande, consulter la matrice de compatibilité Angular, comparer les versions de Node.js et npm disponibles sur la machine, décider s'il fallait changer de runtime ou adapter la stratégie de migration, puis relancer les commandes. Cette démarche est réalisable, mais les décisions intermédiaires restent souvent réparties entre le terminal, la documentation consultée et les notes du développeur. Si le même problème se reproduit sur une autre application, une partie de l'analyse doit être reconstruite.
+
+Dans la Factory, ce blocage est traité comme un problème de qualification. Le stage ne progresse pas tant qu'aucun profil compatible n'est identifié. L'état bloqué est persisté avec les informations nécessaires au diagnostic ; la source n'est pas modifiée et aucune transformation n'est exécutée prématurément. La correction introduite a consisté à versionner le catalogue de compatibilité et à y enregistrer explicitement la paire de runtime validée. Le bénéfice ne réside donc pas seulement dans la résolution de cet incident : la connaissance obtenue devient réutilisable pour les exécutions suivantes et la décision peut être reliée à une configuration précise.
+
+Un second enseignement est apparu plus tard dans la même trajectoire. Une exécution a réussi à sceller les stages allant d'Angular~11 à Angular~16. Le passage 16 vers 17 a ensuite exécuté les commandes de migration, mais le stage n'a pas obtenu son état de validation final. Une lecture superficielle du terminal aurait pu conduire à considérer la commande comme réussie. La Factory distingue au contraire l'exécution locale d'une commande de la validation globale du stage. Tant que les critères de sortie ne sont pas satisfaits et que le checkpoint n'est pas scellé, la migration n'est pas autorisée à présenter cette transition comme acquise.
+
+Cette distinction a un impact direct sur la \textbf{reproductibilité}. Le résultat d'une migration ne dépend plus uniquement du fait qu'une série de commandes ait terminé avec un code de sortie favorable ; il dépend également du profil utilisé, de l'état de l'espace de travail et des validations associées. En conservant ces informations, la Factory rend possible une analyse a posteriori plus fiable et facilite la comparaison entre deux exécutions.
+
+L'impact sur la \textbf{traçabilité} est également important. Dans le processus manuel, le lien entre un échec, la décision prise pour le corriger et le résultat du nouvel essai peut être implicite. Dans la Factory, l'objectif est que ces éléments soient rattachés au même stage et à la même exécution. Cette organisation ne garantit pas qu'un diagnostic agentique soit toujours correct, mais elle réduit le risque qu'une proposition soit appliquée hors contexte ou qu'une décision soit évaluée sur une version différente de l'artefact concerné.
+
+Enfin, la comparaison met en évidence un déplacement du rôle du développeur. Dans le processus manuel, une part importante du temps est consacrée à l'enchaînement des commandes, à la collecte d'informations et à la reconstruction de l'état. Dans la Factory, ces opérations sont davantage structurées par le système ; l'intervention humaine se concentre sur la validation des choix sensibles, l'examen des propositions et les situations qui dépassent les règles disponibles. Ce déplacement correspond à l'objectif du projet : assister le développeur dans la migration sans lui retirer l'autorité sur les décisions importantes.
+
+Cette analyse reste qualitative. Elle ne permet pas encore d'affirmer qu'une migration réalisée avec la Factory est, par exemple, deux fois plus rapide qu'une migration manuelle. Une telle conclusion exigerait un protocole contrôlé, plusieurs applications comparables, des répétitions et une mesure précise du temps actif du développeur. En revanche, le cas Angular montre déjà de manière concrète que la Factory transforme une succession d'actions techniques en un processus persistant, explicite et réutilisable, ce qui constitue l'apport principal recherché avant même la mesure d'un gain temporel.
+
 
 Cette comparaison exprime les capacités du système ; elle ne remplace pas une expérience chronométrée sur deux groupes comparables. Une telle étude reste à réaliser avant de quantifier un gain de productivité.
 
