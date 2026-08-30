@@ -1,11 +1,11 @@
-\chapter{Évaluation, démonstrations, résultats et perspectives}
+\chapter{Évaluation, démonstrations et résultats}
 
 \section*{Introduction}
 \addcontentsline{toc}{section}{Introduction}
 
 Les chapitres précédents ont présenté les besoins, l'état de l'art, la conception multi-agents et l'implémentation des deux systèmes. Le présent chapitre évalue les résultats disponibles sans confondre preuve observée, validation par démonstration, appréciation qualitative et mesure encore absente.
 
-Le cadre d'évaluation s'inspire d'ISO/IEC 25010, qui propose neuf caractéristiques pour spécifier et évaluer la qualité d'un produit logiciel \cite{iso25010}. Les aspects liés aux modèles génératifs sont également examinés selon une logique de maîtrise des risques cohérente avec le NIST AI RMF et son profil consacré à l'IA générative \cite{nist-airmf,nist-genai}. L'état présenté est arrêté au \textbf{6 août 2026}.
+Le cadre d'évaluation s'inspire d'ISO/IEC 25010, qui propose neuf caractéristiques pour spécifier et évaluer la qualité d'un produit logiciel \cite{iso25010}. Les aspects liés aux modèles génératifs sont également examinés selon une logique de maîtrise des risques cohérente avec le NIST AI RMF et son profil consacré à l'IA générative \cite{nist-airmf,nist-genai}. L'état présenté est mis à jour au \textbf{30 août 2026}. Les résultats techniques sont rapportés selon les preuves effectivement disponibles ; un jalon planifié n'est pas assimilé à un résultat lorsqu'aucun élément de validation correspondant n'est intégré au rapport.
 
 % ============================================================
 \section{Objectifs et protocole d'évaluation}
@@ -112,7 +112,7 @@ Les démonstrations ont joué un double rôle : vérifier qu'un scénario pouvai
     \hline
     Java J3 & 19 juin 2026 & Responsables et directeurs CGI & Control Tower full stack : backend, frontend, cockpit, persistance et chatbot. & Réalisé ; passage à une plateforme intégrée. \\
     \hline
-    Angular A1 & 11 août 2026 & Parties prenantes CGI & Première version d'avancement Angular 18 vers 21. & Planifié à la date de référence. \\
+    Angular A1 & 11 août 2026 & Parties prenantes CGI & Première version d'avancement Angular 18 vers 21. & Jalon prévu au planning initial ; non utilisé ici comme preuve technique. \\
     \hline
     Java J4 & Septembre 2026 & Public à confirmer & V1 Java : nouveau frontend, réparation gouvernée et agents LLM améliorés. & Planifié. \\
     \hline
@@ -454,6 +454,6 @@ Ces limites empêchent d'annoncer un pourcentage global de gain de temps ou de r
 \section*{Conclusion}
 \addcontentsline{toc}{section}{Conclusion}
 
-L'évaluation montre que la déclinaison Java valide les principaux mécanismes de gouvernance, d'isolation, de réparation et de traçabilité. Les trois démonstrations Java réalisées matérialisent le passage d'un prototype CLI à une plateforme full stack. Angular confirme la capacité du modèle à s'adapter à un second écosystème, mais sa première démonstration, son parcours complet et ses métriques restent à consolider.
+L'évaluation montre que la déclinaison Java valide les principaux mécanismes de gouvernance, d'isolation, de réparation et de traçabilité. Les trois démonstrations Java réalisées matérialisent le passage d'un prototype CLI à une plateforme full stack. Côté Angular, les preuves techniques intégrées au rapport confirment une progression scellée jusqu'à Angular~16 ; le passage 16 vers 17 reste non scellé dans la dernière exécution documentée, et le parcours complet 11 vers 21 ne peut donc pas encore être présenté comme validé.
 
 Le principal apport du projet est une organisation contrôlée des agents et des outils, plutôt qu'une autonomie totale. Les preuves disponibles sont encourageantes, mais elles ne permettent pas encore de quantifier un gain global. Une campagne expérimentale plus large, reproductible et instrumentée constitue la prochaine étape nécessaire à l'industrialisation.
