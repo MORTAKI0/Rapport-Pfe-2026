@@ -5,7 +5,7 @@
 
 Le chapitre précédent a défini le modèle multi-agents, les responsabilités et les limites d'autorité. Le présent chapitre décrit la mise en œuvre concrète des deux systèmes de la Migration Factory : environnement technique, évolution du prototype Java, organisation des dépôts, agents, orchestrateur, backend, persistance, interface, sécurité et difficultés rencontrées.
 
-Les deux déclinaisons ne possèdent pas le même niveau de maturité. Java/Spring Boot constitue la référence la plus avancée, avec un processus complet, une réparation gouvernée, un assistant et un reporting. Angular est en développement actif : les agents principaux sont implémentés et l'intégration du parcours de bout en bout est en cours. Le texte distingue donc les fonctionnalités validées, partielles et planifiées.
+Les deux déclinaisons ne possèdent pas le même niveau de maturité. Java/Spring Boot constitue la référence la plus avancée, avec un processus complet, une réparation gouvernée, un assistant et un reporting. Angular est en développement actif : les agents principaux sont implémentés et la trajectoire progressive 11--21 est engagée, avec des stages scellés jusqu'à Angular~16 dans la dernière preuve technique intégrée au rapport. Le texte distingue donc les fonctionnalités validées, partielles et encore à consolider.
 
 % ============================================================
 \section{Environnement technique}
@@ -652,7 +652,7 @@ Une campagne d'intégration Java liée au nouveau frontend et à l'assistant a p
 
 Ces valeurs ne représentent pas un benchmark global de la Migration Factory. Elles constituent une preuve ponctuelle d'intégration. Les scénarios Maven réels restent principalement exécutés manuellement ou en recette utilisateur.
 
-Pour Angular, une migration manuelle d'Angular 18 vers 20 a été réalisée afin de comprendre les transformations. Les agents d'analyse, de révision, de planification et de transformation sont développés. Le processus complet et ses métriques quantitatives restent en cours de validation.
+Pour Angular, une migration manuelle d'Angular 18 vers 20 a d'abord été réalisée afin de comprendre les transformations, puis la Factory a été étendue à une trajectoire 11--21. Les agents d'analyse, de révision, de planification et de transformation sont développés. Les preuves techniques retenues établissent des stages scellés jusqu'à Angular~16 ; le passage 16 vers 17 reste non scellé et le processus complet jusqu'à Angular~21 demeure en validation.
 
 Aucun des deux prototypes ne dispose actuellement d'une chaîne CI commune dans le dépôt du produit. Il n'existe pas non plus de politique globale unique de lint couvrant toutes les couches. Ces limites sont reprises au Chapitre V.
 
@@ -661,4 +661,4 @@ Aucun des deux prototypes ne dispose actuellement d'une chaîne CI commune dans 
 
 Ce chapitre a décrit l'implémentation en distinguant les agents intelligents des services déterministes. Il a également montré que l'architecture actuelle résulte d'une évolution progressive : prototype CLI, consolidation, passage à la Control Tower full stack et préparation d'une V1 gouvernée.
 
-Les fiches uniformes précisent les entrées, traitements, sorties, exemples, autorités et limites. Les contrats simplifiés, les preuves d'intégration et les difficultés techniques renforcent le caractère concret de la réalisation. Le chapitre suivant formalise les démonstrations réalisées ou planifiées et évalue les résultats disponibles, la qualité du système, les limites de mesure et les perspectives.
+Les fiches uniformes précisent les entrées, traitements, sorties, exemples, autorités et limites. Les contrats simplifiés, les preuves d'intégration et les difficultés techniques renforcent le caractère concret de la réalisation. Le chapitre suivant formalise les démonstrations et preuves retenues, puis évalue les résultats disponibles, la qualité du système, la comparaison avec le processus manuel et les limites de mesure.
