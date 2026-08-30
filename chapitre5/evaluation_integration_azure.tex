@@ -1,40 +1,4 @@
-% ============================================================
-\section{Évaluation de l'intégration Azure OpenAI}
-% ============================================================
-
-L'intégration Azure doit être évaluée séparément de la qualité fonctionnelle des agents. Un modèle peut produire une sortie correcte alors que la configuration du fournisseur reste fragile, et inversement. Les critères portent donc sur la configurabilité, la disponibilité, la confidentialité, la traçabilité et la résilience.
-
-\begin{table}[H]
-    \centering
-    \scriptsize
-    \arrayrulecolor{cgigray}
-    \rowcolors{2}{cgilight!55}{white}
-    \begin{tabularx}{\textwidth}{|>{\bfseries\RaggedRight\arraybackslash}p{3cm}|>{\RaggedRight\arraybackslash}p{4.5cm}|>{\RaggedRight\arraybackslash}p{4.5cm}|>{\RaggedRight\arraybackslash}X|}
-        \hline
-        \rowcolor{cgilight!95}
-        \textbf{Dimension} & \textbf{Preuve attendue} & \textbf{État observé en Java} & \textbf{Validation restante} \\
-        \hline
-        Configurabilité & Changer un déploiement sans modification du code. & Déploiements par rôle lus depuis l'environnement et couverts par des tests de routage. & Tester plusieurs ressources et configurations client. \\
-        \hline
-        Disponibilité & Détecter endpoint, authentification ou déploiement manquant. & Contrôle préalable réel et états d'échec explicites. & Ajouter supervision continue et seuils d'alerte. \\
-        \hline
-        Confidentialité & Absence de secrets dans l'interface, les DTO et les résumés publics. & Projection limitée aux références, indicateurs et états ; fonctions de redaction présentes. & Audit de sécurité dédié et tests sur des secrets non standards. \\
-        \hline
-        Traçabilité & Conserver rôle, statut, déploiement utilisé et identifiant de diagnostic. & Métadonnées d'invocation et identifiants Azure prévus par le client. & Consolider la restitution dans le rapport final. \\
-        \hline
-        Résilience & Comportement contrôlé en cas d'erreur, de délai ou de limite de débit. & Gestion des délais, erreurs HTTP, reprises limitées et secours optionnel. & Mesurer le comportement sous charge et sur des indisponibilités prolongées. \\
-        \hline
-        Portabilité d'environnement & Connecter une autre ressource Azure sans refonte. & Structure de configuration compatible avec ce besoin. & Validation multi-tenant, multi-ressource et politiques réseau. \\
-        \hline
-        Authentification d'entreprise & Utiliser une identité sans clé et des permissions minimales. & Non validé dans le runtime observé ; clé API utilisée. & Intégrer Microsoft Entra ID, identité managée et coffre de secrets. \\
-        \hline
-    \end{tabularx}
-    \caption{Critères d'évaluation de l'intégration Azure OpenAI}
-    \label{tab:evaluation-azure-ch5}
-    \rowcolors{2}{white}{white}
-    \arrayrulecolor{black}
-\end{table}
-
-La structure actuelle permet de connecter une ressource Azure appartenant au client et d'attribuer des déploiements distincts aux rôles. Elle ne prouve cependant pas encore la portabilité sur plusieurs tenants, régions, politiques réseau ou mécanismes d'identité. Ces validations relèvent de l'industrialisation et doivent être réalisées avant un déploiement multi-client.
-
-La déclinaison Angular ne doit pas être incluse dans cette évaluation Azure tant que son fournisseur LLM effectif et ses mécanismes d'authentification n'ont pas été confirmés par le code et les tests correspondants.
+% L'évaluation Azure OpenAI est désormais intégrée directement dans
+% chapitre5/evaluation_resultats.tex, au sein de l'analyse qualitative.
+% Ce fichier est conservé uniquement pour compatibilité avec le mécanisme
+% d'injection défini dans main.tex.
