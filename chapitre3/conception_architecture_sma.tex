@@ -100,6 +100,8 @@ Les deux systèmes partagent néanmoins la même \textbf{architecture de référ
 
 % ============================================================
 \section{Organisation des agents et de l'architecture}
+
+Après avoir justifié le modèle SMA, cette partie précise comment ses responsabilités sont réparties entre agents intelligents et services déterministes. Elle présente les composants capables de raisonnement contextualisé, les mécanismes qui conservent l'autorité sur l'exécution, puis la matrice d'autonomie et l'architecture globale qui relient ces deux catégories.
 % ============================================================
 
 \subsection{Agents intelligents retenus}
@@ -119,6 +121,8 @@ Les véritables agents du système sont ceux qui disposent d'une responsabilité
 
 \subsection{Services déterministes}
 
+Les agents ne couvrent volontairement qu'une partie du processus. Les opérations dont le résultat doit être reproductible, contrôlable ou directement vérifiable sont confiées à des services déterministes. Cette séparation empêche notamment qu'une décision probabiliste modifie seule l'état métier, exécute une commande arbitraire ou valide sa propre sortie.
+
 Les composants suivants restent volontairement déterministes :
 
 \begin{itemize}
@@ -135,6 +139,8 @@ Les composants suivants restent volontairement déterministes :
 Cette distinction évite de qualifier d'agent tout composant participant au workflow. Elle préserve également l'autorité des mécanismes vérifiables.
 
 \subsection{Matrice des rôles et de l'autonomie}
+
+La spécialisation des agents n'est utile que si leur périmètre d'action reste explicite. La matrice suivante synthétise, pour chaque rôle, la capacité de raisonnement, l'accès aux outils, les droits d'écriture et les points où une validation indépendante ou humaine demeure obligatoire.
 
 \scriptsize
 \begin{longtable}{|>{\bfseries\RaggedRight\arraybackslash}p{2.7cm}|>{\RaggedRight\arraybackslash}p{3.2cm}|>{\centering\arraybackslash}p{2.2cm}|>{\centering\arraybackslash}p{2.2cm}|>{\centering\arraybackslash}p{2.2cm}|>{\RaggedRight\arraybackslash}p{2.7cm}|}
@@ -209,6 +215,8 @@ La base de données conserve l'état métier autoritaire. LangGraph coordonne le
 % ============================================================
 \section{Communication, état et orchestration}
 
+Une fois les responsabilités définies, leur coordination devient le point central de l'architecture. Cette partie décrit la manière dont les composants échangent des artefacts structurés, comment l'orchestrateur contrôle la progression et comment l'état persistant permet d'interrompre puis de reprendre une migration sans perdre les décisions déjà validées.
+
 \subsection{Communication et contrats}
 % ============================================================
 
@@ -246,6 +254,8 @@ Les agents ne maintiennent pas une conversation libre comme source de vérité. 
 
 % ============================================================
 \subsection{Conception de l'orchestrateur}
+
+Les contrats définissent ce qui peut être échangé ; l'orchestrateur détermine quand et dans quelles conditions un échange peut faire progresser la migration. Il constitue ainsi le point de coordination entre l'état persistant, les agents, les services déterministes et les décisions humaines.
 % ============================================================
 
 L'orchestrateur reçoit une intention validée par l'API, charge l'état persistant, sélectionne le nœud autorisé, prépare son contexte, enregistre la sortie, ouvre éventuellement un point de validation et détermine la suite.
@@ -280,6 +290,8 @@ L'orchestrateur reçoit une intention validée par l'API, charge l'état persist
 
 % ============================================================
 \subsection{États, mémoire et contexte}
+
+Le contrôle du workflow suppose que l'état de la migration ne soit pas reconstruit à partir des seules conversations ou des journaux d'exécution. Il doit être persisté et accessible aux composants autorisés. La distinction entre état métier, artefacts durables et contexte agentique temporaire soutient ainsi la reprise, la traçabilité et la limitation des informations transmises aux modèles.
 % ============================================================
 
 Une migration possède un état global et des états locaux pour les stages, commandes, points de validation et réparations. Le frontend présente une projection ; il ne décide pas de l'état.
@@ -319,6 +331,8 @@ Trois formes de mémoire sont distinguées : mémoire métier persistante, mémo
 
 % ============================================================
 \section{Workflows, supervision et reprise}
+
+Les mécanismes précédents définissent le cadre commun ; leur utilité apparaît lorsqu'ils sont appliqués aux parcours concrets de migration. Cette partie montre comment ce cadre est décliné pour Java/Spring Boot et Angular, puis comment les décisions humaines, la réparation et la replanification interviennent lorsqu'un stage ne peut pas progresser normalement.
 
 \subsection{Workflows spécialisés}
 % ============================================================
