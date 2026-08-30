@@ -509,7 +509,11 @@ Pour concrétiser ce séquencement, l'orchestrateur s'appuie sur des contrats te
 Un manifeste de commande contient de manière analogue l'exécutable, les arguments validés, le répertoire de travail, l'environnement matérialisé, le délai maximal et les identifiants de corrélation. L'interface ou un LLM ne transmet jamais une commande shell libre.
 
 % ============================================================
-\section{Backend, persistance et preuves}
+\section{Backend, persistance et interface de supervision}
+
+Le backend constitue la source d'autorité de la plateforme : il valide les requêtes, persiste les états et rattache les actions aux preuves produites. L'interface ne duplique pas cette logique ; elle expose au développeur une projection de l'état autoritaire afin de rendre le workflow compréhensible et pilotable. Les deux sous-parties suivantes présentent successivement ces responsabilités backend puis leur restitution dans le cockpit.
+
+\subsection{Backend, persistance et preuves}
 % ============================================================
 
 Les API couvrent configurations, prérequis, migrations, stages, décisions, réparations, événements, artefacts, assistant et rapports. Les schémas typés détectent les sorties incomplètes.
@@ -533,7 +537,7 @@ run_<id>/
 La source externe n'est pas utilisée comme répertoire d'écriture. Le candidat validé d'un stage devient la base du suivant. Les décisions sensibles sont liées par SHA-256 à l'artefact examiné.
 
 % ============================================================
-\section{Interface, cockpit et captures}
+\subsection{Interface de supervision et captures}
 % ============================================================
 
 Le cockpit présente le résumé, le pipeline, le stage sélectionné, l'analyse, le plan, les points de validation, les commandes, les journaux, les événements, la réparation, l'assistant et les rapports. Le frontend projette l'état fourni par le backend ; il ne maintient pas une vérité parallèle.
