@@ -176,6 +176,8 @@ La spécialisation des agents n'est utile que si leur périmètre d'action reste
 
 % ============================================================
 \subsection{Architecture globale}
+
+Les responsabilités décrites précédemment doivent maintenant être replacées dans une vue d'ensemble afin de comprendre leurs interactions. Cette architecture globale montre comment le cockpit, l'API, l'orchestrateur, les agents, les services déterministes et les mécanismes de persistance coopèrent au sein d'une même chaîne d'exécution. Elle met également en évidence le principe d'autorité retenu : les agents produisent des analyses ou des propositions, tandis que l'état, les transitions et l'exécution restent contrôlés par les composants déterministes.
 % ============================================================
 
 \begin{figure}[H]
