@@ -237,6 +237,8 @@ Chaque véritable agent est présenté selon le même format : objectif, entrée
 
 \subsection{Agent d'analyse}
 
+L'agent d'analyse constitue le point d'entrée du raisonnement agentique. Il transforme les informations brutes du projet en une représentation structurée des versions, dépendances, configurations et risques ; cette sortie sert ensuite de base à l'agent de révision puis au planificateur. Sa qualité conditionne donc directement la pertinence des décisions prises en aval.
+
 \begin{table}[H]
     \centering
     \small
@@ -262,6 +264,8 @@ Chaque véritable agent est présenté selon le même format : objectif, entrée
 \end{table}
 
 \subsection{Agent de révision de l'analyse}
+
+L'agent de révision de l'analyse introduit un premier contrôle indépendant avant toute planification. Son rôle n'est pas de refaire l'analyse, mais d'en vérifier la couverture, la cohérence et l'appui sur les preuves disponibles. Il se place ainsi entre l'analyseur et le planificateur afin d'éviter qu'une compréhension incomplète du projet ne soit transformée en plan d'exécution.
 
 \begin{table}[H]
     \centering
@@ -289,6 +293,8 @@ Chaque véritable agent est présenté selon le même format : objectif, entrée
 
 \subsection{Agent de planification}
 
+L'agent de planification transforme une analyse validée en trajectoire de migration exploitable. Il ordonne les stages, explicite leurs dépendances et associe à chacun des conditions de validation. Il constitue le lien entre la compréhension du projet produite en amont et les opérations de transformation qui seront exécutées après révision et approbation.
+
 \begin{table}[H]
     \centering
     \small
@@ -314,6 +320,8 @@ Chaque véritable agent est présenté selon le même format : objectif, entrée
 \end{table}
 
 \subsection{Agent de révision du plan}
+
+L'agent de révision du plan agit comme second contrôle agentique avant l'exécution. Il vérifie que la trajectoire proposée respecte les prérequis, les compatibilités et l'ordre des transformations attendues. Sa position entre le planificateur et la décision humaine permet de présenter au développeur un plan déjà soumis à une vérification indépendante.
 
 \begin{table}[H]
     \centering
@@ -341,6 +349,8 @@ Chaque véritable agent est présenté selon le même format : objectif, entrée
 
 \subsection{Agent de transformation}
 
+L'agent de transformation est le premier agent susceptible de produire des modifications candidates sur l'application migrée. Il intervient uniquement à partir d'un plan validé et dans un espace de travail isolé, sans autorité sur la source d'origine. Il relie ainsi le raisonnement de planification à l'exécution technique, tandis que la compilation et les tests déterministes restent responsables de la validation du résultat.
+
 \begin{table}[H]
     \centering
     \small
@@ -366,6 +376,8 @@ Chaque véritable agent est présenté selon le même format : objectif, entrée
 \end{table}
 
 \subsection{Proposeur de réparation}
+
+Le proposeur de réparation n'intervient qu'après un échec effectivement observé lors de l'exécution ou de la validation. À partir des journaux, de la commande en échec et d'un contexte borné, il produit un correctif candidat sans pouvoir l'appliquer. Il ouvre ainsi la boucle de réparation tout en restant séparé de l'agent qui révisera la proposition et de l'humain qui décidera de son application.
 
 \begin{table}[H]
     \centering
@@ -393,6 +405,8 @@ Chaque véritable agent est présenté selon le même format : objectif, entrée
 
 \subsection{Agent de révision de la réparation}
 
+L'agent de révision de la réparation constitue le contrôle indépendant de la proposition de correctif. Il examine sa portée, sa cohérence avec l'échec observé et les risques qu'elle introduit ; il peut rejeter la proposition ou produire une version consolidée. Il se situe donc entre le proposeur et la décision humaine, ce qui empêche un même agent de générer puis de valider seul son propre correctif.
+
 \begin{table}[H]
     \centering
     \small
@@ -418,6 +432,8 @@ Chaque véritable agent est présenté selon le même format : objectif, entrée
 \end{table}
 
 \subsection{Assistant de migration}
+
+L'assistant de migration joue un rôle transversal d'explication plutôt qu'un rôle d'exécution. Il exploite les états, événements et preuves déjà produits afin d'aider le développeur à comprendre l'avancement, les blocages et les actions disponibles. Contrairement aux agents du pipeline, il ne fait pas progresser la migration et ne dispose d'aucune autorité sur les décisions ou les fichiers.
 
 \begin{table}[H]
     \centering
