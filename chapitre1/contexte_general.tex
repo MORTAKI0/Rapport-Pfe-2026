@@ -115,7 +115,7 @@ Le système de fichiers local appartient à l'infrastructure d'exécution ; il n
 
 Le système Java/Spring Boot est le plus mature. Il prend en charge une trajectoire progressive Spring Boot 2.1 $\rightarrow$ 2.7 $\rightarrow$ 3.5 $\rightarrow$ 4.0, avec Java 11, 17 et 21 selon les étapes. Il comprend la qualification, l'analyse, la planification, les décisions humaines, les espaces de travail isolés, les transformations, Maven, les tests, une boucle de réparation, un cockpit, un assistant et un rapport final.
 
-Le système Angular est en développement actif sur une trajectoire progressive d'Angular 11 vers Angular 21. Les agents principaux d'analyse, de révision, de planification et de transformation sont développés. Les preuves techniques intégrées au rapport établissent des transitions scellées jusqu'à Angular~16 ; le passage 16 vers 17 reste non scellé dans la dernière exécution documentée. L'intégration du parcours complet, la réparation, l'assistant et le reporting doivent donc encore être consolidés avant de considérer la trajectoire 11 vers 21 comme validée.
+Le système Angular est en développement actif sur une trajectoire progressive visant Angular 11 vers Angular 21. Les agents principaux d'analyse, de révision, de planification et de transformation sont développés. La preuve d'exécution versionnée actuellement retenue valide les transitions Angular 18 vers 19 et 19 vers 20 ; le stage 20 vers 21 est préparé mais n'est pas encore démarré. Cette preuve confirme le fonctionnement du mécanisme par stages sur le périmètre exercé, sans démontrer encore la trajectoire complète 11 vers 21.
 
 \subsection{Genèse et évolution générale du projet}
 
@@ -123,7 +123,7 @@ Le produit n'a pas été construit comme une architecture complète dès le prem
 
 La première phase, menée pendant environ trois semaines à partir du début du mois de mai 2026, a regroupé l'analyse du besoin, l'étude des trajectoires Spring Boot, la préparation des environnements et le développement du premier workflow en ligne de commande. Cette preuve de concept a été présentée le 25 mai 2026. Une deuxième version CLI, corrigée et enrichie, a ensuite été présentée le 3 juin à une audience CGI plus large. Le 19 juin, la troisième démonstration a marqué le passage à une plateforme full stack comprenant backend, frontend, cockpit et chatbot.
 
-À partir du 20 juin, les travaux ont porté sur la consolidation d'une V1 : nouveau frontend, amélioration du travail des agents LLM, reporting enrichi et boucle de réparation gouvernée. La déclinaison Angular a commencé à la mi-juillet 2026 avec un premier périmètre 18--21, puis le travail a été étendu à une trajectoire 11--21. Au 30 août, cette extension a progressé techniquement jusqu'à Angular~16 sans démontrer encore le parcours complet jusqu'à Angular~21.
+À partir du 20 juin, les travaux ont porté sur la consolidation d'une V1 : nouveau frontend, amélioration du travail des agents LLM, reporting enrichi et boucle de réparation gouvernée. La déclinaison Angular a commencé à la mi-juillet 2026 avec un premier périmètre 18--21, puis l'objectif a été étendu à une trajectoire 11--21. La preuve d'exécution versionnée intégrée au rapport établit deux stages scellés, 18 vers 19 puis 19 vers 20 ; les étapes complémentaires restent à démontrer avant de présenter la couverture 11--21 comme acquise.
 
 \begin{figure}[H]
     \centering
