@@ -10,7 +10,9 @@ La conception doit répondre simultanément à plusieurs contraintes. Une migrat
 La description suit plusieurs points de vue conformément à ISO/IEC/IEEE 42010 : contexte, fonctions, comportement, information, déploiement et gouvernance \cite{iso42010}. Les diagrammes utilisent les principes d'UML 2.5.1 \cite{omguml}. L'objectif est de montrer les décisions structurantes et leurs justifications, puis de relier ces décisions aux workflows Java et Angular, sans reproduire toutes les classes du code.
 
 % ============================================================
-\section{Points de vue architecturaux}
+\section{Cadre de conception et choix du modèle SMA}
+
+\subsection{Points de vue architecturaux}
 % ============================================================
 
 Une architecture de cette nature ne peut pas être comprise à partir d'un seul diagramme. La vue fonctionnelle répond à la question \og qui fait quoi ? \fg{}, la vue comportementale montre \og dans quel ordre et sous quelles conditions ? \fg{}, tandis que les vues informationnelle, de déploiement et de gouvernance précisent respectivement les données échangées, l'environnement d'exécution et les limites d'autorité. Le tableau suivant associe chaque préoccupation à la représentation utilisée dans le rapport.
@@ -45,7 +47,7 @@ Une architecture de cette nature ne peut pas être comprise à partir d'un seul 
 \end{table}
 
 % ============================================================
-\section{Choix du modèle SMA}
+\subsection{Choix du modèle SMA}
 % ============================================================
 
 Le choix du modèle SMA résulte des contraintes identifiées précédemment plutôt que d'une préférence pour une architecture multi-agents en elle-même. Trois alternatives ont été écartées comme modèle principal : un agent unique concentrant analyse, transformation et exécution ; une chorégraphie entièrement distribuée où chaque composant ferait progresser le workflow localement ; et une automatisation exclusivement déterministe, insuffisante pour certaines analyses contextuelles. Le modèle retenu cherche donc un compromis entre spécialisation du raisonnement, contrôle central de la progression et exécution vérifiable.
@@ -97,7 +99,7 @@ Enfin, conserver deux dépôts limite le \textbf{couplage conditionnel} dans l'o
 Les deux systèmes partagent néanmoins la même \textbf{architecture de référence} : spécialisation des agents, orchestration persistante, services déterministes responsables de l'exécution, espaces de travail isolés, preuves liées aux états et décisions humaines sur les opérations sensibles. La généralisation recherchée porte donc sur ces principes et contrats de gouvernance, et non sur l'imposition d'une base de code d'exécution unique.
 
 % ============================================================
-\section{Agents et services déterministes}
+\section{Organisation des agents et de l'architecture}
 % ============================================================
 
 \subsection{Agents intelligents retenus}
@@ -167,7 +169,7 @@ Cette distinction évite de qualifier d'agent tout composant participant au work
 \normalsize
 
 % ============================================================
-\section{Architecture globale}
+\subsection{Architecture globale}
 % ============================================================
 
 \begin{figure}[H]
@@ -205,7 +207,9 @@ Cette distinction évite de qualifier d'agent tout composant participant au work
 La base de données conserve l'état métier autoritaire. LangGraph coordonne les nœuds et les interruptions, mais ne remplace pas les règles métier. Les agents produisent des artefacts ; les services déterministes vérifient, appliquent et exécutent.
 
 % ============================================================
-\section{Communication et contrats}
+\section{Communication, état et orchestration}
+
+\subsection{Communication et contrats}
 % ============================================================
 
 Les agents ne maintiennent pas une conversation libre comme source de vérité. Ils échangent indirectement par des artefacts orchestrés. Un contrat logique contient : identifiant de migration, tâche, producteur, consommateur, référence de contexte, schéma attendu, empreintes, statut et erreurs.
@@ -241,7 +245,7 @@ Les agents ne maintiennent pas une conversation libre comme source de vérité. 
 \end{figure}
 
 % ============================================================
-\section{Conception de l'orchestrateur}
+\subsection{Conception de l'orchestrateur}
 % ============================================================
 
 L'orchestrateur reçoit une intention validée par l'API, charge l'état persistant, sélectionne le nœud autorisé, prépare son contexte, enregistre la sortie, ouvre éventuellement un point de validation et détermine la suite.
@@ -275,7 +279,7 @@ L'orchestrateur reçoit une intention validée par l'API, charge l'état persist
 \end{figure}
 
 % ============================================================
-\section{États, mémoire et contexte}
+\subsection{États, mémoire et contexte}
 % ============================================================
 
 Une migration possède un état global et des états locaux pour les stages, commandes, points de validation et réparations. Le frontend présente une projection ; il ne décide pas de l'état.
@@ -314,19 +318,21 @@ Une migration possède un état global et des états locaux pour les stages, com
 Trois formes de mémoire sont distinguées : mémoire métier persistante, mémoire documentaire des artefacts et contexte agentique temporaire. Le contexte transmis à un agent est borné, nettoyé et relié à des références persistées. Cette approche soutient la confidentialité et la gestion des risques recommandées par ISO/IEC 23894 et le NIST AI RMF \cite{iso23894,nist-airmf,nist-genai}.
 
 % ============================================================
-\section{Workflows spécialisés}
+\section{Workflows, supervision et reprise}
+
+\subsection{Workflows spécialisés}
 % ============================================================
 
-\subsection{Java/Spring Boot}
+\paragraph{Java/Spring Boot.}
 
 Pour chaque transition, le système qualifie JDK et Maven, analyse le projet, révise l'analyse, planifie, révise le plan, ouvre une décision humaine, prépare l'espace isolé, transforme, compile et teste. Un échec peut ouvrir la réparation gouvernée avant le passage au stage suivant.
 
-\subsection{Angular}
+\paragraph{Angular.}
 
 Le workflow Angular détecte Angular, Node.js, npm, TypeScript et RxJS, résout un profil compatible, prépare un espace de stage propre, analyse manifestes et sources, produit et révise un plan, applique les transformations, installe les dépendances, construit et teste. L'intégration complète, la réparation et le reporting restent en consolidation.
 
 % ============================================================
-\section{Supervision et réparation gouvernée}
+\subsection{Supervision et réparation gouvernée}
 % ============================================================
 
 Les points de validation permettent d'approuver, rejeter, demander une révision ou annuler. Une décision est liée à l'état courant et à l'empreinte de l'artefact examiné.
@@ -365,7 +371,7 @@ Les points de validation permettent d'approuver, rejeter, demander une révision
 Le reviewer de réparation peut consolider la proposition, mais ne peut pas l'appliquer. Le diff final est soumis à des contrôles déterministes, à une approbation humaine et à une revalidation obligatoire. Le nombre de tentatives est limité.
 
 % ============================================================
-\section{Gestion des erreurs et replanification}
+\subsection{Gestion des erreurs et replanification}
 % ============================================================
 
 Les erreurs sont classées en précondition invalide, erreur transitoire, échec de transformation ou validation, et incohérence d'analyse ou de plan. Selon la catégorie, l'orchestrateur bloque, réessaie, ouvre la réparation, demande une décision ou renvoie vers la planification.
