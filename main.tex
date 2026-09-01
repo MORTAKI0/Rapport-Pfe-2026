@@ -194,9 +194,11 @@
 \clearpage
 
 \begingroup
-\fontsize{10.2}{10.6}\selectfont
+\fontsize{11}{11.3}\selectfont
 \setlength{\parskip}{0pt}
-\titlespacing*{\chapter}{0pt}{-1.1cm}{0.7cm}
+\titlespacing*{\chapter}{0pt}{-1.1cm}{0.55cm}
+\let\mfOriginalAddVSpace\addvspace
+\renewcommand{\addvspace}[1]{\vspace{3pt}}
 \listoftables
 \endgroup
 \addcontentsline{toc}{chapter}{Liste des tableaux}
