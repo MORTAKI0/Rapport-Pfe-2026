@@ -201,26 +201,7 @@ Avant d'introduire les outils et plateformes étudiés, il est utile de représe
 
 \begin{figure}[H]
     \centering
-    \resizebox{0.97\textwidth}{!}{%
-    \begin{tikzpicture}[
-        step/.style={draw=cgiblue,rounded corners=3pt,fill=cgilight!55,text width=3.0cm,minimum height=1.05cm,align=center,font=\small\bfseries},
-        risk/.style={draw=cgired,rounded corners=3pt,fill=white,text width=3.0cm,minimum height=1.05cm,align=center,font=\small\bfseries},
-        arr/.style={-{Latex[length=2mm]},thick,draw=cgigray}
-    ]
-        \node[step] (analyse) {Analyser le projet};
-        \node[step,right=0.45cm of analyse] (guides) {Consulter guides et documentation};
-        \node[step,right=0.45cm of guides] (modify) {Modifier manifestes et code};
-        \node[step,right=0.45cm of modify] (commands) {Exécuter les commandes};
-        \node[risk,below=1.05cm of commands] (logs) {Lire journaux et erreurs};
-        \node[step,left=0.45cm of logs] (diagnose) {Diagnostiquer et corriger};
-        \draw[arr] (analyse)--(guides);
-        \draw[arr] (guides)--(modify);
-        \draw[arr] (modify)--(commands);
-        \draw[arr] (commands)--(logs);
-        \draw[arr] (logs)--(diagnose);
-        \draw[arr,rounded corners=5pt] (diagnose.west)--++(-0.7,0)|-(analyse.south);
-    \end{tikzpicture}%
-    }
+    \includegraphics[width=0.98\textwidth]{"logos/Figure 2.5.png"}
     \caption{Boucle typique d'une migration conduite manuellement}
     \label{fig:processus-manuel-reference-ch2}
 \end{figure}
