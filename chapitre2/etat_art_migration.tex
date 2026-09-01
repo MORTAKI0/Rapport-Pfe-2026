@@ -268,28 +268,7 @@ La carte de positionnement regroupe les solutions étudiées par \textbf{famille
 
 \begin{figure}[H]
     \centering
-    \resizebox{0.98\textwidth}{!}{%
-    \begin{tikzpicture}[
-        root/.style={draw=cgired,rounded corners=3pt,fill=white,minimum width=4cm,minimum height=1cm,align=center,font=\small\bfseries},
-        cat/.style={draw=cgiblue,rounded corners=3pt,fill=cgilight!55,minimum width=3.7cm,minimum height=1cm,align=center,font=\small\bfseries},
-        item/.style={draw=cgigray,rounded corners=3pt,fill=white,text width=3.4cm,minimum height=1.2cm,align=center,font=\scriptsize},
-        arr/.style={-{Latex[length=2mm]},thick,draw=cgigray}
-    ]
-        \node[root] (root) {Écosystème étudié};
-        \node[cat,below left=1.2cm and 5.5cm of root] (det) {Migration déterministe};
-        \node[cat,below left=1.2cm and 1.7cm of root] (ai) {Assistance et réparation};
-        \node[cat,below right=1.2cm and 1.7cm of root] (mas) {Orchestration multi-agents};
-        \node[cat,below right=1.2cm and 5.5cm of root] (std) {Standards et protocoles};
-        \node[item,below=0.55cm of det] {OpenRewrite\\Angular CLI\\Dependabot};
-        \node[item,below=0.55cm of ai] {Amazon Q\\Copilot Modernization\\SWE-agent\\Repairnator};
-        \node[item,below=0.55cm of mas] {AutoGen\\LangGraph};
-        \node[item,below=0.55cm of std] {FIPA-ACL\\protocoles d'interaction};
-        \draw[arr] (root)--(det);
-        \draw[arr] (root)--(ai);
-        \draw[arr] (root)--(mas);
-        \draw[arr] (root)--(std);
-    \end{tikzpicture}%
-    }
+    \includegraphics[width=0.98\textwidth]{"logos/Figure 2.6.png"}
     \caption{Regroupement des approches, plateformes et standards étudiés}
     \label{fig:mindmap-etat-art-ch2}
 \end{figure}
