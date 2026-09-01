@@ -75,26 +75,24 @@
 \usepackage{titlesec}
 
 \titleformat{\chapter}[display]
-  {\normalfont\sffamily\bfseries\color{cgidark}}
-  {\filleft\fontsize{48}{48}\selectfont\color{cgired}\thechapter}
+  {\normalfont\sffamily\bfseries\color{black}}
+  {\filleft\fontsize{48}{48}\selectfont\color{black}\thechapter}
   {-1.2ex}
-  {\titlerule[1.1pt]\vspace{1ex}\Huge}
-  [\vspace{0.8ex}\titlerule]
+  {\Huge}
 
 \titleformat{name=\chapter,numberless}[display]
-  {\normalfont\sffamily\bfseries\color{cgidark}}
+  {\normalfont\sffamily\bfseries\color{black}}
   {}
   {0pt}
   {\Huge}
-  [\vspace{0.8ex}\titlerule]
 
 \titlespacing*{\chapter}{0pt}{-1.1cm}{1.1cm}
-\titleformat{\section}{\Large\sffamily\bfseries\color{cgidark}}{\thesection}{0.7em}{}
-\titleformat{\subsection}{\large\sffamily\bfseries\color{cgiblue}}{\thesubsection}{0.7em}{}
+\titleformat{\section}{\Large\sffamily\bfseries\color{black}}{\thesection}{0.7em}{}
+\titleformat{\subsection}{\large\sffamily\bfseries\color{black}}{\thesubsection}{0.7em}{}
 
 \pagestyle{fancy}
 \fancyhf{}
-\fancyhead[L]{\sffamily\bfseries\textcolor{cgired}{CGI}}
+\fancyhead[L]{\sffamily\bfseries CGI}
 \fancyhead[C]{\small\sffamily\nouppercase{\leftmark}}
 \fancyhead[R]{\small\sffamily Migration Factory}
 \fancyfoot[L]{\small\sffamily 2025--2026}
@@ -106,7 +104,7 @@
 
 \fancypagestyle{plain}{
     \fancyhf{}
-    \fancyhead[L]{\sffamily\bfseries\textcolor{cgired}{CGI}}
+    \fancyhead[L]{\sffamily\bfseries CGI}
     \fancyhead[R]{\small\sffamily Migration Factory}
     \fancyfoot[L]{\small\sffamily 2025--2026}
     \fancyfoot[R]{\small\sffamily\thepage}
