@@ -8,19 +8,7 @@ L'objectif n'est pas d'imposer un modèle unique géré ou embarqué par la plat
 
 \begin{figure}[H]
     \centering
-    \resizebox{0.92\textwidth}{!}{%
-    \begin{tikzpicture}[
-        box/.style={draw=cgiblue,rounded corners=3pt,fill=cgilight!55,text width=4.2cm,minimum height=1.25cm,align=center,font=\small},
-        azure/.style={draw=cgired,rounded corners=3pt,fill=white,text width=4.6cm,minimum height=1.25cm,align=center,font=\small},
-        arr/.style={-{Latex[length=2mm]},thick,draw=cgigray}
-    ]
-        \node[azure] (resource) {\textbf{Ressource Azure contrôlée par CGI}\\endpoint, authentification et déploiements de modèles};
-        \node[box,right=1.3cm of resource] (backend) {\textbf{Backend Migration Factory}\\configuration externalisée et routage par rôle};
-        \node[box,right=1.3cm of backend] (agents) {\textbf{Agents spécialisés}\\proposition, révision, réparation et assistance};
-        \draw[arr] (resource)--node[above,font=\scriptsize]{configuration et appels sécurisés} (backend);
-        \draw[arr] (backend)--node[above,font=\scriptsize]{réponse structurée} (agents);
-    \end{tikzpicture}%
-    }
+    \includegraphics[width=0.98\textwidth]{"logos/Figure 1.6.png"}
     \caption{Principe d'intégration des déploiements Azure contrôlés par CGI}
     \label{fig:integration-azure-contexte-ch1}
 \end{figure}
