@@ -267,31 +267,7 @@ Les points de validation permettent d'approuver, rejeter, demander une révision
 
 \begin{figure}[H]
     \centering
-    \resizebox{0.98\textwidth}{!}{%
-    \begin{tikzpicture}[
-        step/.style={draw=cgiblue,rounded corners=3pt,fill=cgilight!55,minimum width=3cm,minimum height=1cm,align=center,font=\small\bfseries},
-        human/.style={draw=cgired,rounded corners=3pt,fill=white,minimum width=3cm,minimum height=1cm,align=center,font=\small\bfseries},
-        arr/.style={-{Latex[length=2mm]},thick,draw=cgigray}
-    ]
-        \node[step] (failure) {Conserver l'échec};
-        \node[step,right=0.4cm of failure] (context) {Construire le contexte};
-        \node[step,right=0.4cm of context] (propose) {Proposer un diff};
-        \node[step,right=0.4cm of propose] (review) {Réviser le diff};
-        \node[human,right=0.4cm of review] (approve) {Décision humaine};
-        \node[step,below=1.15cm of approve] (apply) {Appliquer};
-        \node[step,left=0.4cm of apply] (test) {Recompiler et tester};
-        \node[step,left=0.4cm of test] (result) {Valider ou réessayer};
-        \draw[arr] (failure)--(context);
-        \draw[arr] (context)--(propose);
-        \draw[arr] (propose)--(review);
-        \draw[arr] (review)--(approve);
-        \draw[arr] (approve)--(apply);
-        \draw[arr] (apply)--(test);
-        \draw[arr] (test)--(result);
-        \draw[arr,bend left=28] (result.north) to (context.south);
-        \draw[arr,bend left=25] (approve.north) to (propose.north);
-    \end{tikzpicture}%
-    }
+    \includegraphics[width=0.98\textwidth]{"logos/Figure 3.6.png"}
     \caption{Boucle de réparation gouvernée}
     \label{fig:reparation-sma-ch3}
 \end{figure}
