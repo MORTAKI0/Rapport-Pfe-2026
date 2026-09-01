@@ -65,25 +65,7 @@ Ce choix répond à quatre contraintes principales :
 
 \begin{figure}[H]
     \centering
-    \resizebox{0.96\textwidth}{!}{%
-    \begin{tikzpicture}[
-        core/.style={draw=cgired,rounded corners=4pt,fill=white,minimum width=5.4cm,minimum height=1.35cm,align=center,font=\bfseries},
-        agent/.style={draw=emsigreen!70!black,rounded corners=3pt,fill=emsigreen!8,text width=4.6cm,minimum height=1.3cm,align=center,font=\small},
-        service/.style={draw=cgiblue,rounded corners=3pt,fill=cgilight!55,text width=4.6cm,minimum height=1.3cm,align=center,font=\small},
-        ext/.style={draw=cgigray,rounded corners=3pt,fill=white,text width=4.6cm,minimum height=1.3cm,align=center,font=\small},
-        arr/.style={<->,thick,draw=cgigray}
-    ]
-        \node[core] (orch) {Orchestrateur central\\état, routage, interruptions et reprise};
-        \node[agent,above left=1.25cm and 1.2cm of orch] (agents) {\textbf{Agents intelligents}\\analyse, planification, révision, transformation, réparation, assistant};
-        \node[service,above right=1.25cm and 1.2cm of orch] (human) {\textbf{Supervision humaine}\\approbation, rejet, révision et annulation};
-        \node[service,below left=1.25cm and 1.2cm of orch] (services) {\textbf{Services déterministes}\\profils, transitions, exécution, validation, rapports};
-        \node[ext,below right=1.25cm and 1.2cm of orch] (stores) {\textbf{État et preuves}\\base, événements, artefacts et checkpoints};
-        \draw[arr] (agents)--(orch);
-        \draw[arr] (human)--(orch);
-        \draw[arr] (services)--(orch);
-        \draw[arr] (stores)--(orch);
-    \end{tikzpicture}%
-    }
+    \includegraphics[width=0.98\textwidth]{"logos/Figure 3.1.png"}
     \caption{Modèle hybride retenu pour la Migration Factory}
     \label{fig:modele-sma-ch3}
 \end{figure}
