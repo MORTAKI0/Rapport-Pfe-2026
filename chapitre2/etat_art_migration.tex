@@ -180,27 +180,7 @@ Les migrations peuvent concerner runtime, langage, framework, dépendances, plat
 
 \begin{figure}[H]
     \centering
-    \resizebox{0.98\textwidth}{!}{%
-    \begin{tikzpicture}[
-        step/.style={draw=cgiblue,rounded corners=3pt,fill=cgilight!55,minimum width=2.6cm,minimum height=1cm,align=center,font=\small\bfseries},
-        arr/.style={-{Latex[length=2mm]},thick,draw=cgigray}
-    ]
-        \node[step] (inventory) {Inventaire};
-        \node[step,right=0.35cm of inventory] (target) {Cible};
-        \node[step,right=0.35cm of target] (plan) {Plan};
-        \node[step,right=0.35cm of plan] (transform) {Transformation};
-        \node[step,right=0.35cm of transform] (build) {Compilation et tests};
-        \node[step,right=0.35cm of build] (repair) {Réparation};
-        \node[step,right=0.35cm of repair] (report) {Validation};
-        \draw[arr] (inventory)--(target);
-        \draw[arr] (target)--(plan);
-        \draw[arr] (plan)--(transform);
-        \draw[arr] (transform)--(build);
-        \draw[arr] (build)--(repair);
-        \draw[arr] (repair)--(report);
-        \draw[arr,rounded corners=4pt] (repair.south)--++(0,-0.65)-|(transform.south);
-    \end{tikzpicture}%
-    }
+    \includegraphics[width=0.98\textwidth]{"logos/Figure 2.4.png"}
     \caption{Processus général d'une migration applicative}
     \label{fig:processus-migration-ch2}
 \end{figure}
