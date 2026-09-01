@@ -84,27 +84,7 @@ La figure~\ref{fig:contexte-acteurs-services-ch1} sépare les catégories afin d
 
 \begin{figure}[H]
     \centering
-    \resizebox{0.98\textwidth}{!}{%
-    \begin{tikzpicture}[
-        center/.style={draw=cgired,rounded corners=4pt,fill=white,minimum width=5cm,minimum height=1.35cm,align=center,font=\bfseries},
-        actor/.style={draw=cgiblue,rounded corners=3pt,fill=cgilight!55,text width=4cm,minimum height=1.35cm,align=center,font=\small},
-        agent/.style={draw=emsigreen!70!black,rounded corners=3pt,fill=emsigreen!8,text width=4cm,minimum height=1.35cm,align=center,font=\small},
-        service/.style={draw=cgigray,rounded corners=3pt,fill=white,text width=4cm,minimum height=1.35cm,align=center,font=\small},
-        arr/.style={<->,thick,draw=cgigray}
-    ]
-        \node[center] (mf) {Migration Factory};
-        \node[actor,above left=1.25cm and 2.8cm of mf] (human) {\textbf{Acteur humain}\\Développeur};
-        \node[agent,above right=1.25cm and 2.8cm of mf] (agents) {\textbf{Agents intelligents internes}\\Analyse, planification, révision, transformation agentique, réparation, assistant};
-        \node[service,below left=1.25cm and 2.8cm of mf] (det) {\textbf{Services déterministes internes}\\Transitions, profils, exécution, stockage, rapports};
-        \node[service,below=1.25cm of mf] (tools) {\textbf{Outils d'exécution}\\JDK, Maven, OpenRewrite, Node.js, npm, Angular CLI};
-        \node[service,below right=1.25cm and 2.8cm of mf] (external) {\textbf{Services réseau externes}\\Fournisseur LLM et dépôts de dépendances};
-        \draw[arr] (human)--(mf);
-        \draw[arr] (agents)--(mf);
-        \draw[arr] (det)--(mf);
-        \draw[arr] (tools)--(mf);
-        \draw[arr] (external)--(mf);
-    \end{tikzpicture}%
-    }
+    \includegraphics[width=0.98\textwidth]{"logos/Figure 1.2.png"}
     \caption{Vue de contexte et classification des acteurs et composants}
     \label{fig:contexte-acteurs-services-ch1}
 \end{figure}
