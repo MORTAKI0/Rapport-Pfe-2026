@@ -17,18 +17,7 @@ Un agent logiciel est une entité située dans un environnement, capable de rece
 
 \begin{figure}[H]
     \centering
-    \resizebox{0.78\textwidth}{!}{%
-    \begin{tikzpicture}[
-        box/.style={draw=cgiblue,rounded corners=3pt,fill=cgilight!55,minimum width=4cm,minimum height=1.2cm,align=center,font=\small\bfseries},
-        env/.style={draw=cgigray,rounded corners=3pt,fill=white,minimum width=4cm,minimum height=1.2cm,align=center,font=\small\bfseries},
-        arr/.style={-{Latex[length=2.2mm]},thick,draw=cgigray}
-    ]
-        \node[env] (env) {Environnement};
-        \node[box,right=2cm of env] (agent) {Agent\\objectifs, contexte, capacités};
-        \draw[arr,bend left=18] (env) to node[above,font=\small]{perceptions} (agent);
-        \draw[arr,bend left=18] (agent) to node[below,font=\small]{actions ou propositions} (env);
-    \end{tikzpicture}%
-    }
+    \includegraphics[width=0.98\textwidth]{"logos/Figure 2.1.png"}
     \caption{Interaction générale entre un agent et son environnement}
     \label{fig:agent-environnement-ch2}
 \end{figure}
