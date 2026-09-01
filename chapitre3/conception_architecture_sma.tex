@@ -221,28 +221,7 @@ L'orchestrateur reçoit une intention validée par l'API, charge l'état persist
 
 \begin{figure}[H]
     \centering
-    \resizebox{0.95\textwidth}{!}{%
-    \begin{tikzpicture}[
-        step/.style={draw=cgiblue,rounded corners=3pt,fill=cgilight!55,minimum width=3cm,minimum height=1cm,align=center,font=\small\bfseries},
-        decision/.style={diamond,draw=cgired,fill=white,aspect=2.2,align=center,font=\small\bfseries},
-        arr/.style={-{Latex[length=2mm]},thick,draw=cgigray}
-    ]
-        \node[step] (load) {Charger l'état};
-        \node[decision,right=1cm of load] (allowed) {Action\\autorisée ?};
-        \node[step,right=1cm of allowed] (route) {Sélectionner le nœud};
-        \node[step,right=1cm of route] (invoke) {Invoquer agent ou service};
-        \node[step,below=1.25cm of invoke] (persist) {Persister résultat et événement};
-        \node[decision,left=1cm of persist] (gate) {Décision\\humaine ?};
-        \node[step,left=1cm of gate] (next) {Reprendre ou terminer};
-        \draw[arr] (load)--(allowed);
-        \draw[arr] (allowed)--node[above,font=\scriptsize]{oui} (route);
-        \draw[arr] (route)--(invoke);
-        \draw[arr] (invoke)--(persist);
-        \draw[arr] (persist)--(gate);
-        \draw[arr] (gate)--(next);
-        \draw[arr,rounded corners=4pt] (next.west)--++(-0.6,0)|-(load.south);
-    \end{tikzpicture}%
-    }
+    \includegraphics[width=0.98\textwidth]{"logos/Figure 3.4.png"}
     \caption{Logique générale de l'orchestrateur}
     \label{fig:orchestrateur-ch3}
 \end{figure}
