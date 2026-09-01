@@ -86,23 +86,7 @@ Un système multi-agents (SMA) regroupe plusieurs agents capables d'interagir da
 
 \begin{figure}[H]
     \centering
-    \resizebox{0.9\textwidth}{!}{%
-    \begin{tikzpicture}[
-        agent/.style={draw=emsigreen!70!black,rounded corners=3pt,fill=emsigreen!8,minimum width=3.2cm,minimum height=1cm,align=center,font=\small\bfseries},
-        state/.style={draw=cgiblue,rounded corners=3pt,fill=cgilight!55,minimum width=4cm,minimum height=1cm,align=center,font=\small\bfseries},
-        arr/.style={<->,thick,draw=cgigray}
-    ]
-        \node[state] (shared) {État et artefacts partagés};
-        \node[agent,above left=1.25cm and 1.4cm of shared] (a1) {Analyseur};
-        \node[agent,above right=1.25cm and 1.4cm of shared] (a2) {Planificateur};
-        \node[agent,below left=1.25cm and 1.4cm of shared] (a3) {Transformateur};
-        \node[agent,below right=1.25cm and 1.4cm of shared] (a4) {Agent de révision};
-        \draw[arr] (a1)--(shared);
-        \draw[arr] (a2)--(shared);
-        \draw[arr] (a3)--(shared);
-        \draw[arr] (a4)--(shared);
-    \end{tikzpicture}%
-    }
+    \includegraphics[width=0.98\textwidth]{"logos/Figure 2.2.png"}
     \caption{Vue simplifiée d'un SMA spécialisé}
     \label{fig:sma-simplifie-ch2}
 \end{figure}
