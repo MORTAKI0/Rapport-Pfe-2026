@@ -2,132 +2,115 @@
     \thispagestyle{empty}
 
     % =========================================================
-    % Décor vertical inspiré de la charte EMSI
+    % Mise en page inspirée du modèle officiel EMSI / Honoris
     % =========================================================
     \begin{tikzpicture}[remember picture,overlay]
-        \coordinate (topleft) at (current page.north west);
-        \coordinate (bottomleft) at (current page.south west);
-
-        % Ligne verticale fine.
-        \draw[emsigreen,line width=1.5pt]
-            ($(topleft)+(0.78cm,-1.45cm)$)
-            --
-            ($(bottomleft)+(0.78cm,2.45cm)$);
-
-        % Bande verte principale.
+        % Bande verte verticale.
         \fill[emsigreen]
-            ($(topleft)+(1.08cm,0)$)
+            ($(current page.north west)+(0.95cm,-1.45cm)$)
             rectangle
-            ($(bottomleft)+(1.78cm,2.05cm)$);
+            ($(current page.south west)+(1.50cm,1.65cm)$);
 
         % Bloc rouge inférieur.
         \fill[cgired]
-            ($(bottomleft)+(1.08cm,0.72cm)$)
+            ($(current page.south west)+(0.95cm,0.72cm)$)
             rectangle
-            ($(bottomleft)+(1.78cm,1.72cm)$);
+            ($(current page.south west)+(1.50cm,1.42cm)$);
     \end{tikzpicture}
 
-    % Décalage du contenu afin de libérer la bande décorative.
-    \hspace*{0.65cm}
-    \begin{minipage}[t][0.95\textheight]{0.92\textwidth}
-        \begin{center}
-
-            % =================================================
-            % Logos officiels présents dans le dossier logos/
-            % =================================================
-            \vspace*{-0.85cm}
-
-            \begin{minipage}[c][2.3cm][c]{0.56\textwidth}
-                \raggedright
-                \IfFileExists{logos/EMSI.png}{%
-                    % On enlève seulement un peu de marge verticale,
-                    % sans couper le texte à droite.
-                    \includegraphics[
-                        height=2.15cm,
-                        trim=0 12 0 12,
-                        clip
-                    ]{logos/EMSI.png}%
-                }{%
-                    \fbox{\parbox[c][1.8cm][c]{0.92\textwidth}{\centering\bfseries EMSI}}%
-                }
-            \end{minipage}
-            \hfill
-            \begin{minipage}[c][2.3cm][c]{0.30\textwidth}
-                \raggedleft
-                \IfFileExists{logos/cgi.png}{%
-                    \includegraphics[
-                        height=1.55cm,
-                        keepaspectratio
-                    ]{logos/cgi.png}%
-                }{%
-                    \fbox{\parbox[c][1.6cm][c]{0.72\textwidth}{\centering\bfseries CGI}}%
-                }
-            \end{minipage}
-
-            \vspace{0.72cm}
-
-            % =================================================
-            % Nature du document et formation
-            % =================================================
-            {\Large\bfseries Rapport de Projet de Fin d'Études}\\[0.30cm]
-            {\large 5\textsuperscript{e} année -- \textbf{Ingénierie Informatique et Réseaux}}\\[0.16cm]
-            {\normalsize Année universitaire 2025--2026}
-
-            \vspace{0.95cm}
-
-            {\large\bfseries Sous le thème :}\\[0.38cm]
-            \rule{0.84\linewidth}{0.65mm}\\[0.55cm]
-
-            % =================================================
-            % Intitulé du projet
-            % =================================================
-            \begin{spacing}{1.16}
-                {\fontsize{27}{32}\selectfont\bfseries\projectname}\\[0.38cm]
-                {\Large\bfseries\reporttitle}
-            \end{spacing}
-
-            \vspace{0.44cm}
-            {\normalsize\itshape\reportsubtitle}
-
-            \vspace{0.55cm}
-            \rule{0.84\linewidth}{0.65mm}
-        \end{center}
-
-        \vspace{0.95cm}
+    \hspace*{0.72cm}
+    \begin{minipage}[t][0.95\textheight]{0.91\textwidth}
 
         % =====================================================
-        % Informations du projet
+        % Logos institutionnels
         % =====================================================
-        \begin{minipage}[t]{0.47\textwidth}
+        \vspace*{-1.00cm}
+        \noindent
+        \begin{minipage}[c][2.2cm][c]{0.60\textwidth}
             \raggedright
-            {\large\itshape Réalisé par :}\\[0.18cm]
-            {\Large\bfseries\MakeUppercase{\studentname}}
+            \IfFileExists{logos/EMSI.png}{%
+                \includegraphics[
+                    height=1.85cm,
+                    keepaspectratio
+                ]{logos/EMSI.png}%
+            }{%
+                \textbf{ÉCOLE MAROCAINE DES SCIENCES DE L'INGÉNIEUR}%
+            }
+        \end{minipage}
+        \hfill
+        \begin{minipage}[c][2.2cm][c]{0.30\textwidth}
+            \raggedleft
+            {\fontsize{19}{20}\selectfont\bfseries\textcolor[RGB]{111,19,38}{HONORIS}}\\[-0.05cm]
+            \textcolor[RGB]{111,19,38}{\rule{3.1cm}{0.55pt}}\\[-0.02cm]
+            {\scriptsize\textcolor[RGB]{111,19,38}{UNITED UNIVERSITIES}}
+        \end{minipage}
+
+        % =====================================================
+        % Nature du rapport et formation
+        % =====================================================
+        \vspace{1.10cm}
+        \begin{center}
+            {\LARGE\bfseries Rapport de stage}\\[0.16cm]
+            {\large\bfseries 5\textsuperscript{e} année}\\[0.10cm]
+            {\large\bfseries Ingénierie Informatique et Réseaux}
+
+            \vspace{0.90cm}
+
+            {\large\bfseries Sous le thème}\\[0.26cm]
+            \rule{0.56\linewidth}{0.45pt}
+
+            \vspace{0.50cm}
+
+            {\fontsize{24}{27}\selectfont\bfseries \projectname}\\[0.28cm]
+            \begin{minipage}{0.82\linewidth}
+                \centering
+                {\large\bfseries \reporttitle}
+            \end{minipage}\\[0.28cm]
+            {\normalsize\itshape \reportsubtitle}
 
             \vspace{0.70cm}
 
-            {\large\itshape Organisme d'accueil :}\\[0.18cm]
-            {\large\bfseries\companyname}
-        \end{minipage}
-        \hfill
-        \begin{minipage}[t]{0.47\textwidth}
-            \raggedleft
-            {\large\itshape Encadré par :}\\[0.18cm]
-            \textbf{Encadrant professionnel :}\\
-            \companysupervisor\\[0.22cm]
-           
-            \textbf{Encadrant pédagogique :}\\
-            \academicsupervisor
-            
+            {\large\bfseries PÉRIODE DE STAGE}\\[0.18cm]
+            {\normalsize \internshipperiod}\\[0.24cm]
+            \rule{0.56\linewidth}{0.45pt}
+        \end{center}
+
+        % =====================================================
+        % Étudiant, encadrants et organisme d'accueil
+        % =====================================================
+        \vspace{1.00cm}
+        \hspace*{1.00cm}
+        \begin{minipage}{0.82\textwidth}
+            \raggedright
+
+            {\large\bfseries Réalisé par :}\\[0.08cm]
+            {\normalsize M. \studentname}
+
+            \vspace{0.55cm}
+
+            {\large\bfseries Encadré par :}\\[0.10cm]
+            {\normalsize
+            \textbf{Encadrante pédagogique :} \academicsupervisor\\[0.08cm]
+            \textbf{Encadrants professionnels :} \companysupervisor
+            }
+
+            \vspace{0.55cm}
+
+            {\normalsize
+            \textbf{Entreprise :} \companyname\\[0.08cm]
+            \textbf{Activité :} \companyactivity\\[0.08cm]
+            \textbf{Adresse :} \companyaddress
+            }
         \end{minipage}
 
         \vfill
 
         % =====================================================
-        % Pied de couverture
+        % Année universitaire
         % =====================================================
         \begin{center}
-            \textcolor{cgigray}{\rule{0.62\linewidth}{0.35pt}}\\[0.28cm]
-            {\large\bfseries Période académique : 2025--2026}
+            {\normalsize\bfseries ANNÉE UNIVERSITAIRE : 2025--2026}
         \end{center}
+
     \end{minipage}
 \end{titlepage}
