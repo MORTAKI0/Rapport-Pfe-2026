@@ -21,34 +21,39 @@
 
         % =====================================================
         % Logos : EMSI / Honoris / CGI
+        % Positionnement indépendant pour un alignement équilibré
         % =====================================================
         \vspace*{-0.95cm}
-        \noindent
-        \begin{minipage}[c][2.35cm][c]{0.39\textwidth}
-            \raggedright
-            \includegraphics[
-                height=2.05cm,
-                trim=0 12 0 12,
-                clip,
-                keepaspectratio
-            ]{logos/EMSI.png}
-        \end{minipage}
-        \hfill
-        \begin{minipage}[c][2.35cm][c]{0.25\textwidth}
-            \centering
-            \includegraphics[
-                width=3.15cm,
-                keepaspectratio
-            ]{logos/honoris.png}
-        \end{minipage}
-        \hfill
-        \begin{minipage}[c][2.35cm][c]{0.25\textwidth}
-            \raggedleft
-            \includegraphics[
-                height=1.25cm,
-                keepaspectratio
-            ]{logos/cgi.png}
-        \end{minipage}
+        \begin{tikzpicture}[remember picture,overlay]
+            % EMSI davantage à gauche.
+            \node[anchor=north west,inner sep=0pt]
+                at ($(current page.north west)+(2.05cm,-1.48cm)$)
+                {\includegraphics[
+                    height=2.05cm,
+                    trim=0 12 0 12,
+                    clip,
+                    keepaspectratio
+                ]{logos/EMSI.png}};
+
+            % Honoris centré exactement sur la page.
+            \node[anchor=north,inner sep=0pt]
+                at ($(current page.north)+(0cm,-1.58cm)$)
+                {\includegraphics[
+                    width=3.15cm,
+                    keepaspectratio
+                ]{logos/honoris.png}};
+
+            % CGI aligné à droite avec une marge symétrique.
+            \node[anchor=north east,inner sep=0pt]
+                at ($(current page.north east)+(-2.05cm,-1.55cm)$)
+                {\includegraphics[
+                    height=1.25cm,
+                    keepaspectratio
+                ]{logos/cgi.png}};
+        \end{tikzpicture}
+
+        % Réserve l'espace vertical occupé par les trois logos.
+        \vspace*{2.35cm}
 
         % =====================================================
         % Nature du rapport et formation
