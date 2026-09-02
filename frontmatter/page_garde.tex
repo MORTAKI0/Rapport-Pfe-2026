@@ -2,16 +2,14 @@
     \thispagestyle{empty}
 
     % =========================================================
-    % Mise en page inspirée du modèle officiel EMSI / Honoris
+    % Couverture conforme à l'esprit du modèle EMSI
     % =========================================================
     \begin{tikzpicture}[remember picture,overlay]
-        % Bande verte verticale.
         \fill[emsigreen]
             ($(current page.north west)+(0.95cm,-1.45cm)$)
             rectangle
             ($(current page.south west)+(1.50cm,1.65cm)$);
 
-        % Bloc rouge inférieur.
         \fill[cgired]
             ($(current page.south west)+(0.95cm,0.72cm)$)
             rectangle
@@ -19,86 +17,98 @@
     \end{tikzpicture}
 
     \hspace*{0.72cm}
-    \begin{minipage}[t][0.95\textheight]{0.91\textwidth}
+    \begin{minipage}[t][0.945\textheight]{0.91\textwidth}
 
         % =====================================================
-        % Logos institutionnels
+        % Logos : EMSI / Honoris / CGI
         % =====================================================
-        \vspace*{-1.00cm}
+        \vspace*{-0.95cm}
         \noindent
-        \begin{minipage}[c][2.2cm][c]{0.60\textwidth}
+        \begin{minipage}[c][2.35cm][c]{0.39\textwidth}
             \raggedright
-            \IfFileExists{logos/EMSI.png}{%
-                \includegraphics[
-                    height=1.85cm,
-                    keepaspectratio
-                ]{logos/EMSI.png}%
-            }{%
-                \textbf{ÉCOLE MAROCAINE DES SCIENCES DE L'INGÉNIEUR}%
-            }
+            \includegraphics[
+                height=2.05cm,
+                trim=0 12 0 12,
+                clip,
+                keepaspectratio
+            ]{logos/EMSI.png}
         \end{minipage}
         \hfill
-        \begin{minipage}[c][2.2cm][c]{0.30\textwidth}
+        \begin{minipage}[c][2.35cm][c]{0.25\textwidth}
+            \centering
+            \includegraphics[
+                width=3.15cm,
+                keepaspectratio
+            ]{logos/honoris.png}
+        \end{minipage}
+        \hfill
+        \begin{minipage}[c][2.35cm][c]{0.25\textwidth}
             \raggedleft
-            {\fontsize{19}{20}\selectfont\bfseries\textcolor[RGB]{111,19,38}{HONORIS}}\\[-0.05cm]
-            \textcolor[RGB]{111,19,38}{\rule{3.1cm}{0.55pt}}\\[-0.02cm]
-            {\scriptsize\textcolor[RGB]{111,19,38}{UNITED UNIVERSITIES}}
+            \includegraphics[
+                height=1.25cm,
+                keepaspectratio
+            ]{logos/cgi.png}
         \end{minipage}
 
         % =====================================================
         % Nature du rapport et formation
         % =====================================================
-        \vspace{1.10cm}
+        \vspace{0.65cm}
         \begin{center}
-            {\LARGE\bfseries Rapport de stage}\\[0.16cm]
-            {\large\bfseries 5\textsuperscript{e} année}\\[0.10cm]
+            {\LARGE\bfseries Rapport de stage}\\[0.12cm]
+            {\large\bfseries 5\textsuperscript{e} année}\\[0.08cm]
             {\large\bfseries Ingénierie Informatique et Réseaux}
 
-            \vspace{0.90cm}
+            \vspace{0.72cm}
 
-            {\large\bfseries Sous le thème}\\[0.26cm]
+            {\large\bfseries Sous le thème}\\[0.22cm]
             \rule{0.56\linewidth}{0.45pt}
 
-            \vspace{0.50cm}
+            \vspace{0.42cm}
 
-            {\fontsize{24}{27}\selectfont\bfseries \projectname}\\[0.28cm]
+            {\fontsize{23}{25}\selectfont\bfseries \projectname}\\[0.24cm]
+
             \begin{minipage}{0.82\linewidth}
                 \centering
-                {\large\bfseries \reporttitle}
-            \end{minipage}\\[0.28cm]
-            {\normalsize\itshape \reportsubtitle}
+                \begin{spacing}{1.02}
+                    {\fontsize{12}{14}\selectfont\bfseries
+                    \reporttitle}
+                \end{spacing}
+            \end{minipage}
 
-            \vspace{0.70cm}
+            \vspace{0.58cm}
 
-            {\large\bfseries PÉRIODE DE STAGE}\\[0.18cm]
-            {\normalsize \internshipperiod}\\[0.24cm]
+            {\large\bfseries PÉRIODE DE STAGE}\\[0.14cm]
+            {\normalsize \internshipperiod}\\[0.20cm]
             \rule{0.56\linewidth}{0.45pt}
         \end{center}
 
         % =====================================================
-        % Étudiant, encadrants et organisme d'accueil
+        % Étudiant, encadrement et entreprise
         % =====================================================
-        \vspace{1.00cm}
+        \vspace{0.82cm}
         \hspace*{1.00cm}
-        \begin{minipage}{0.82\textwidth}
+        \begin{minipage}{0.83\textwidth}
             \raggedright
+            \setlength{\parindent}{0pt}
 
             {\large\bfseries Réalisé par :}\\[0.08cm]
             {\normalsize M. \studentname}
 
-            \vspace{0.55cm}
+            \vspace{0.48cm}
 
-            {\large\bfseries Encadré par :}\\[0.10cm]
+            {\large\bfseries Encadrement :}\\[0.12cm]
             {\normalsize
-            \textbf{Encadrante pédagogique :} \academicsupervisor\\[0.08cm]
-            \textbf{Encadrants professionnels :} \companysupervisor
+            \textbf{Encadrante pédagogique :} \academicsupervisor\\[0.12cm]
+            \textbf{Encadrants professionnels :}\\[0.06cm]
+            \companysupervisor
             }
 
-            \vspace{0.55cm}
+            \vspace{0.48cm}
 
             {\normalsize
-            \textbf{Entreprise :} \companyname\\[0.08cm]
-            \textbf{Activité :} \companyactivity\\[0.08cm]
+            \textbf{Entreprise :} \companyname\\[0.10cm]
+            \textbf{Activité :} \companyactivity\\[0.10cm]
             \textbf{Adresse :} \companyaddress
             }
         \end{minipage}
@@ -111,6 +121,7 @@
         \begin{center}
             {\normalsize\bfseries ANNÉE UNIVERSITAIRE : 2025--2026}
         \end{center}
+        \vspace*{0.10cm}
 
     \end{minipage}
 \end{titlepage}
