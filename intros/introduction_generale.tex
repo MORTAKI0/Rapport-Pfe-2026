@@ -6,31 +6,39 @@ Les systèmes logiciels constituent un patrimoine stratégique pour les organisa
 
 Les outils déterministes automatisent efficacement les transformations connues et les contrôles reproductibles, mais ils restent limités lorsque la résolution dépend fortement du contexte d'une application. À l'inverse, les grands modèles de langage peuvent analyser du code, interpréter des journaux et proposer des adaptations, sans offrir à eux seuls les garanties nécessaires pour contrôler des écritures, des commandes ou des décisions sensibles. Le problème n'est donc pas de choisir entre automatisation déterministe et intelligence générative, mais de les combiner dans un cadre maîtrisé.
 
-Ce projet de fin d'études, réalisé au sein de \textbf{CGI Technologies et Solutions Maroc}, porte sur la conception et le développement d'une \textbf{Migration Factory intelligente, extensible et gouvernée}. La solution adopte une architecture multi-agents hybride et centralement orchestrée. Les agents sont spécialisés dans les activités de raisonnement, de révision, de planification, de transformation agentique, de réparation et d'assistance. Les services déterministes conservent l'autorité sur l'état du workflow, les transitions, les profils, les chemins, les commandes, les écritures et les validations. Le développeur reste responsable des décisions qui engagent la suite du processus.
-
-La démarche est appliquée à deux écosystèmes. La déclinaison Java/Spring Boot couvre une trajectoire progressive entre Spring Boot 2.1, 2.7, 3.5 et 4.0 avec plusieurs versions de Java. Elle constitue l'implémentation la plus mature et intègre notamment les espaces de travail isolés, les validations Maven, la réparation gouvernée, le cockpit, l'assistant et le reporting. Les appels aux modèles y sont configurés au moyen d'Azure OpenAI, avec des déploiements externalisés selon les rôles agentiques. La déclinaison Angular permet d'éprouver les mêmes principes dans un second écosystème ; les preuves retenues valident les transitions 18 vers 19 et 19 vers 20, tandis que le parcours élargi 11 vers 21 reste à compléter.
-
-L'utilisateur principal est le développeur chargé de la migration. L'objectif n'est pas de supprimer son intervention, mais de réduire les opérations répétitives, de structurer le diagnostic et de lui fournir un environnement où l'état, les preuves, les blocages et les actions autorisées sont explicitement visibles.
-
-La problématique générale peut être formulée comme suit :
+La problématique générale peut ainsi être formulée comme suit :
 
 \begin{quote}
 \itshape
 Comment concevoir et mettre en œuvre une architecture multi-agents hybride capable de coordonner l'analyse, la planification, la transformation, la validation et la réparation de migrations Java/Spring Boot et Angular, tout en préservant l'intégrité du code source, la traçabilité des décisions, la reproductibilité des opérations et le contrôle du développeur ?
 \end{quote}
 
-Pour y répondre, le projet poursuit plusieurs objectifs complémentaires : identifier les agents nécessaires, distinguer les services déterministes, définir leurs responsabilités et leurs limites d'autorité, concevoir l'orchestrateur et les contrats d'échange, intégrer les outils propres à chaque écosystème, mettre en œuvre une réparation gouvernée et évaluer les résultats obtenus.
+Ce projet de fin d'études, réalisé au sein de \textbf{CGI Technologies et Solutions Maroc}, porte sur la conception et le développement d'une \textbf{Migration Factory intelligente, extensible et gouvernée}. La solution adopte une architecture multi-agents hybride et centralement orchestrée : les agents sont spécialisés dans les tâches nécessitant raisonnement ou adaptation, tandis que les services déterministes conservent l'autorité sur l'état du workflow, les transitions, les profils, les chemins, les commandes, les écritures et les validations. Le développeur chargé de la migration demeure l'utilisateur principal et reste responsable des décisions qui engagent la suite du processus.
+
+L'objectif général du projet est de \textbf{concevoir et implémenter une plateforme capable d'automatiser et de gouverner une migration applicative de bout en bout, tout en restant extensible à plusieurs écosystèmes techniques et contrôlable par le développeur}. Pour atteindre cet objectif, les réalisations concrètes visées sont les suivantes :
+
+\begin{itemize}
+    \item analyser le processus de migration et identifier les responsabilités à répartir entre agents, orchestrateur et services déterministes ;
+    \item concevoir une architecture multi-agents gouvernée, avec des contrats d'échange, des états persistants et des points de décision humaine explicites ;
+    \item implémenter des pipelines de migration spécialisés pour Java/Spring Boot et Angular en intégrant leurs outils, profils de versions et mécanismes de validation ;
+    \item mettre en œuvre la supervision, la révision et la réparation gouvernée, ainsi qu'une intégration contrôlée des modèles via Azure OpenAI dans la déclinaison Java ;
+    \item vérifier le fonctionnement de la plateforme à partir de scénarios techniques, de preuves d'exécution et d'une analyse des limites et de l'extensibilité obtenue.
+\end{itemize}
+
+Le projet a été conduit selon une démarche incrémentale et itérative. Chaque évolution part d'un problème observé, conduit à la formulation d'une exigence, puis à la conception et à l'implémentation d'un composant. Celui-ci est ensuite vérifié par les tests ou les commandes techniques appropriées, exercé dans un scénario représentatif, présenté lors des points de suivi, puis ajusté à partir des retours obtenus. Cette démarche a d'abord été appliquée à Java/Spring Boot afin de stabiliser les mécanismes centraux de la plateforme, puis étendue à Angular pour éprouver leur transférabilité dans un second écosystème.
+
+Les résultats obtenus montrent une maturité différente selon les deux déclinaisons. La chaîne Java/Spring Boot est la plus avancée : elle couvre une trajectoire progressive entre Spring Boot 2.1, 2.7, 3.5 et 4.0 avec plusieurs versions de Java, des espaces de travail isolés, des validations Maven, une boucle de réparation gouvernée, un cockpit, un assistant et un reporting. Les appels aux modèles y sont configurés au moyen d'Azure OpenAI avec des déploiements externalisés selon les rôles agentiques. La déclinaison Angular reprend les mêmes principes avec ses propres profils Node.js, npm, TypeScript et Angular ; les preuves retenues valident les transitions 18 vers 19 et 19 vers 20, tandis que le stage 20 vers 21 est préparé mais non démarré et que la trajectoire complète 11 vers 21 reste à achever.
 
 Sauf indication contraire, l'état présenté dans ce rapport est mis à jour au \textbf{30 août 2026}. Une étape n'est considérée comme validée que lorsqu'elle est appuyée par une preuve technique ou un élément de validation explicitement intégré au rapport ; les objectifs encore ouverts sont présentés comme tels.
 
 Le rapport est organisé en cinq chapitres :
 
 \begin{itemize}
-    \item le \textbf{Chapitre I} présente le contexte, les besoins, les objectifs et la méthodologie ;
+    \item le \textbf{Chapitre I} présente le contexte du projet, l'analyse des besoins, les objectifs et la méthodologie ;
     \item le \textbf{Chapitre II} expose le cadrage conceptuel, l'état de l'art et le positionnement de la solution ;
-    \item le \textbf{Chapitre III} décrit la conception de l'architecture multi-agents et de sa gouvernance ;
-    \item le \textbf{Chapitre IV} présente l'architecture technique et l'implémentation des deux déclinaisons ;
-    \item le \textbf{Chapitre V} formalise le protocole d'évaluation, les résultats, l'analyse comparative et les limites.
+    \item le \textbf{Chapitre III} décrit la conception de l'architecture multi-agents et les mécanismes de gouvernance retenus ;
+    \item le \textbf{Chapitre IV} présente l'architecture technique, l'implémentation des deux déclinaisons et leurs interfaces de supervision ;
+    \item le \textbf{Chapitre V} formalise le protocole d'évaluation, les résultats obtenus, leur analyse comparative et les limites identifiées.
 \end{itemize}
 
 La conclusion générale synthétise les apports du projet, ses limites actuelles et les perspectives d'industrialisation.
