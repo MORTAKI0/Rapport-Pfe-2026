@@ -540,64 +540,55 @@ La source externe n'est pas utilisée comme répertoire d'écriture. Le candidat
 \subsection{Interface de supervision et captures}
 % ============================================================
 
-Le cockpit présente le résumé, le pipeline, le stage sélectionné, l'analyse, le plan, les points de validation, les commandes, les journaux, les événements, la réparation, l'assistant et les rapports. Le frontend projette l'état fourni par le backend ; il ne maintient pas une vérité parallèle.
+Le cockpit constitue la projection opérationnelle de l'état persistant de la migration. Il présente la trajectoire calculée, les profils d'exécution, les phases en cours, les résultats d'analyse et de planification, les points de validation, les journaux, les preuves et les propositions de réparation. Le frontend n'est pas une source de vérité autonome : il restitue les états et artefacts fournis par le backend et n'autorise que les actions rendues disponibles par le workflow.
+
+Afin de documenter l'interface sans transformer ce chapitre en galerie d'écrans, quatre vues représentatives ont été retenues : deux pour Angular et deux pour Java/Spring Boot. Elles illustrent respectivement la préparation d'une migration, la supervision d'une phase agentique, la qualification de l'environnement Java et l'examen d'une réparation gouvernée.
+
+\paragraph{Déclinaison Angular.}
+
+La figure~\ref{fig:interface-angular-configuration-ch4} montre l'écran de préparation d'une migration Angular. La source détectée, la cible demandée et la trajectoire adjacente-major sont explicitées avant le démarrage. La source reste en lecture seule et l'interface expose également les contrôles de disponibilité nécessaires à la revue de préparation.
 
 \begin{figure}[H]
     \centering
-    \IfFileExists{figures/chapitre4/java-demo1-cli.png}{%
-        \includegraphics[width=0.96\textwidth]{figures/chapitre4/java-demo1-cli.png}%
-    }{%
-        \fbox{\parbox[c][4.6cm][c]{0.9\textwidth}{\centering\bfseries Capture historique à intégrer : Java J1\\\normalfont Première démonstration de la solution CLI du 25 mai 2026.}}%
-    }
-    \caption{Première version Java/Spring Boot utilisée en ligne de commande}
-    \label{fig:capture-java-demo1-ch4}
+    \includegraphics[width=0.97\textwidth]{"logos/Angular screen 1.png"}
+    \caption{Configuration d'une migration Angular et projection de la trajectoire cible 11--21}
+    \label{fig:interface-angular-configuration-ch4}
 \end{figure}
 
-\begin{figure}[H]
-    \centering
-    \IfFileExists{figures/chapitre4/java-demo3-control-tower.png}{%
-        \includegraphics[width=0.96\textwidth]{figures/chapitre4/java-demo3-control-tower.png}%
-    }{%
-        \fbox{\parbox[c][5cm][c]{0.9\textwidth}{\centering\bfseries Capture réelle à intégrer : Java J3\\\normalfont Control Tower full stack présentée le 19 juin 2026.}}%
-    }
-    \caption{Control Tower Java/Spring Boot}
-    \label{fig:capture-control-tower-java-ch4}
-\end{figure}
+Cette projection décrit une \textbf{trajectoire cible calculée} ; elle ne constitue pas une preuve que l'ensemble du parcours Angular 11--21 a été exécuté. Les résultats techniques retenus dans ce rapport restent ceux explicitement documentés au Chapitre V.
+
+La figure~\ref{fig:interface-angular-analyse-ch4} illustre ensuite la supervision en temps réel de la phase d'analyse. Le développeur peut suivre les nœuds déterministes déjà validés, le passage au proposeur d'analyse, l'intervention du réviseur indépendant, la progression globale et les journaux produits pendant l'exécution.
 
 \begin{figure}[H]
     \centering
-    \IfFileExists{figures/chapitre4/java-demo3-chatbot.png}{%
-        \includegraphics[width=0.96\textwidth]{figures/chapitre4/java-demo3-chatbot.png}%
-    }{%
-        \fbox{\parbox[c][5cm][c]{0.9\textwidth}{\centering\bfseries Capture réelle à intégrer : chatbot Java\\\normalfont Assistant contextualisé présenté dans la plateforme full stack.}}%
-    }
-    \caption{Assistant conversationnel de la Control Tower}
-    \label{fig:capture-chatbot-java-ch4}
+    \includegraphics[width=0.97\textwidth]{"logos/angular analyse .png"}
+    \caption{Supervision en temps réel de la phase d'analyse Angular}
+    \label{fig:interface-angular-analyse-ch4}
 \end{figure}
+
+Cette capture est utilisée pour documenter le comportement de l'interface de supervision et la séparation des rôles. Les libellés de fournisseur ou de modèle visibles dans l'écran ne sont pas utilisés, à eux seuls, comme preuve du fournisseur LLM effectivement validé pour la déclinaison Angular.
+
+\paragraph{Déclinaison Java/Spring Boot.}
+
+La figure~\ref{fig:interface-java-configuration-ch4} présente la trajectoire Java/Spring Boot avant création de la migration gouvernée. Les quatre stages, les versions de Java associées, Maven, la politique de continuation, le niveau de preuve et les contrôles de disponibilité sont regroupés dans une même vue afin que le développeur puisse vérifier le contexte d'exécution avant le lancement.
 
 \begin{figure}[H]
     \centering
-    \IfFileExists{figures/chapitre4/java-v1-reparation.png}{%
-        \includegraphics[width=0.96\textwidth]{figures/chapitre4/java-v1-reparation.png}%
-    }{%
-        \fbox{\parbox[c][5cm][c]{0.9\textwidth}{\centering\bfseries Capture future à intégrer : réparation gouvernée\\\normalfont Proposition, révision, décision et résultat de revalidation de la V1.}}%
-    }
-    \caption{Écran de réparation gouvernée de la V1 Java}
+    \includegraphics[width=0.97\textwidth]{"logos/java 2 env look.png"}
+    \caption{Configuration de la trajectoire Java/Spring Boot et vérification de l'environnement d'exécution}
+    \label{fig:interface-java-configuration-ch4}
+\end{figure}
+
+Enfin, la figure~\ref{fig:capture-reparation-java-ch4} montre une vue de réparation gouvernée. Le diagnostic, la décision du réviseur, l'empreinte de l'artefact et le diff proposé sont présentés ensemble. Cette organisation permet au développeur d'examiner la proposition exacte avant toute application et matérialise la séparation entre proposition, révision et exécution déterministe.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.97\textwidth]{"logos/java diffs .png"}
+    \caption{Supervision d'une proposition de réparation gouvernée Java/Spring Boot}
     \label{fig:capture-reparation-java-ch4}
 \end{figure}
 
-\begin{figure}[H]
-    \centering
-    \IfFileExists{figures/chapitre4/angular-demo-a1.png}{%
-        \includegraphics[width=0.96\textwidth]{figures/chapitre4/angular-demo-a1.png}%
-    }{%
-        \fbox{\parbox[c][5cm][c]{0.9\textwidth}{\centering\bfseries Capture Angular A1 à intégrer\\\normalfont Jalon du planning initial ; non utilisé comme preuve technique dans ce rapport.}}%
-    }
-    \caption{Première démonstration d'avancement Angular}
-    \label{fig:capture-angular-a1-ch4}
-\end{figure}
-
-Ces emplacements rendent explicites les preuves visuelles encore à fournir. Aucune capture fictive n'est présentée comme résultat.
+Ces captures complètent les descriptions architecturales par une vue concrète de l'interaction avec la Factory. Elles illustrent la configuration, la progression et la gouvernance visibles par le développeur ; elles ne remplacent pas les preuves techniques d'exécution, de compilation ou de test analysées au Chapitre V.
 
 % ============================================================
 \section{Robustesse, sécurité et validation technique}
