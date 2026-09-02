@@ -542,7 +542,7 @@ La source externe n'est pas utilisée comme répertoire d'écriture. Le candidat
 
 Le cockpit constitue la projection opérationnelle de l'état persistant de la migration. Il présente la trajectoire calculée, les profils d'exécution, les phases en cours, les résultats d'analyse et de planification, les points de validation, les journaux, les preuves et les propositions de réparation. Le frontend n'est pas une source de vérité autonome : il restitue les états et artefacts fournis par le backend et n'autorise que les actions rendues disponibles par le workflow.
 
-Afin de documenter l'interface sans transformer ce chapitre en galerie d'écrans, quatre vues représentatives ont été retenues : deux pour Angular et deux pour Java/Spring Boot. Elles illustrent respectivement la préparation d'une migration, la supervision d'une phase agentique, la qualification de l'environnement Java et l'examen d'une réparation gouvernée.
+Afin de documenter l'interface sans transformer ce chapitre en galerie d'écrans, cinq vues représentatives ont été retenues : trois pour Angular et deux pour Java/Spring Boot. Elles illustrent respectivement la préparation d'une migration, la supervision d'une phase agentique, l'examen d'une réparation gouvernée Angular, la qualification de l'environnement Java et l'examen d'une réparation gouvernée Java/Spring Boot.
 
 \paragraph{Déclinaison Angular.}
 
@@ -566,7 +566,18 @@ La figure~\ref{fig:interface-angular-analyse-ch4} illustre ensuite la supervisio
     \label{fig:interface-angular-analyse-ch4}
 \end{figure}
 
-Cette capture est utilisée pour documenter le comportement de l'interface de supervision et la séparation des rôles. Les libellés de fournisseur ou de modèle visibles dans l'écran ne sont pas utilisés, à eux seuls, comme preuve du fournisseur LLM effectivement validé pour la déclinaison Angular.
+Cette capture documente le comportement de l'interface de supervision et la séparation des rôles entre les étapes déterministes, le proposeur d'analyse et le réviseur indépendant.
+
+La figure~\ref{fig:interface-angular-reparation-ch4} présente ensuite une réparation gouvernée déclenchée par une incompatibilité d'outillage. Le diagnostic est figé avant la génération du correctif ; le Main Repair LLM produit une proposition bornée, puis un réviseur indépendant contrôle sa cohérence et les risques associés. Le diff exact est affiché dans le cockpit et reste soumis à l'approbation humaine G10 avant toute application.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.97\textwidth]{"logos/angular diff 2.png"}
+    \caption{Exemple de réparation gouvernée Angular avec proposition de diff et révision indépendante}
+    \label{fig:interface-angular-reparation-ch4}
+\end{figure}
+
+Cette vue met en évidence la séparation entre génération, révision et décision humaine : la proposition reste un artefact contrôlé tant que le point de validation n'est pas approuvé.
 
 \paragraph{Déclinaison Java/Spring Boot.}
 
