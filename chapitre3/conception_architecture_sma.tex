@@ -15,10 +15,12 @@ La description suit plusieurs points de vue conformément à ISO/IEC/IEEE 42010 
 \subsection{Points de vue architecturaux}
 % ============================================================
 
-Une architecture de cette nature ne peut pas être comprise à partir d'un seul diagramme. La vue fonctionnelle répond à la question \og qui fait quoi ? \fg{}, la vue comportementale montre \og dans quel ordre et sous quelles conditions ? \fg{}, tandis que les vues informationnelle, de déploiement et de gouvernance précisent respectivement les données échangées, l'environnement d'exécution et les limites d'autorité. Le tableau suivant associe chaque préoccupation à la représentation utilisée dans le rapport.
+Une architecture de cette nature ne peut pas être comprise à partir d'un seul diagramme. La vue fonctionnelle répond à la question \og qui fait quoi ? \fg{}, la vue comportementale montre \og dans quel ordre et sous quelles conditions ? \fg{}, tandis que les vues informationnelle, de déploiement et de gouvernance précisent respectivement les données échangées, l'environnement d'exécution et les limites d'autorité. Le Tableau~\ref{tab:viewpoints-ch3} associe chaque préoccupation à la représentation utilisée dans le rapport.
 
 \begin{table}[H]
     \centering
+    \caption{Points de vue retenus pour la description de l'architecture}
+    \label{tab:viewpoints-ch3}
     \small
     \arrayrulecolor{cgigray}
     \rowcolors{2}{cgilight!55}{white}
@@ -40,8 +42,6 @@ Une architecture de cette nature ne peut pas être comprise à partir d'un seul 
         Gouvernance & Autorité, approbation et risques. & Matrice d'autonomie et boucle de réparation. \\
         \hline
     \end{tabularx}
-    \caption{Points de vue retenus pour la description de l'architecture}
-    \label{tab:viewpoints-ch3}
     \rowcolors{2}{white}{white}
     \arrayrulecolor{black}
 \end{table}
@@ -62,6 +62,8 @@ Ce choix répond à quatre contraintes principales :
     \item les décisions sensibles doivent pouvoir interrompre le processus ;
     \item les résultats intermédiaires doivent être persistés et reliés aux preuves.
 \end{itemize}
+
+La Figure~\ref{fig:modele-sma-ch3} synthétise les catégories de composants et les limites d'autorité du modèle hybride retenu.
 
 \begin{figure}[H]
     \centering
@@ -122,7 +124,7 @@ Cette distinction évite de qualifier d'agent tout composant participant au work
 
 \subsection{Matrice des rôles et de l'autonomie}
 
-La spécialisation des agents n'est utile que si leur périmètre d'action reste explicite. La matrice suivante synthétise, pour chaque rôle, la capacité de raisonnement, l'accès aux outils, les droits d'écriture et les points où une validation indépendante ou humaine demeure obligatoire.
+La spécialisation des agents n'est utile que si leur périmètre d'action reste explicite. Le Tableau~\ref{tab:autonomie-agents-ch3} synthétise, pour chaque rôle, la capacité de raisonnement, l'accès aux outils, les droits d'écriture et les points où une validation indépendante ou humaine demeure obligatoire.
 
 \scriptsize
 \begin{longtable}{|>{\bfseries\RaggedRight\arraybackslash}p{2.7cm}|>{\RaggedRight\arraybackslash}p{3.2cm}|>{\centering\arraybackslash}p{2.2cm}|>{\centering\arraybackslash}p{2.2cm}|>{\centering\arraybackslash}p{2.2cm}|>{\RaggedRight\arraybackslash}p{2.7cm}|}
@@ -159,7 +161,7 @@ La spécialisation des agents n'est utile que si leur périmètre d'action reste
 % ============================================================
 \subsection{Architecture globale}
 
-Les responsabilités décrites précédemment doivent maintenant être replacées dans une vue d'ensemble afin de comprendre leurs interactions. Cette architecture globale montre comment le cockpit, l'API, l'orchestrateur, les agents, les services déterministes et les mécanismes de persistance coopèrent au sein d'une même chaîne d'exécution. Elle met également en évidence le principe d'autorité retenu : les agents produisent des analyses ou des propositions, tandis que l'état, les transitions et l'exécution restent contrôlés par les composants déterministes.
+Les responsabilités décrites précédemment doivent maintenant être replacées dans une vue d'ensemble afin de comprendre leurs interactions. Cette architecture globale montre comment le cockpit, l'API, l'orchestrateur, les agents, les services déterministes et les mécanismes de persistance coopèrent au sein d'une même chaîne d'exécution. Elle met également en évidence le principe d'autorité retenu : les agents produisent des analyses ou des propositions, tandis que l'état, les transitions et l'exécution restent contrôlés par les composants déterministes. La Figure~\ref{fig:architecture-sma-ch3} présente cette vue d'ensemble.
 % ============================================================
 
 \begin{figure}[H]
@@ -179,7 +181,7 @@ Une fois les responsabilités définies, leur coordination devient le point cent
 \subsection{Communication et contrats}
 % ============================================================
 
-Les agents ne maintiennent pas une conversation libre comme source de vérité. Ils échangent indirectement par des artefacts orchestrés. Un contrat logique contient : identifiant de migration, tâche, producteur, consommateur, référence de contexte, schéma attendu, empreintes, statut et erreurs.
+Les agents ne maintiennent pas une conversation libre comme source de vérité. Ils échangent indirectement par des artefacts orchestrés. Un contrat logique contient : identifiant de migration, tâche, producteur, consommateur, référence de contexte, schéma attendu, empreintes, statut et erreurs. La Figure~\ref{fig:sequence-sma-ch3} illustre une séquence simplifiée de ces échanges.
 
 \begin{figure}[H]
     \centering
@@ -217,7 +219,7 @@ Les agents ne maintiennent pas une conversation libre comme source de vérité. 
 Les contrats définissent ce qui peut être échangé ; l'orchestrateur détermine quand et dans quelles conditions un échange peut faire progresser la migration. Il constitue ainsi le point de coordination entre l'état persistant, les agents, les services déterministes et les décisions humaines.
 % ============================================================
 
-L'orchestrateur reçoit une intention validée par l'API, charge l'état persistant, sélectionne le nœud autorisé, prépare son contexte, enregistre la sortie, ouvre éventuellement un point de validation et détermine la suite.
+L'orchestrateur reçoit une intention validée par l'API, charge l'état persistant, sélectionne le nœud autorisé, prépare son contexte, enregistre la sortie, ouvre éventuellement un point de validation et détermine la suite. La Figure~\ref{fig:orchestrateur-ch3} synthétise cette logique.
 
 \begin{figure}[H]
     \centering
@@ -232,7 +234,7 @@ L'orchestrateur reçoit une intention validée par l'API, charge l'état persist
 Le contrôle du workflow suppose que l'état de la migration ne soit pas reconstruit à partir des seules conversations ou des journaux d'exécution. Il doit être persisté et accessible aux composants autorisés. La distinction entre état métier, artefacts durables et contexte agentique temporaire soutient ainsi la reprise, la traçabilité et la limitation des informations transmises aux modèles.
 % ============================================================
 
-Une migration possède un état global et des états locaux pour les stages, commandes, points de validation et réparations. Le frontend présente une projection ; il ne décide pas de l'état.
+Une migration possède un état global et des états locaux pour les stages, commandes, points de validation et réparations. Le frontend présente une projection ; il ne décide pas de l'état. La Figure~\ref{fig:machine-etats-sma-ch3} présente une machine à états simplifiée.
 
 \begin{figure}[H]
     \centering
@@ -263,7 +265,7 @@ Le workflow Angular détecte Angular, Node.js, npm, TypeScript et RxJS, résout 
 \subsection{Supervision et réparation gouvernée}
 % ============================================================
 
-Les points de validation permettent d'approuver, rejeter, demander une révision ou annuler. Une décision est liée à l'état courant et à l'empreinte de l'artefact examiné.
+Les points de validation permettent d'approuver, rejeter, demander une révision ou annuler. Une décision est liée à l'état courant et à l'empreinte de l'artefact examiné. La Figure~\ref{fig:reparation-sma-ch3} représente la boucle de réparation gouvernée.
 
 \begin{figure}[H]
     \centering
