@@ -8,10 +8,12 @@ Cette approche peut être décrite comme un principe d'\textit{apport de ses pro
 
 \subsection{Configuration observée dans la déclinaison Java}
 
-L'audit du dépôt Java confirme une configuration externalisée par variables d'environnement. Les agents ne reçoivent pas directement ces valeurs ; elles sont lues par les composants backend responsables du routage et du transport.
+L'audit du dépôt Java confirme une configuration externalisée par variables d'environnement. Les agents ne reçoivent pas directement ces valeurs ; elles sont lues par les composants backend responsables du routage et du transport. Le Tableau~\ref{tab:configuration-azure-ch4} récapitule les paramètres observés et leur usage.
 
 \begin{table}[H]
     \centering
+    \caption{Configuration Azure OpenAI externalisée dans le système Java}
+    \label{tab:configuration-azure-ch4}
     \scriptsize
     \arrayrulecolor{cgigray}
     \rowcolors{2}{cgilight!55}{white}
@@ -33,8 +35,6 @@ L'audit du dépôt Java confirme une configuration externalisée par variables d
         \texttt{AZURE\_OPENAI\_FALLBACK\_DEPLOYMENT} & Nom optionnel d'un déploiement de secours & Continuité contrôlée lorsque le rôle principal n'est pas disponible et que le secours est activé. \\
         \hline
     \end{tabularx}
-    \caption{Configuration Azure OpenAI externalisée dans le système Java}
-    \label{tab:configuration-azure-ch4}
     \rowcolors{2}{white}{white}
     \arrayrulecolor{black}
 \end{table}
@@ -43,7 +43,7 @@ Le routeur sélectionne le déploiement correspondant au rôle demandé. Les tes
 
 \subsection{Chaîne d'appel et contrôle préalable}
 
-Après avoir défini les paramètres externalisés et le routage par rôle, il convient de préciser comment une requête traverse effectivement le backend. La chaîne suivante met en évidence les contrôles appliqués avant l'appel au modèle, la sélection du déploiement correspondant au rôle demandé, puis la validation de la réponse avant sa restitution au reste du système. Elle relie ainsi la configuration décrite précédemment aux mécanismes de sûreté et de traçabilité de l'exécution.
+Après avoir défini les paramètres externalisés et le routage par rôle, il convient de préciser comment une requête traverse effectivement le backend. La chaîne suivante met en évidence les contrôles appliqués avant l'appel au modèle, la sélection du déploiement correspondant au rôle demandé, puis la validation de la réponse avant sa restitution au reste du système. Elle relie ainsi la configuration décrite précédemment aux mécanismes de sûreté et de traçabilité de l'exécution. La Figure~\ref{fig:chaine-appel-azure-ch4} en donne la vue d'ensemble.
 
 \begin{figure}[H]
     \centering
