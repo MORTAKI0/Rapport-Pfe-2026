@@ -17,22 +17,22 @@ L'audit du dépôt Java confirme une configuration externalisée par variables d
     \scriptsize
     \arrayrulecolor{cgigray}
     \rowcolors{2}{cgilight!55}{white}
-    \begin{tabularx}{\textwidth}{|>{\bfseries\RaggedRight\arraybackslash}p{4.2cm}|>{\RaggedRight\arraybackslash}p{4.1cm}|>{\RaggedRight\arraybackslash}X|}
+    \begin{tabularx}{\textwidth}{|>{\bfseries\RaggedRight\arraybackslash}p{4.8cm}|>{\RaggedRight\arraybackslash}p{3.5cm}|>{\RaggedRight\arraybackslash}X|}
         \hline
         \rowcolor{cgilight!95}
         \textbf{Variable} & \textbf{Valeur fournie} & \textbf{Usage} \\
         \hline
-        \texttt{AZURE\_OPENAI\_ENDPOINT} & URL de la ressource Azure & Point d'accès utilisé par le client backend. \\
+        \nolinkurl{AZURE_OPENAI_ENDPOINT} & URL de la ressource Azure & Point d'accès utilisé par le client backend. \\
         \hline
-        \texttt{AZURE\_OPENAI\_API\_KEY} & Clé secrète de la ressource & Authentification effectivement utilisée dans le runtime observé. \\
+        \nolinkurl{AZURE_OPENAI_API_KEY} & Clé secrète de la ressource & Authentification effectivement utilisée dans le runtime observé. \\
         \hline
-        \texttt{AZURE\_OPENAI\_PROPOSER\_DEPLOYMENT} & Nom du déploiement proposeur & Génération des propositions ou correctifs candidats. \\
+        \nolinkurl{AZURE_OPENAI_PROPOSER_DEPLOYMENT} & Nom du déploiement proposeur & Génération des propositions ou correctifs candidats. \\
         \hline
-        \texttt{AZURE\_OPENAI\_REVIEWER\_DEPLOYMENT} & Nom du déploiement réviseur & Évaluation indépendante et consolidation des sorties. \\
+        \nolinkurl{AZURE_OPENAI_REVIEWER_DEPLOYMENT} & Nom du déploiement réviseur & Évaluation indépendante et consolidation des sorties. \\
         \hline
-        \texttt{AZURE\_OPENAI\_ASSISTANT\_DEPLOYMENT} & Nom du déploiement assistant & Réponses conversationnelles contextualisées. \\
+        \nolinkurl{AZURE_OPENAI_ASSISTANT_DEPLOYMENT} & Nom du déploiement assistant & Réponses conversationnelles contextualisées. \\
         \hline
-        \texttt{AZURE\_OPENAI\_FALLBACK\_DEPLOYMENT} & Nom optionnel d'un déploiement de secours & Continuité contrôlée lorsque le rôle principal n'est pas disponible et que le secours est activé. \\
+        \nolinkurl{AZURE_OPENAI_FALLBACK_DEPLOYMENT} & Nom optionnel d'un déploiement de secours & Continuité contrôlée lorsque le rôle principal n'est pas disponible et que le secours est activé. \\
         \hline
     \end{tabularx}
     \rowcolors{2}{white}{white}
