@@ -31,4 +31,4 @@ Azure OpenAI et Microsoft Foundry utilisent des déploiements nommés. L'applica
     \arrayrulecolor{black}
 \end{table}
 
-Cette organisation ne supprime pas les risques. Elle exige une gestion rigoureuse des secrets, des permissions, des journaux et des indisponibilités. Microsoft recommande l'authentification par Microsoft Entra ID pour les connexions sans clé, tout en maintenant la prise en charge des clés API selon le contexte d'exécution \cite{azure-openai-auth,azure-entra-auth}.
+Cette organisation ne supprime pas les risques. Elle exige une gestion rigoureuse des secrets, des permissions, des journaux et des indisponibilités. Microsoft recommande l'authentification par Microsoft Entra ID pour les connexions sans clé ; lorsque des clés API sont utilisées, elles doivent rester gérées comme des secrets et protégées hors du code applicatif \cite{azure-entra-auth,azure-key-vault-secrets}.
