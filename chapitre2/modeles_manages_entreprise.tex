@@ -4,10 +4,12 @@
 
 L'intégration d'un LLM dans une plateforme d'entreprise peut suivre plusieurs modèles. Une application peut appeler directement un service public à l'aide d'une clé propre au projet, ou consommer un modèle déployé dans une ressource contrôlée par l'organisation. Dans le second cas, la ressource, l'endpoint, les identités et les déploiements sont gouvernés par l'entreprise, tandis que l'application conserve uniquement les références nécessaires à l'appel.
 
-Azure OpenAI et Microsoft Foundry utilisent des déploiements nommés. L'application adresse le nom du déploiement configuré, et non seulement le nom générique du modèle sous-jacent. Cette séparation permet à l'organisation de remplacer un modèle, de modifier sa capacité ou d'attribuer des déploiements différents à plusieurs responsabilités sans modifier la logique fonctionnelle des agents \cite{azure-foundry-endpoints}.
+Azure OpenAI et Microsoft Foundry utilisent des déploiements nommés. L'application adresse le nom du déploiement configuré, et non seulement le nom générique du modèle sous-jacent. Cette séparation permet à l'organisation de remplacer un modèle, de modifier sa capacité ou d'attribuer des déploiements différents à plusieurs responsabilités sans modifier la logique fonctionnelle des agents \cite{azure-foundry-endpoints}. Le Tableau~\ref{tab:modeles-manages-entreprise-ch2} compare les modes d'intégration qui en découlent et leurs conséquences architecturales.
 
 \begin{table}[H]
     \centering
+    \caption{Modes d'intégration des modèles dans une plateforme d'entreprise}
+    \label{tab:modeles-manages-entreprise-ch2}
     \small
     \arrayrulecolor{cgigray}
     \rowcolors{2}{cgilight!55}{white}
@@ -25,8 +27,6 @@ Azure OpenAI et Microsoft Foundry utilisent des déploiements nommés. L'applica
         Configuration externalisée & Endpoint, authentification et noms de déploiement sont fournis au runtime. & Réduction des valeurs codées en dur et meilleure adaptation aux environnements client. \\
         \hline
     \end{tabularx}
-    \caption{Modes d'intégration des modèles dans une plateforme d'entreprise}
-    \label{tab:modeles-manages-entreprise-ch2}
     \rowcolors{2}{white}{white}
     \arrayrulecolor{black}
 \end{table}
