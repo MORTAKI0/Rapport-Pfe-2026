@@ -4,7 +4,7 @@
 
 Le choix du fournisseur de modèles ne constitue pas uniquement une décision d'implémentation. Il répond également à une contrainte d'intégration dans l'environnement technologique du client. CGI utilisant principalement les services Microsoft Azure, la déclinaison Java/Spring Boot de la Migration Factory s'appuie sur Azure OpenAI pour l'accès aux grands modèles de langage.
 
-L'objectif n'est pas d'imposer un modèle unique géré ou embarqué par la plateforme. La solution doit permettre à l'organisation de connecter les modèles qu'elle a elle-même déployés et gouvernés dans sa ressource Azure. Le backend reçoit alors une configuration externalisée comprenant l'endpoint de la ressource, le mécanisme d'authentification et les noms des déploiements associés aux rôles agentiques. Azure distingue en effet la ressource, son endpoint et les déploiements nommés appelés par les applications \cite{azure-foundry-endpoints}.
+L'objectif n'est pas d'imposer un modèle unique géré ou embarqué par la plateforme. La solution doit permettre à l'organisation de connecter les modèles qu'elle a elle-même déployés et gouvernés dans sa ressource Azure. Le backend reçoit alors une configuration externalisée comprenant l'endpoint de la ressource, le mécanisme d'authentification et les noms des déploiements associés aux rôles agentiques. Azure distingue en effet la ressource, son endpoint et les déploiements nommés appelés par les applications \cite{azure-foundry-endpoints}. La Figure~\ref{fig:integration-azure-contexte-ch1} synthétise ce principe d'intégration.
 
 \begin{figure}[H]
     \centering
@@ -15,10 +15,12 @@ L'objectif n'est pas d'imposer un modèle unique géré ou embarqué par la plat
 
 Cette orientation correspond à une logique d'\textit{apport de ses propres déploiements Azure} : l'organisation ne téléverse pas nécessairement un modèle dans la Migration Factory ; elle fournit les références nécessaires pour consommer des modèles déjà déployés dans son environnement.
 
-Les exigences suivantes traduisent cette orientation en résultats attendus et en critères vérifiables :
+Les exigences suivantes traduisent cette orientation en résultats attendus et en critères vérifiables. Le Tableau~\ref{tab:exigences-azure-ch1} distingue l'exigence fonctionnelle de connexion des déploiements et les contraintes de configurabilité et de confidentialité associées.
 
 \begin{table}[H]
     \centering
+    \caption{Exigences liées à l'intégration Azure OpenAI}
+    \label{tab:exigences-azure-ch1}
     \small
     \arrayrulecolor{cgigray}
     \rowcolors{2}{cgilight!55}{white}
@@ -34,8 +36,6 @@ Les exigences suivantes traduisent cette orientation en résultats attendus et e
         BNF-14 & Confidentialité & Les clés, endpoints complets et identifiants sensibles ne doivent pas être exposés par l'interface ou les projections publiques. & Inspecter les réponses API, journaux et artefacts publics et vérifier le masquage des valeurs sensibles. \\
         \hline
     \end{tabularx}
-    \caption{Exigences liées à l'intégration Azure OpenAI}
-    \label{tab:exigences-azure-ch1}
     \rowcolors{2}{white}{white}
     \arrayrulecolor{black}
 \end{table}
