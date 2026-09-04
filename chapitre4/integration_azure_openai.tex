@@ -76,7 +76,7 @@ Le client met en œuvre un appel de contrôle réel pour vérifier l'endpoint, l
 
 La configuration backend est conçue pour ne pas exposer l'URL complète, la clé, les identifiants de déploiement ou les prompts bruts dans les projections publiques. L'interface reçoit des références de variables, des indicateurs de disponibilité, des rôles et des états de santé. Les mécanismes de redaction nettoient également les résumés d'erreur avant leur affichage.
 
-L'authentification par clé API correspond à l'état réellement observé. Pour une industrialisation, Microsoft Entra ID et les identités managées permettraient une connexion sans clé et éviteraient la gestion directe d'un secret applicatif \cite{azure-openai-auth,azure-entra-auth}. Lorsque des secrets restent nécessaires, Azure Key Vault fournit un magasin centralisé et des mécanismes de rotation et de contrôle d'accès \cite{azure-key-vault-secrets}.
+L'authentification par clé API correspond à l'état réellement observé. Pour une industrialisation, Microsoft Entra ID et les identités managées permettraient une connexion sans clé et éviteraient la gestion directe d'un secret applicatif \cite{azure-entra-auth}. Lorsque des secrets restent nécessaires, Azure Key Vault fournit un magasin centralisé et des mécanismes de rotation et de contrôle d'accès \cite{azure-key-vault-secrets}.
 
 Il convient donc de distinguer :
 
