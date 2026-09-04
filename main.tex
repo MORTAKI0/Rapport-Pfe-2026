@@ -13,6 +13,7 @@
 \usepackage{setspace}
 \usepackage{ragged2e}
 \usepackage{etoolbox}
+\usepackage{needspace}
 \usepackage{cite}
 
 % ============================================================
@@ -58,10 +59,11 @@
 \setlist[enumerate]{leftmargin=1.1cm,itemsep=0.25em,topsep=0.35em}
 
 % Le guide EMSI impose un interligne 1,5 pour le texte courant et un
-% interligne simple pour les titres. Les tableaux restent compacts pour
-% préserver leur lisibilité et éviter des coupures artificielles.
+% interligne simple pour les titres. Les tableaux et blocs de code restent
+% compacts afin de préserver leur lisibilité sans modifier le texte courant.
 \AtBeginEnvironment{table}{\setstretch{1.0}}
 \AtBeginEnvironment{longtable}{\setstretch{1.0}}
+\AtBeginEnvironment{verbatim}{\setstretch{1.0}\small}
 
 % ============================================================
 % COULEURS ET DIAGRAMMES
@@ -98,6 +100,18 @@
 \titlespacing*{\chapter}{0pt}{-1.1cm}{1.1cm}
 \titleformat{\section}{\Large\sffamily\bfseries\color{black}\setstretch{1.0}}{\thesection}{0.7em}{}
 \titleformat{\subsection}{\large\sffamily\bfseries\color{black}\setstretch{1.0}}{\thesubsection}{0.7em}{}
+
+% Le bloc arborescent du dépôt Java doit rester sur une seule page.
+% Si l'espace restant est insuffisant, la sous-section entière passe à la page suivante.
+\let\mfOriginalSubsection\subsection
+\RenewDocumentCommand{\subsection}{s o m}{%
+    \ifstrequal{#3}{Dépôt Java/Spring Boot}{\Needspace{0.40\textheight}}{}%
+    \IfBooleanTF{#1}{%
+        \mfOriginalSubsection*{#3}%
+    }{%
+        \IfNoValueTF{#2}{\mfOriginalSubsection{#3}}{\mfOriginalSubsection[#2]{#3}}%
+    }%
+}
 
 \pagestyle{fancy}
 \fancyhf{}
@@ -141,7 +155,13 @@
     \let\mfOriginalSection\section
     \RenewDocumentCommand{\section}{s m}{%
         \IfBooleanTF{##1}{%
-            \ifstrequal{##2}{Conclusion}{\input{#2}}{}%
+            \ifstrequal{##2}{Conclusion}{%
+                \input{#2}%
+                % Conserver l'interligne 1,5 du texte tout en évitant qu'une
+                % conclusion courte déborde seule sur une page supplémentaire.
+                \titlespacing*{\section}{0pt}{0.35cm}{0.22cm}%
+                \setlength{\parskip}{0pt}%
+            }{}%
             \mfOriginalSection*{##2}%
         }{%
             \mfOriginalSection{##2}%
