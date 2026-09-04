@@ -53,6 +53,11 @@
 \counterwithin{table}{chapter}
 \renewcommand{\thefigure}{\thechapter.\arabic{figure}}
 \renewcommand{\thetable}{\thechapter.\arabic{table}}
+\addto\captionsfrench{%
+    \renewcommand{\tablename}{Tableau}%
+    \renewcommand{\listfigurename}{Liste des figures}%
+    \renewcommand{\listtablename}{Liste des tableaux}%
+}
 \renewcommand{\arraystretch}{1.25}
 \captionsetup{font=footnotesize,labelfont=bf,justification=centering}
 \setlist[itemize]{leftmargin=1.1cm,itemsep=0.25em,topsep=0.35em}
@@ -161,8 +166,9 @@
                 % conclusion courte déborde seule sur une page supplémentaire.
                 \titlespacing*{\section}{0pt}{0.35cm}{0.22cm}%
                 \setlength{\parskip}{0pt}%
-                % Le Chapitre IV ne déborde que d'une ligne : élargir localement
-                % la page évite une page quasi vide sans modifier le contenu.
+                % Les chapitres I et IV n'ont besoin que d'un ajustement local
+                % de pagination ; le contenu et l'interligne du texte restent inchangés.
+                \ifnum\value{chapter}=1\relax\enlargethispage{3\baselineskip}\fi%
                 \ifnum\value{chapter}=4\relax\enlargethispage{\baselineskip}\fi%
             }{}%
             \mfOriginalSection*{##2}%
@@ -219,7 +225,6 @@
 \clearpage
 
 \tableofcontents
-\addcontentsline{toc}{chapter}{Table des matières}
 \clearpage
 
 \begingroup
