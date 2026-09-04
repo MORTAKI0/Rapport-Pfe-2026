@@ -4,7 +4,7 @@
 
 L'accès aux modèles est conçu comme une capacité d'infrastructure distincte des agents. Un agent ne manipule ni la clé d'authentification ni l'endpoint Azure. Il exprime un rôle et fournit un contexte borné ; le backend sélectionne ensuite le déploiement correspondant, construit la requête et valide la réponse avant de la rendre au workflow.
 
-Cette séparation poursuit quatre objectifs : limiter l'exposition des secrets, éviter le couplage d'un agent à un modèle précis, permettre des déploiements différents selon les responsabilités et produire un échec contrôlé lorsqu'une configuration est absente ou indisponible.
+Cette séparation poursuit quatre objectifs : limiter l'exposition des secrets, éviter le couplage d'un agent à un modèle précis, permettre des déploiements différents selon les responsabilités et produire un échec contrôlé lorsqu'une configuration est absente ou indisponible. La Figure~\ref{fig:passerelle-azure-ch3} présente la passerelle et le routage par rôle qui matérialisent cette séparation.
 
 \begin{figure}[H]
     \centering
@@ -30,8 +30,12 @@ Cette séparation poursuit quatre objectifs : limiter l'exposition des secrets, 
     \label{fig:passerelle-azure-ch3}
 \end{figure}
 
+Le Tableau~\ref{tab:responsabilites-azure-ch3} précise ensuite quelles informations et responsabilités restent localisées dans la ressource, la configuration backend, le routeur, les agents et le frontend.
+
 \begin{table}[H]
     \centering
+    \caption{Répartition des responsabilités autour de la passerelle Azure}
+    \label{tab:responsabilites-azure-ch3}
     \small
     \arrayrulecolor{cgigray}
     \rowcolors{2}{cgilight!55}{white}
@@ -53,8 +57,6 @@ Cette séparation poursuit quatre objectifs : limiter l'exposition des secrets, 
         Frontend & Afficher un état de disponibilité et des informations non sensibles. & Non \\
         \hline
     \end{tabularx}
-    \caption{Répartition des responsabilités autour de la passerelle Azure}
-    \label{tab:responsabilites-azure-ch3}
     \rowcolors{2}{white}{white}
     \arrayrulecolor{black}
 \end{table}
