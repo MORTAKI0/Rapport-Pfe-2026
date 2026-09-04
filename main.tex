@@ -161,6 +161,9 @@
                 % conclusion courte déborde seule sur une page supplémentaire.
                 \titlespacing*{\section}{0pt}{0.35cm}{0.22cm}%
                 \setlength{\parskip}{0pt}%
+                % Le Chapitre IV ne déborde que d'une ligne : élargir localement
+                % la page évite une page quasi vide sans modifier le contenu.
+                \ifnum\value{chapter}=4\relax\enlargethispage{\baselineskip}\fi%
             }{}%
             \mfOriginalSection*{##2}%
         }{%
