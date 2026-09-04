@@ -13,7 +13,7 @@ Le chapitre présente d'abord les notions théoriques sous une forme pédagogiqu
 
 \subsection{Définition et interaction avec l'environnement}
 
-Un agent logiciel est une entité située dans un environnement, capable de recevoir des perceptions, de maintenir un état ou un contexte, puis d'agir afin de poursuivre un objectif. Wooldridge et Jennings distinguent la théorie des agents, leurs architectures et les langages utilisés pour les construire \cite{wooldridge-jennings}.
+Un agent logiciel est une entité située dans un environnement, capable de recevoir des perceptions, de maintenir un état ou un contexte, puis d'agir afin de poursuivre un objectif. Wooldridge et Jennings distinguent la théorie des agents, leurs architectures et les langages utilisés pour les construire \cite{wooldridge-jennings}. La Figure~\ref{fig:agent-environnement-ch2} illustre cette interaction générale.
 
 \begin{figure}[H]
     \centering
@@ -41,8 +41,12 @@ Ces propriétés existent à des degrés différents. L'autonomie de raisonnemen
 
 \subsection{Types d'agents}
 
+Le Tableau~\ref{tab:types-agents-ch2} met en relation plusieurs catégories classiques d'agents avec les responsabilités effectivement présentes dans la Migration Factory.
+
 \begin{table}[H]
     \centering
+    \caption{Types d'agents et correspondance avec la Migration Factory}
+    \label{tab:types-agents-ch2}
     \small
     \arrayrulecolor{cgigray}
     \rowcolors{2}{cgilight!55}{white}
@@ -64,8 +68,6 @@ Ces propriétés existent à des degrés différents. L'autonomie de raisonnemen
         Agent réactif & Répond à un événement précis. & Peut être utilisé pour une classification intelligente ; les contrôles purement déterministes restent des services. \\
         \hline
     \end{tabularx}
-    \caption{Types d'agents et correspondance avec la Migration Factory}
-    \label{tab:types-agents-ch2}
     \rowcolors{2}{white}{white}
     \arrayrulecolor{black}
 \end{table}
@@ -80,9 +82,7 @@ Ainsi, le résolveur de profils, l'exécuteur de commandes, le service de transi
 \section{Systèmes multi-agents}
 % ============================================================
 
-\subsection{Définition}
-
-Un système multi-agents (SMA) regroupe plusieurs agents capables d'interagir dans un environnement partagé afin de contribuer à un objectif collectif. Les responsabilités, connaissances et actions sont réparties entre plusieurs entités \cite{wooldridge-book,weiss-mas,ferber-mas}.
+Un système multi-agents (SMA) regroupe plusieurs agents capables d'interagir dans un environnement partagé afin de contribuer à un objectif collectif. Les responsabilités, connaissances et actions sont réparties entre plusieurs entités \cite{wooldridge-book,weiss-mas,ferber-mas}. La Figure~\ref{fig:sma-simplifie-ch2} en donne une représentation simplifiée adaptée au principe de spécialisation retenu dans le projet.
 
 \begin{figure}[H]
     \centering
@@ -105,10 +105,12 @@ La spécialisation apporte modularité, testabilité, séparation des responsabi
 \section{Orchestration d'agents}
 % ============================================================
 
-\subsection{Notions à distinguer}
+Pour décrire correctement la coordination du système, il est nécessaire de distinguer quatre notions proches mais non équivalentes : orchestration, chorégraphie, coordination et planification. Le Tableau~\ref{tab:notions-orchestration-ch2} précise leur sens et leur application dans la Migration Factory afin d'éviter d'attribuer à l'orchestrateur des responsabilités qui relèvent en réalité du planificateur ou des mécanismes de coordination.
 
 \begin{table}[H]
     \centering
+    \caption{Orchestration, chorégraphie, coordination et planification}
+    \label{tab:notions-orchestration-ch2}
     \small
     \arrayrulecolor{cgigray}
     \rowcolors{2}{cgilight!55}{white}
@@ -126,21 +128,17 @@ La spécialisation apporte modularité, testabilité, séparation des responsabi
         Planification & Construction d'une séquence permettant d'atteindre une cible. & Trajectoire de versions et unités de migration. \\
         \hline
     \end{tabularx}
-    \caption{Orchestration, chorégraphie, coordination et planification}
-    \label{tab:notions-orchestration-ch2}
     \rowcolors{2}{white}{white}
     \arrayrulecolor{black}
 \end{table}
 
-\subsection{Modèles d'organisation}
-
-Les modèles courants sont l'orchestrateur central, les agents distribués, l'organisation hiérarchique et l'architecture hybride. La Migration Factory adopte un modèle hybride : l'orchestrateur centralise l'état et les transitions, alors que les agents conservent une autonomie locale de raisonnement. LangGraph fournit le graphe d'exécution, les checkpoints et les interruptions, mais ne constitue pas la source d'autorité métier \cite{langgraph-persistence}.
+Après cette distinction conceptuelle, le choix du mode d'organisation peut être précisé. Les modèles courants sont l'orchestrateur central, les agents distribués, l'organisation hiérarchique et l'architecture hybride. La Migration Factory adopte un modèle hybride : l'orchestrateur centralise l'état et les transitions, alors que les agents conservent une autonomie locale de raisonnement. LangGraph fournit le graphe d'exécution, les checkpoints et les interruptions, mais ne constitue pas la source d'autorité métier \cite{langgraph-persistence}.
 
 % ============================================================
 \section{Plateformes et architectures intelligentes}
 % ============================================================
 
-Une plateforme agentique associe interface, API, orchestrateur, agents, services déterministes, persistance, artefacts, observabilité et sécurité. Les agents peuvent être intégrés comme modules internes ou services séparés. Une architecture microservices n'est pas une condition nécessaire : le critère central reste la séparation explicite des responsabilités et des contrats.
+Une plateforme agentique associe interface, API, orchestrateur, agents, services déterministes, persistance, artefacts, observabilité et sécurité. Les agents peuvent être intégrés comme modules internes ou services séparés. Une architecture microservices n'est pas une condition nécessaire : le critère central reste la séparation explicite des responsabilités et des contrats. La Figure~\ref{fig:plateforme-agentique-ch2} résume cette organisation en couches.
 
 \begin{figure}[H]
     \centering
@@ -176,7 +174,7 @@ Les migrations sont déclenchées par la fin de support, les vulnérabilités, l
 
 \subsection{Types et processus}
 
-Les migrations peuvent concerner runtime, langage, framework, dépendances, plateforme, architecture ou données. Dans ce projet, le processus général suit inventaire, définition de cible, planification, transformation, compilation ou construction, tests, réparation et validation.
+Les migrations peuvent concerner runtime, langage, framework, dépendances, plateforme, architecture ou données. Dans ce projet, le processus général suit inventaire, définition de cible, planification, transformation, compilation ou construction, tests, réparation et validation. La Figure~\ref{fig:processus-migration-ch2} synthétise cet enchaînement.
 
 \begin{figure}[H]
     \centering
@@ -197,7 +195,7 @@ Angular associe Angular CLI, Node.js, npm, TypeScript et RxJS. La documentation 
 
 \subsection{Processus manuel de référence}
 
-Avant d'introduire les outils et plateformes étudiés, il est utile de représenter le fonctionnement d'une migration conduite principalement de manière manuelle. Le développeur alterne entre compréhension du projet, consultation de documentation, modification du code et des manifestes, exécution des outils, lecture des erreurs et nouvelle correction. Ce cycle se répète jusqu'à l'obtention d'un état jugé acceptable.
+Avant d'introduire les outils et plateformes étudiés, il est utile de représenter le fonctionnement d'une migration conduite principalement de manière manuelle. Le développeur alterne entre compréhension du projet, consultation de documentation, modification du code et des manifestes, exécution des outils, lecture des erreurs et nouvelle correction. Ce cycle se répète jusqu'à l'obtention d'un état jugé acceptable. La Figure~\ref{fig:processus-manuel-reference-ch2} représente cette boucle typique.
 
 \begin{figure}[H]
     \centering
@@ -220,7 +218,7 @@ SWE-agent évalue l'effet d'une interface agent--ordinateur sur la résolution d
 
 \subsection{Comparaison synthétique}
 
-La comparaison suivante ne cherche pas à établir un classement global entre des solutions de nature différente. Elle examine plutôt cinq dimensions utiles au projet : le domaine couvert, la présence ou non d'agents, le mode de coordination, les preuves produites et la principale limite au regard d'une migration gouvernée de bout en bout. Cette grille permet de distinguer les capacités directement réutilisables des fonctions qui doivent être combinées ou complétées dans la Migration Factory.
+La comparaison suivante ne cherche pas à établir un classement global entre des solutions de nature différente. Elle examine plutôt cinq dimensions utiles au projet : le domaine couvert, la présence ou non d'agents, le mode de coordination, les preuves produites et la principale limite au regard d'une migration gouvernée de bout en bout. Le Tableau~\ref{tab:travaux-proches-ch2} permet ainsi de distinguer les capacités directement réutilisables des fonctions qui doivent être combinées ou complétées dans la Migration Factory.
 
 \scriptsize
 \begin{longtable}{|>{\bfseries\RaggedRight\arraybackslash}p{2.2cm}|>{\RaggedRight\arraybackslash}p{2.4cm}|>{\RaggedRight\arraybackslash}p{2.9cm}|>{\RaggedRight\arraybackslash}p{3.2cm}|>{\RaggedRight\arraybackslash}p{4.1cm}|}
@@ -264,7 +262,7 @@ La Migration Factory reprend donc plusieurs principes sans chercher à reproduir
 
 \subsection{Carte de positionnement}
 
-La carte de positionnement regroupe les solutions étudiées par \textbf{famille de contribution} plutôt que par technologie ou éditeur. Elle permet de visualiser les écosystèmes intellectuels et techniques auxquels se rattache la solution : transformation déterministe, assistance intelligente et réparation, orchestration multi-agents, ainsi que standards de communication et d'interaction.
+La carte de positionnement regroupe les solutions étudiées par \textbf{famille de contribution} plutôt que par technologie ou éditeur. Elle permet de visualiser les écosystèmes intellectuels et techniques auxquels se rattache la solution : transformation déterministe, assistance intelligente et réparation, orchestration multi-agents, ainsi que standards de communication et d'interaction. La Figure~\ref{fig:mindmap-etat-art-ch2} synthétise ce regroupement.
 
 \begin{figure}[H]
     \centering
