@@ -178,13 +178,16 @@
         \IfBooleanTF{##1}{%
             \ifstrequal{##2}{Conclusion}{%
                 \input{#2}%
-                % Conserver l'interligne 1,5 du texte tout en évitant qu'une
-                % conclusion courte déborde seule sur une page supplémentaire.
-                \titlespacing*{\section}{0pt}{0.35cm}{0.22cm}%
+                % Conserver l'interligne 1,5 du texte. Pour le chapitre I,
+                % réduire uniquement l'espace autour du titre de conclusion
+                % afin d'éviter une ligne isolée sans empiéter sur le pied de page.
+                \ifnum\value{chapter}=1\relax
+                    \titlespacing*{\section}{0pt}{0pt}{0.08cm}%
+                \else
+                    \titlespacing*{\section}{0pt}{0.35cm}{0.22cm}%
+                \fi
                 \setlength{\parskip}{0pt}%
-                % Les chapitres I et IV n'ont besoin que d'un ajustement local
-                % de pagination ; le contenu et l'interligne du texte restent inchangés.
-                \ifnum\value{chapter}=1\relax\enlargethispage{3\baselineskip}\fi%
+                % Le chapitre IV conserve un très léger ajustement local de pagination.
                 \ifnum\value{chapter}=4\relax\enlargethispage{\baselineskip}\fi%
             }{}%
             \mfOriginalSection*{##2}%
