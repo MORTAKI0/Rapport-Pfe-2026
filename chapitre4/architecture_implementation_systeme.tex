@@ -13,10 +13,12 @@ Les deux déclinaisons ne possèdent pas le même niveau de maturité. Java/Spri
 
 \subsection{Technologies communes}
 
-Avant de distinguer les chaînes propres à Java/Spring Boot et à Angular, il est nécessaire d'identifier le socle technique partagé par les deux déclinaisons. Ce socle regroupe les composants qui assurent le pilotage du workflow, la persistance de l'état, l'exposition des services et l'interaction avec le développeur. Le tableau suivant présente ces technologies communes et précise leur rôle dans l'architecture globale.
+Avant de distinguer les chaînes propres à Java/Spring Boot et à Angular, il est nécessaire d'identifier le socle technique partagé par les deux déclinaisons. Ce socle regroupe les composants qui assurent le pilotage du workflow, la persistance de l'état, l'exposition des services et l'interaction avec le développeur. Le Tableau~\ref{tab:technologies-communes-ch4} présente ces technologies communes et précise leur rôle dans l'architecture globale.
 
 \begin{table}[H]
     \centering
+    \caption{Technologies communes aux deux systèmes}
+    \label{tab:technologies-communes-ch4}
     \small
     \arrayrulecolor{cgigray}
     \rowcolors{2}{cgilight!55}{white}
@@ -38,8 +40,6 @@ Avant de distinguer les chaînes propres à Java/Spring Boot et à Angular, il e
         Collaboration & GitHub, Jira, Teams et Confluence & Versionnement, backlog, échanges et documentation. \\
         \hline
     \end{tabularx}
-    \caption{Technologies communes aux deux systèmes}
-    \label{tab:technologies-communes-ch4}
     \rowcolors{2}{white}{white}
     \arrayrulecolor{black}
 \end{table}
@@ -98,7 +98,7 @@ Les travaux engagés à partir du 20 juin préparent une V1 prévue pour septemb
     \item un reporting enrichi et une meilleure observation de la consommation des modèles.
 \end{itemize}
 
-Cette quatrième étape est encore en cours à la date de référence du rapport ; elle ne doit donc pas être présentée comme une démonstration déjà réalisée.
+Cette quatrième étape est encore en cours à la date de référence du rapport ; elle ne doit donc pas être présentée comme une démonstration déjà réalisée. La Figure~\ref{fig:evolution-technique-java-ch4} synthétise les quatre incréments successifs.
 
 \begin{figure}[H]
     \centering
@@ -123,9 +123,13 @@ Cette quatrième étape est encore en cours à la date de référence du rapport
     \label{fig:evolution-technique-java-ch4}
 \end{figure}
 
+Le Tableau~\ref{tab:comparaison-demos-java-ch4} compare les capacités majeures de ces incréments et distingue clairement le statut réalisé des éléments planifiés pour J4.
+
 \scriptsize
 \begin{table}[H]
     \centering
+    \caption{Comparaison des principaux incréments Java/Spring Boot}
+    \label{tab:comparaison-demos-java-ch4}
     \arrayrulecolor{cgigray}
     \begin{tabularx}{\textwidth}{|>{\bfseries\RaggedRight\arraybackslash}p{2.4cm}|>{\RaggedRight\arraybackslash}p{3cm}|>{\RaggedRight\arraybackslash}p{3cm}|>{\RaggedRight\arraybackslash}p{3cm}|>{\RaggedRight\arraybackslash}X|}
         \hline
@@ -147,8 +151,6 @@ Cette quatrième étape est encore en cours à la date de référence du rapport
         Statut & Réalisé & Réalisé & Réalisé & Planifié \\
         \hline
     \end{tabularx}
-    \caption{Comparaison des principaux incréments Java/Spring Boot}
-    \label{tab:comparaison-demos-java-ch4}
     \arrayrulecolor{black}
 \end{table}
 \normalsize
@@ -202,7 +204,7 @@ Les deux dépôts partagent des principes et une terminologie, mais pas leurs se
 
 \subsection{Déploiement local}
 
-Les deux sous-sections précédentes ont présenté l'organisation interne des dépôts Java/Spring Boot et Angular. La présente vue complète cette description en montrant comment leurs composants sont réellement instanciés et reliés pendant l'exécution locale : le navigateur accède au frontend, le frontend dialogue avec le backend, et le backend coordonne persistance, espaces isolés, outils d'écosystème et fournisseur LLM. Elle fait ainsi le lien entre la structure du code et l'architecture d'exécution.
+Les deux sous-sections précédentes ont présenté l'organisation interne des dépôts Java/Spring Boot et Angular. La présente vue complète cette description en montrant comment leurs composants sont réellement instanciés et reliés pendant l'exécution locale : le navigateur accède au frontend, le frontend dialogue avec le backend, et le backend coordonne persistance, espaces isolés, outils d'écosystème et fournisseur LLM. La Figure~\ref{fig:deploiement-local-ch4} fait ainsi le lien entre la structure du code et l'architecture d'exécution.
 
 \begin{figure}[H]
     \centering
@@ -237,10 +239,12 @@ Chaque véritable agent est présenté selon le même format : objectif, entrée
 
 \subsection{Agent d'analyse}
 
-L'agent d'analyse constitue le point d'entrée du raisonnement agentique. Il transforme les informations brutes du projet en une représentation structurée des versions, dépendances, configurations et risques ; cette sortie sert ensuite de base à l'agent de révision puis au planificateur. Sa qualité conditionne donc directement la pertinence des décisions prises en aval.
+L'agent d'analyse constitue le point d'entrée du raisonnement agentique. Il transforme les informations brutes du projet en une représentation structurée des versions, dépendances, configurations et risques ; cette sortie sert ensuite de base à l'agent de révision puis au planificateur. Sa qualité conditionne donc directement la pertinence des décisions prises en aval. Le Tableau~\ref{tab:agent-analyse-ch4} résume son contrat fonctionnel.
 
 \begin{table}[H]
     \centering
+    \caption{Fiche de l'agent d'analyse}
+    \label{tab:agent-analyse-ch4}
     \small
     \begin{tabularx}{\textwidth}{|>{\bfseries\RaggedRight\arraybackslash}p{3.1cm}|>{\RaggedRight\arraybackslash}X|}
         \hline
@@ -259,16 +263,16 @@ L'agent d'analyse constitue le point d'entrée du raisonnement agentique. Il tra
         Limitations & Dépendances privées et configurations dynamiques peuvent nécessiter une information humaine. \\
         \hline
     \end{tabularx}
-    \caption{Fiche de l'agent d'analyse}
-    \label{tab:agent-analyse-ch4}
 \end{table}
 
 \subsection{Agent de révision de l'analyse}
 
-L'agent de révision de l'analyse introduit un premier contrôle indépendant avant toute planification. Son rôle n'est pas de refaire l'analyse, mais d'en vérifier la couverture, la cohérence et l'appui sur les preuves disponibles. Il se place ainsi entre l'analyseur et le planificateur afin d'éviter qu'une compréhension incomplète du projet ne soit transformée en plan d'exécution.
+L'agent de révision de l'analyse introduit un premier contrôle indépendant avant toute planification. Son rôle n'est pas de refaire l'analyse, mais d'en vérifier la couverture, la cohérence et l'appui sur les preuves disponibles. Il se place ainsi entre l'analyseur et le planificateur afin d'éviter qu'une compréhension incomplète du projet ne soit transformée en plan d'exécution. Le Tableau~\ref{tab:agent-review-analyse-ch4} synthétise ce rôle.
 
 \begin{table}[H]
     \centering
+    \caption{Fiche de l'agent de révision de l'analyse}
+    \label{tab:agent-review-analyse-ch4}
     \small
     \begin{tabularx}{\textwidth}{|>{\bfseries\RaggedRight\arraybackslash}p{3.1cm}|>{\RaggedRight\arraybackslash}X|}
         \hline
@@ -287,16 +291,16 @@ L'agent de révision de l'analyse introduit un premier contrôle indépendant av
         Limitations & Sa qualité dépend des preuves disponibles et du schéma d'analyse. \\
         \hline
     \end{tabularx}
-    \caption{Fiche de l'agent de révision de l'analyse}
-    \label{tab:agent-review-analyse-ch4}
 \end{table}
 
 \subsection{Agent de planification}
 
-L'agent de planification transforme une analyse validée en trajectoire de migration exploitable. Il ordonne les stages, explicite leurs dépendances et associe à chacun des conditions de validation. Il constitue le lien entre la compréhension du projet produite en amont et les opérations de transformation qui seront exécutées après révision et approbation.
+L'agent de planification transforme une analyse validée en trajectoire de migration exploitable. Il ordonne les stages, explicite leurs dépendances et associe à chacun des conditions de validation. Il constitue le lien entre la compréhension du projet produite en amont et les opérations de transformation qui seront exécutées après révision et approbation. Le Tableau~\ref{tab:agent-planification-ch4} présente sa fiche synthétique.
 
 \begin{table}[H]
     \centering
+    \caption{Fiche de l'agent de planification}
+    \label{tab:agent-planification-ch4}
     \small
     \begin{tabularx}{\textwidth}{|>{\bfseries\RaggedRight\arraybackslash}p{3.1cm}|>{\RaggedRight\arraybackslash}X|}
         \hline
@@ -315,16 +319,16 @@ L'agent de planification transforme une analyse validée en trajectoire de migra
         Limitations & Dépend de la qualité de l'analyse et des profils disponibles. \\
         \hline
     \end{tabularx}
-    \caption{Fiche de l'agent de planification}
-    \label{tab:agent-planification-ch4}
 \end{table}
 
 \subsection{Agent de révision du plan}
 
-L'agent de révision du plan agit comme second contrôle agentique avant l'exécution. Il vérifie que la trajectoire proposée respecte les prérequis, les compatibilités et l'ordre des transformations attendues. Sa position entre le planificateur et la décision humaine permet de présenter au développeur un plan déjà soumis à une vérification indépendante.
+L'agent de révision du plan agit comme second contrôle agentique avant l'exécution. Il vérifie que la trajectoire proposée respecte les prérequis, les compatibilités et l'ordre des transformations attendues. Sa position entre le planificateur et la décision humaine permet de présenter au développeur un plan déjà soumis à une vérification indépendante. Le Tableau~\ref{tab:agent-review-plan-ch4} en précise les responsabilités.
 
 \begin{table}[H]
     \centering
+    \caption{Fiche de l'agent de révision du plan}
+    \label{tab:agent-review-plan-ch4}
     \small
     \begin{tabularx}{\textwidth}{|>{\bfseries\RaggedRight\arraybackslash}p{3.1cm}|>{\RaggedRight\arraybackslash}X|}
         \hline
@@ -343,16 +347,16 @@ L'agent de révision du plan agit comme second contrôle agentique avant l'exéc
         Limitations & Ne peut pas prouver la réussite future d'une compilation. \\
         \hline
     \end{tabularx}
-    \caption{Fiche de l'agent de révision du plan}
-    \label{tab:agent-review-plan-ch4}
 \end{table}
 
 \subsection{Agent de transformation}
 
-L'agent de transformation est le premier agent susceptible de produire des modifications candidates sur l'application migrée. Il intervient uniquement à partir d'un plan validé et dans un espace de travail isolé, sans autorité sur la source d'origine. Il relie ainsi le raisonnement de planification à l'exécution technique, tandis que la compilation et les tests déterministes restent responsables de la validation du résultat.
+L'agent de transformation est le premier agent susceptible de produire des modifications candidates sur l'application migrée. Il intervient uniquement à partir d'un plan validé et dans un espace de travail isolé, sans autorité sur la source d'origine. Il relie ainsi le raisonnement de planification à l'exécution technique, tandis que la compilation et les tests déterministes restent responsables de la validation du résultat. Le Tableau~\ref{tab:agent-transformation-ch4} résume ces limites.
 
 \begin{table}[H]
     \centering
+    \caption{Fiche de l'agent de transformation}
+    \label{tab:agent-transformation-ch4}
     \small
     \begin{tabularx}{\textwidth}{|>{\bfseries\RaggedRight\arraybackslash}p{3.1cm}|>{\RaggedRight\arraybackslash}X|}
         \hline
@@ -371,16 +375,16 @@ L'agent de transformation est le premier agent susceptible de produire des modif
         Limitations & Les modifications restent candidates tant que compilation et tests ne réussissent pas. \\
         \hline
     \end{tabularx}
-    \caption{Fiche de l'agent de transformation}
-    \label{tab:agent-transformation-ch4}
 \end{table}
 
 \subsection{Proposeur de réparation}
 
-Le proposeur de réparation n'intervient qu'après un échec effectivement observé lors de l'exécution ou de la validation. À partir des journaux, de la commande en échec et d'un contexte borné, il produit un correctif candidat sans pouvoir l'appliquer. Il ouvre ainsi la boucle de réparation tout en restant séparé de l'agent qui révisera la proposition et de l'humain qui décidera de son application.
+Le proposeur de réparation n'intervient qu'après un échec effectivement observé lors de l'exécution ou de la validation. À partir des journaux, de la commande en échec et d'un contexte borné, il produit un correctif candidat sans pouvoir l'appliquer. Il ouvre ainsi la boucle de réparation tout en restant séparé de l'agent qui révisera la proposition et de l'humain qui décidera de son application. Le Tableau~\ref{tab:agent-proposeur-reparation-ch4} formalise ce périmètre.
 
 \begin{table}[H]
     \centering
+    \caption{Fiche du proposeur de réparation}
+    \label{tab:agent-proposeur-reparation-ch4}
     \small
     \begin{tabularx}{\textwidth}{|>{\bfseries\RaggedRight\arraybackslash}p{3.1cm}|>{\RaggedRight\arraybackslash}X|}
         \hline
@@ -399,16 +403,16 @@ Le proposeur de réparation n'intervient qu'après un échec effectivement obser
         Limitations & Le contexte borné peut omettre une dépendance indirecte. \\
         \hline
     \end{tabularx}
-    \caption{Fiche du proposeur de réparation}
-    \label{tab:agent-proposeur-reparation-ch4}
 \end{table}
 
 \subsection{Agent de révision de la réparation}
 
-L'agent de révision de la réparation constitue le contrôle indépendant de la proposition de correctif. Il examine sa portée, sa cohérence avec l'échec observé et les risques qu'elle introduit ; il peut rejeter la proposition ou produire une version consolidée. Il se situe donc entre le proposeur et la décision humaine, ce qui empêche un même agent de générer puis de valider seul son propre correctif.
+L'agent de révision de la réparation constitue le contrôle indépendant de la proposition de correctif. Il examine sa portée, sa cohérence avec l'échec observé et les risques qu'elle introduit ; il peut rejeter la proposition ou produire une version consolidée. Il se situe donc entre le proposeur et la décision humaine, ce qui empêche un même agent de générer puis de valider seul son propre correctif. Le Tableau~\ref{tab:agent-review-reparation-ch4} décrit précisément ce rôle.
 
 \begin{table}[H]
     \centering
+    \caption{Fiche de l'agent de révision de la réparation}
+    \label{tab:agent-review-reparation-ch4}
     \small
     \begin{tabularx}{\textwidth}{|>{\bfseries\RaggedRight\arraybackslash}p{3.1cm}|>{\RaggedRight\arraybackslash}X|}
         \hline
@@ -427,16 +431,16 @@ L'agent de révision de la réparation constitue le contrôle indépendant de la
         Limitations & Une sortie correcte en apparence peut encore échouer à la compilation. \\
         \hline
     \end{tabularx}
-    \caption{Fiche de l'agent de révision de la réparation}
-    \label{tab:agent-review-reparation-ch4}
 \end{table}
 
 \subsection{Assistant de migration}
 
-L'assistant de migration joue un rôle transversal d'explication plutôt qu'un rôle d'exécution. Il exploite les états, événements et preuves déjà produits afin d'aider le développeur à comprendre l'avancement, les blocages et les actions disponibles. Contrairement aux agents du pipeline, il ne fait pas progresser la migration et ne dispose d'aucune autorité sur les décisions ou les fichiers.
+L'assistant de migration joue un rôle transversal d'explication plutôt qu'un rôle d'exécution. Il exploite les états, événements et preuves déjà produits afin d'aider le développeur à comprendre l'avancement, les blocages et les actions disponibles. Contrairement aux agents du pipeline, il ne fait pas progresser la migration et ne dispose d'aucune autorité sur les décisions ou les fichiers. Le Tableau~\ref{tab:agent-assistant-ch4} synthétise ses responsabilités et ses limites.
 
 \begin{table}[H]
     \centering
+    \caption{Fiche de l'assistant de migration}
+    \label{tab:agent-assistant-ch4}
     \small
     \begin{tabularx}{\textwidth}{|>{\bfseries\RaggedRight\arraybackslash}p{3.1cm}|>{\RaggedRight\arraybackslash}X|}
         \hline
@@ -455,8 +459,6 @@ L'assistant de migration joue un rôle transversal d'explication plutôt qu'un r
         Limitations & Une information absente de l'état ne doit pas être inventée. \\
         \hline
     \end{tabularx}
-    \caption{Fiche de l'assistant de migration}
-    \label{tab:agent-assistant-ch4}
 \end{table}
 
 % ============================================================
@@ -465,7 +467,7 @@ L'assistant de migration joue un rôle transversal d'explication plutôt qu'un r
 
 Le résolveur de profils, le service de transitions, l'exécuteur, les services de compilation et de tests, le stockage et le reporting ne sont pas des agents. Ils implémentent des règles vérifiables.
 
-Le frontend transmet une intention à l'API. Le backend valide le schéma, charge l'état et vérifie l'action. L'orchestrateur choisit ensuite le nœud autorisé. Les résultats sont persistés avant toute projection vers le cockpit.
+Le frontend transmet une intention à l'API. Le backend valide le schéma, charge l'état et vérifie l'action. L'orchestrateur choisit ensuite le nœud autorisé. Les résultats sont persistés avant toute projection vers le cockpit. La Figure~\ref{fig:sequencement-orchestrateur-ch4} synthétise le séquencement principal.
 
 \begin{figure}[H]
     \centering
@@ -619,8 +621,12 @@ Les contextes LLM sont bornés et nettoyés. La rédaction demeure fondée sur d
 \subsection{Difficultés techniques et corrections}
 % ============================================================
 
+Les difficultés rencontrées ne relèvent pas d'un seul type de défaut : elles concernent aussi bien l'applicabilité des correctifs, l'autorité des commandes, les profils de runtime, la persistance que l'intégration du frontend. Le Tableau~\ref{tab:difficultes-corrections-ch4} synthétise des obstacles représentatifs, leurs causes et les décisions correctives utilisées pour stabiliser les prototypes.
+
 \begin{table}[H]
     \centering
+    \caption{Principales difficultés et corrections}
+    \label{tab:difficultes-corrections-ch4}
     \small
     \arrayrulecolor{cgigray}
     \rowcolors{2}{cgilight!55}{white}
@@ -640,8 +646,6 @@ Les contextes LLM sont bornés et nettoyés. La rédaction demeure fondée sur d
         Intégration frontend & Fusion de nouvelles vues et fonctions existantes. & Intégration progressive et comparaison au baseline. \\
         \hline
     \end{tabularx}
-    \caption{Principales difficultés et corrections}
-    \label{tab:difficultes-corrections-ch4}
     \rowcolors{2}{white}{white}
     \arrayrulecolor{black}
 \end{table}
