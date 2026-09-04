@@ -106,6 +106,22 @@
 \titleformat{\section}{\Large\sffamily\bfseries\color{black}\setstretch{1.0}}{\thesection}{0.7em}{}
 \titleformat{\subsection}{\large\sffamily\bfseries\color{black}\setstretch{1.0}}{\thesubsection}{0.7em}{}
 
+% Le titre du Chapitre IV est forcé sur deux lignes propres, sans césure
+% au milieu du mot « système ». Le titre court reste utilisé dans la table
+% des matières, les signets et les en-têtes.
+\let\mfOriginalChapter\chapter
+\RenewDocumentCommand{\chapter}{s o m}{%
+    \IfBooleanTF{#1}{%
+        \mfOriginalChapter*{#3}%
+    }{%
+        \ifstrequal{#3}{Architecture et implémentation du système}{%
+            \mfOriginalChapter[Architecture et implémentation du système]{Architecture et implémentation\\du système}%
+        }{%
+            \IfNoValueTF{#2}{\mfOriginalChapter{#3}}{\mfOriginalChapter[#2]{#3}}%
+        }%
+    }%
+}
+
 % Le bloc arborescent du dépôt Java doit rester sur une seule page.
 % Si l'espace restant est insuffisant, la sous-section entière passe à la page suivante.
 \let\mfOriginalSubsection\subsection
@@ -173,6 +189,8 @@
             }{}%
             \mfOriginalSection*{##2}%
         }{%
+            % Éviter qu'un grand titre de section reste seul au bas d'une page.
+            \ifstrequal{##2}{Positionnement de la Migration Factory et choix d'intégration}{\Needspace{0.22\textheight}}{}%
             \mfOriginalSection{##2}%
         }%
     }%
