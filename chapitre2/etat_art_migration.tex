@@ -187,7 +187,7 @@ Les migrations peuvent concerner runtime, langage, framework, dépendances, plat
 
 Spring Boot associe Java, Spring Framework, dépendances, plugins et propriétés. La progression étudiée couvre Spring Boot 2.1, 2.7, 3.5 et 4.0 avec Java 11, 17 et 21 \cite{spring-boot-upgrading}.
 
-Angular associe Angular CLI, Node.js, npm, TypeScript et RxJS. La documentation officielle publie une matrice de compatibilité et recommande de franchir les versions majeures successivement avec l'Update Guide et \texttt{ng update} \cite{angular-versions,angular-update}. Le périmètre initial couvre Angular 18 à 21.
+Angular associe Angular CLI, Node.js, npm, TypeScript et RxJS. La documentation officielle publie une matrice de compatibilité et recommande de franchir les versions majeures successivement avec l'Update Guide et \texttt{ng update} \cite{angular-versions,angular-update}. Le premier périmètre étudié a couvert Angular 18 à 21 ; l'objectif a ensuite été étendu à une trajectoire progressive allant d'Angular 11 à Angular 21.
 
 % ============================================================
 \section{Étude de l'existant et travaux proches}
@@ -210,7 +210,7 @@ Cette dispersion a plusieurs conséquences. Elle réduit la \textbf{reproductibi
 
 \subsection{Corpus étudié}
 
-Le corpus regroupe neuf approches : OpenRewrite, Angular CLI, Dependabot, Amazon Q Developer, GitHub Copilot Modernization, SWE-agent, Repairnator, AutoGen et LangGraph. FIPA est étudié séparément comme standard de communication et non comme plateforme d'orchestration.
+Le corpus regroupe neuf approches : OpenRewrite, Angular CLI, Dependabot, Amazon Q Developer, GitHub Copilot Modernization, SWE-agent, Repairnator, AutoGen et LangGraph. FIPA est étudié séparément comme standard de communication et non comme plateforme d'orchestration. Les caractéristiques fonctionnelles et organisationnelles attribuées à ces approches sont établies à partir de leurs documentations officielles ou publications de référence \cite{openrewrite-recipes,angular-update,dependabot,amazonq-transform,copilot-modernization,swe-agent,repairnator,autogen-paper,langgraph-persistence}.
 
 Repairnator est particulièrement proche de la problématique de réparation : il surveille des échecs d'intégration continue, tente de reproduire les défauts et propose des correctifs aux développeurs. L'étude rapporte cinq correctifs acceptés et fusionnés \cite{repairnator}.
 
