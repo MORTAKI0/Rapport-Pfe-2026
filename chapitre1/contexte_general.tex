@@ -13,7 +13,7 @@ La spécification s'appuie sur les principes d'ISO/IEC/IEEE 29148 : une exigence
 
 \subsection{Le groupe CGI}
 
-Fondée en 1976 au Québec, CGI figure parmi les principales entreprises mondiales de conseil en technologies de l'information et en management. À l'occasion de son cinquantième anniversaire en 2026, le groupe indique compter environ 94\,000 professionnels, être présent dans plus de 400 implantations et avoir réalisé un chiffre d'affaires de 15,9 milliards de dollars canadiens pour l'exercice 2025 \cite{cgi-at-glance,cgi-history}.
+Fondée en 1976 au Québec, CGI figure parmi les principales entreprises mondiales de conseil en technologies de l'information et en management. À l'occasion de son cinquantième anniversaire en 2026, le groupe indique compter environ 94\,000 professionnels, être présent dans plus de 400 implantations et avoir réalisé un chiffre d'affaires de 15,9 milliards de dollars canadiens pour l'exercice 2025 \cite{cgi-at-glance,cgi-history}. La Figure~\ref{fig:logo-cgi-ch1} rappelle l'identité visuelle du groupe.
 
 \begin{figure}[H]
     \centering
@@ -28,10 +28,12 @@ L'offre de CGI couvre notamment le conseil, l'intégration de systèmes, le dév
 
 CGI dispose au Maroc de centres implantés à Rabat, Casablanca et Fès. Le site officiel de l'entreprise indique que ces centres regroupent plus de 1\,300 professionnels et fournissent des services applicatifs, d'infrastructure et de support sur des technologies modernes et historiques \cite{cgi-maroc}. Le stage s'est déroulé au centre de Rabat, situé à Technopolis, Sala Al Jadida.
 
-Le projet est une initiative interne. L'équipe opérationnelle comprend trois développeurs, accompagnés par deux référents fonctionnels, un expert technique et les responsables intervenant lors des revues et démonstrations.
+Le projet est une initiative interne. L'équipe opérationnelle comprend trois développeurs, accompagnés par deux référents fonctionnels, un expert technique et les responsables intervenant lors des revues et démonstrations. Le Tableau~\ref{tab:parties-prenantes-ch1} synthétise les principales catégories de parties prenantes et leur contribution.
 
 \begin{table}[H]
     \centering
+    \caption{Parties prenantes du projet}
+    \label{tab:parties-prenantes-ch1}
     \small
     \arrayrulecolor{cgigray}
     \rowcolors{2}{cgilight!60}{white}
@@ -49,8 +51,6 @@ Le projet est une initiative interne. L'équipe opérationnelle comprend trois d
         Responsables CGI & Priorisation, suivi de l'avancement et appréciation des démonstrations. \\
         \hline
     \end{tabularx}
-    \caption{Parties prenantes du projet}
-    \label{tab:parties-prenantes-ch1}
     \rowcolors{2}{white}{white}
     \arrayrulecolor{black}
 \end{table}
@@ -80,7 +80,7 @@ Dans une version industrialisée, d'autres rôles pourraient être distingués :
 
 \subsection{Classification des acteurs et composants}
 
-La figure~\ref{fig:contexte-acteurs-services-ch1} sépare les catégories afin de ne pas transformer artificiellement tout composant du workflow en agent.
+La Figure~\ref{fig:contexte-acteurs-services-ch1} sépare les catégories afin de ne pas transformer artificiellement tout composant du workflow en agent.
 
 \begin{figure}[H]
     \centering
@@ -103,7 +103,7 @@ Le produit n'a pas été construit comme une architecture complète dès le prem
 
 La première phase, menée pendant environ trois semaines à partir du début du mois de mai 2026, a regroupé l'analyse du besoin, l'étude des trajectoires Spring Boot, la préparation des environnements et le développement du premier workflow en ligne de commande. Cette preuve de concept a été présentée le 25 mai 2026. Une deuxième version CLI, corrigée et enrichie, a ensuite été présentée le 3 juin à une audience CGI plus large. Le 19 juin, la troisième démonstration a marqué le passage à une plateforme full stack comprenant backend, frontend, cockpit et chatbot.
 
-À partir du 20 juin, les travaux ont porté sur la consolidation d'une V1 : nouveau frontend, amélioration du travail des agents LLM, reporting enrichi et boucle de réparation gouvernée. La déclinaison Angular a commencé à la mi-juillet 2026 avec un premier périmètre 18--21, puis l'objectif a été étendu à une trajectoire 11--21. La preuve d'exécution versionnée intégrée au rapport établit deux stages scellés, 18 vers 19 puis 19 vers 20 ; les étapes complémentaires restent à démontrer avant de présenter la couverture 11--21 comme acquise.
+À partir du 20 juin, les travaux ont porté sur la consolidation d'une V1 : nouveau frontend, amélioration du travail des agents LLM, reporting enrichi et boucle de réparation gouvernée. La déclinaison Angular a commencé à la mi-juillet 2026 avec un premier périmètre 18--21, puis l'objectif a été étendu à une trajectoire 11--21. La preuve d'exécution versionnée intégrée au rapport établit deux stages scellés, 18 vers 19 puis 19 vers 20 ; les étapes complémentaires restent à démontrer avant de présenter la couverture 11--21 comme acquise. La Figure~\ref{fig:chronologie-generale-ch1} synthétise cette évolution générale.
 
 \begin{figure}[H]
     \centering
@@ -138,9 +138,9 @@ La première phase, menée pendant environ trois semaines à partir du début du
 \section{Problématique traitée}
 % ============================================================
 
-\subsection{Constats et besoin de coordination}
+La problématique est construite à partir des difficultés de coordination observées dans une migration et des limites qu'entraînerait une concentration excessive des responsabilités dans un seul composant intelligent.
 
-Une migration combine inventaire, détection de versions, résolution de compatibilités, planification, transformation, installation, compilation, tests, diagnostic, réparation et production de preuves. La difficulté provient autant de ces tâches que de leur coordination : choisir le bon traitement, transmettre le contexte utile, préserver l'ordre, suspendre à un point de validation, reprendre après décision et empêcher l'application d'un résultat obsolète.
+Une migration combine inventaire, détection de versions, résolution de compatibilités, planification, transformation, installation, compilation, tests, diagnostic, réparation et production de preuves. La difficulté provient autant de ces tâches que de leur coordination : choisir le bon traitement, transmettre le contexte utile, préserver l'ordre, suspendre à un point de validation, reprendre après décision et empêcher l'application d'un résultat obsolète. La Figure~\ref{fig:complexite-coordination-ch1} représente les principales dépendances et boucles associées.
 
 \begin{figure}[H]
     \centering
@@ -168,13 +168,11 @@ Une migration combine inventaire, détection de versions, résolution de compati
     \label{fig:complexite-coordination-ch1}
 \end{figure}
 
-\subsection{Limites d'une architecture monolithique ou d'un agent unique}
-
-Un agent unique devrait simultanément comprendre le projet, planifier, transformer, exécuter, valider et se corriger. Cette concentration entraîne un contexte trop large, une séparation insuffisante entre proposition et autorité, une faible testabilité et une propagation accrue des erreurs. Elle complique également l'adaptation à deux écosystèmes différents.
+Cette coordination devient particulièrement difficile dans une architecture monolithique ou centrée sur un agent unique. Un même agent devrait simultanément comprendre le projet, planifier, transformer, exécuter, valider et se corriger. Cette concentration entraîne un contexte trop large, une séparation insuffisante entre proposition et autorité, une faible testabilité et une propagation accrue des erreurs. Elle complique également l'adaptation à deux écosystèmes différents.
 
 Le projet retient donc une architecture multi-agents hybride, spécialisée et centralement orchestrée. Les agents possèdent des objectifs bornés ; l'orchestrateur organise leur séquence ; les services déterministes conservent l'autorité sur l'exécution.
 
-\subsection{Problématique générale}
+À partir de ces constats, la problématique générale peut être formulée comme suit :
 
 \begin{quote}
 \itshape
@@ -184,6 +182,8 @@ Comment concevoir et mettre en œuvre une architecture multi-agents hybride capa
 % ============================================================
 \section{Besoins fonctionnels}
 % ============================================================
+
+Le Tableau~\ref{tab:bf-ch1} regroupe les besoins fonctionnels et précise leur niveau de maturité dans les deux déclinaisons afin de distinguer les capacités déjà implémentées de celles encore en intégration ou en validation.
 
 \scriptsize
 \begin{longtable}{|>{\bfseries\RaggedRight\arraybackslash}p{1cm}|>{\RaggedRight\arraybackslash}p{6.1cm}|>{\RaggedRight\arraybackslash}p{3.2cm}|>{\RaggedRight\arraybackslash}p{3.2cm}|}
@@ -232,6 +232,8 @@ Comment concevoir et mettre en œuvre une architecture multi-agents hybride capa
 % ============================================================
 \section{Besoins non fonctionnels}
 % ============================================================
+
+Le Tableau~\ref{tab:bnf-ch1} traduit les qualités attendues en exigences vérifiables, ce qui permet de relier chaque objectif non fonctionnel à un critère de contrôle concret.
 
 \scriptsize
 \begin{longtable}{|>{\bfseries\RaggedRight\arraybackslash}p{1cm}|>{\RaggedRight\arraybackslash}p{2.5cm}|>{\RaggedRight\arraybackslash}p{5.1cm}|>{\RaggedRight\arraybackslash}p{5.1cm}|}
@@ -313,11 +315,13 @@ Le cycle de travail associe backlog, sélection d'un périmètre, conception, im
 La conduite Agile du projet n'empêche pas de représenter les grandes périodes de travail et les jalons attendus. Deux vues sont distinguées ci-dessous. La première est une \textbf{reconstitution prévisionnelle} construite à partir des jalons initialement fixés et des grandes phases documentées dans le backlog ; aucun diagramme de Gantt prévisionnel original n'a été retrouvé parmi les artefacts de suivi consultés. La seconde est une vue \textbf{rétrospective}, qui décrit l'enchaînement effectivement observé et les objectifs encore planifiés à la date de référence du rapport. Cette distinction évite de présenter a posteriori le déroulement réel comme s'il avait été entièrement prévu dès le départ.
 
 \paragraph{Planification prévisionnelle reconstituée.}
-La vue suivante représente le cadrage macroscopique attendu : valider d'abord la faisabilité Java, consolider progressivement la plateforme, puis adapter les mêmes principes à Angular avant les jalons de septembre.
+La vue suivante représente le cadrage macroscopique attendu : valider d'abord la faisabilité Java, consolider progressivement la plateforme, puis adapter les mêmes principes à Angular avant les jalons de septembre. Le Tableau~\ref{tab:gantt-previsionnel-ch1} présente cette reconstitution.
 
 \scriptsize
 \begin{table}[H]
     \centering
+    \caption{Diagramme de Gantt prévisionnel reconstitué du projet Migration Factory}
+    \label{tab:gantt-previsionnel-ch1}
     \arrayrulecolor{cgigray}
     \begin{tabularx}{\textwidth}{|>{\RaggedRight\arraybackslash}p{4.9cm}|c|c|c|c|c|>{\RaggedRight\arraybackslash}X|}
         \hline
@@ -345,8 +349,6 @@ La vue suivante représente le cadrage macroscopique attendu : valider d'abord l
         Rédaction et validation du rapport & & & \cellcolor{cgigray!20} & \cellcolor{cgigray!30} & \cellcolor{cgigray!20} & Documentation \\
         \hline
     \end{tabularx}
-    \caption{Diagramme de Gantt prévisionnel reconstitué du projet Migration Factory}
-    \label{tab:gantt-previsionnel-ch1}
     \arrayrulecolor{black}
 \end{table}
 \normalsize
@@ -365,11 +367,13 @@ La vue suivante représente le cadrage macroscopique attendu : valider d'abord l
 \end{center}
 
 \paragraph{Planification rétrospective.}
-Le diagramme suivant décrit l'évolution réellement observée ou, pour les éléments encore futurs à la date de référence du rapport, les objectifs explicitement planifiés. Cette représentation macroscopique est compatible avec une conduite itérative ; ISO 21502 reconnaît les approches prédictives, incrémentales, itératives, adaptatives et hybrides, y compris les approches agiles \cite{iso21502}.
+Le diagramme suivant décrit l'évolution réellement observée ou, pour les éléments encore futurs à la date de référence du rapport, les objectifs explicitement planifiés. Cette représentation macroscopique est compatible avec une conduite itérative ; ISO 21502 reconnaît les approches prédictives, incrémentales, itératives, adaptatives et hybrides, y compris les approches agiles \cite{iso21502}. Le Tableau~\ref{tab:gantt-retrospectif-ch1} distingue les réalisations acquises des jalons encore planifiés.
 
 \scriptsize
 \begin{table}[H]
     \centering
+    \caption{Diagramme de Gantt rétrospectif du projet Migration Factory}
+    \label{tab:gantt-retrospectif-ch1}
     \arrayrulecolor{cgigray}
     \begin{tabularx}{\textwidth}{|>{\RaggedRight\arraybackslash}p{4.6cm}|c|c|c|c|c|>{\RaggedRight\arraybackslash}X|}
         \hline
@@ -403,8 +407,6 @@ Le diagramme suivant décrit l'évolution réellement observée ou, pour les él
         Rédaction, validation et soutenance & & & \cellcolor{cgigray!20} & \cellcolor{cgigray!30} & \cellcolor{cgigray!20} & En cours \\
         \hline
     \end{tabularx}
-    \caption{Diagramme de Gantt rétrospectif du projet Migration Factory}
-    \label{tab:gantt-retrospectif-ch1}
     \arrayrulecolor{black}
 \end{table}
 \normalsize
@@ -424,7 +426,7 @@ Le diagramme suivant décrit l'évolution réellement observée ou, pour les él
 
 \subsection{Itérations, incréments et jalons de validation}
 
-Cette partie complète la lecture temporelle du Gantt en montrant \textbf{ce que chaque période de travail devait produire}. Le tableau relie ainsi quatre éléments : la période considérée, l'objectif poursuivi, l'incrément effectivement obtenu et le jalon servant de point de démonstration ou de validation. Il permet de suivre la progression du projet non seulement par dates, mais aussi par résultats fonctionnels et techniques successifs.
+Cette partie complète la lecture temporelle du Gantt en montrant \textbf{ce que chaque période de travail devait produire}. Le Tableau~\ref{tab:iterations-increments-ch1} relie ainsi quatre éléments : la période considérée, l'objectif poursuivi, l'incrément effectivement obtenu et le jalon servant de point de démonstration ou de validation. Il permet de suivre la progression du projet non seulement par dates, mais aussi par résultats fonctionnels et techniques successifs.
 
 \scriptsize
 \begin{longtable}{|>{\bfseries\RaggedRight\arraybackslash}p{2.8cm}|>{\RaggedRight\arraybackslash}p{4.0cm}|>{\RaggedRight\arraybackslash}p{5.2cm}|>{\RaggedRight\arraybackslash}p{2.8cm}|}
@@ -464,7 +466,7 @@ Les numéros détaillés des sprints et les tickets associés restent disponible
 
 \subsection{Cycle technique}
 
-La progression technique suit une boucle courte d'apprentissage et de validation. Chaque incrément part d'un problème observé, le transforme en exigence, puis en solution conçue et implémentée. La vérification technique et la démonstration produisent ensuite de nouvelles observations qui alimentent l'itération suivante.
+La progression technique suit une boucle courte d'apprentissage et de validation. Chaque incrément part d'un problème observé, le transforme en exigence, puis en solution conçue et implémentée. La vérification technique et la démonstration produisent ensuite de nouvelles observations qui alimentent l'itération suivante. La Figure~\ref{fig:cycle-technique-iteratif-ch1} représente ce cycle.
 
 \begin{figure}[H]
     \centering
