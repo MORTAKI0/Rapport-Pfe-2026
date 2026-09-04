@@ -23,6 +23,8 @@ Lors de l'évaluation, nous avons cherché à répondre aux questions suivantes 
     \item le système réduit-il les opérations manuelles répétitives sans masquer les limites restantes ?
 \end{itemize}
 
+La Figure~\ref{fig:protocole-evaluation-ch5} représente la séquence utilisée pour organiser une exécution d'évaluation.
+
 \begin{figure}[H]
     \centering
     \resizebox{0.96\textwidth}{!}{%
@@ -52,7 +54,7 @@ Le protocole idéal prévoit plusieurs applications, plusieurs répétitions et 
 % ============================================================
 \section{Critères et métriques}
 
-Les critères retenus ont été choisis en fonction des objectifs du projet et des risques propres à une migration assistée par des agents. L'intégrité est essentielle pour garantir que la source d'origine reste protégée ; la fiabilité et la traçabilité permettent de vérifier la progression d'un processus composé de plusieurs stages ; l'efficacité mesure la réduction potentielle des opérations répétitives ; la qualité des agents et de la réparation évalue la maîtrise des sorties probabilistes ; enfin, l'utilisabilité et le coût permettent d'apprécier la viabilité de la solution du point de vue du développeur et de son exploitation. Ces dimensions structurent l'analyse des résultats présentée dans les sections suivantes.
+Les critères retenus ont été choisis en fonction des objectifs du projet et des risques propres à une migration assistée par des agents. L'intégrité est essentielle pour garantir que la source d'origine reste protégée ; la fiabilité et la traçabilité permettent de vérifier la progression d'un processus composé de plusieurs stages ; l'efficacité mesure la réduction potentielle des opérations répétitives ; la qualité des agents et de la réparation évalue la maîtrise des sorties probabilistes ; enfin, l'utilisabilité et le coût permettent d'apprécier la viabilité de la solution du point de vue du développeur et de son exploitation. Ces dimensions structurent l'analyse des résultats présentée dans les sections suivantes. Le Tableau~\ref{tab:metriques-ch5} associe chaque dimension aux preuves disponibles et aux mesures restant à consolider.
 % ============================================================
 
 \scriptsize
@@ -93,7 +95,7 @@ Les critères retenus ont été choisis en fonction des objectifs du projet et d
 \section{Validation progressive par les démonstrations CGI}
 % ============================================================
 
-Les démonstrations ont joué un double rôle : vérifier qu'un scénario pouvait être présenté de bout en bout pour le périmètre considéré et recueillir des observations permettant d'orienter l'incrément suivant. Elles constituent des preuves de maturité et de validation par les parties prenantes, mais elles ne remplacent pas une campagne expérimentale reproductible.
+Les démonstrations ont joué un double rôle : vérifier qu'un scénario pouvait être présenté de bout en bout pour le périmètre considéré et recueillir des observations permettant d'orienter l'incrément suivant. Elles constituent des preuves de maturité et de validation par les parties prenantes, mais elles ne remplacent pas une campagne expérimentale reproductible. Le Tableau~\ref{tab:demonstrations-ch5} distingue les jalons réalisés des jalons encore planifiés.
 
 \scriptsize
 \begin{longtable}{|>{\bfseries\RaggedRight\arraybackslash}p{2cm}|>{\centering\arraybackslash}p{2.1cm}|>{\RaggedRight\arraybackslash}p{3.6cm}|>{\RaggedRight\arraybackslash}p{4.8cm}|>{\RaggedRight\arraybackslash}p{2.7cm}|}
@@ -123,10 +125,12 @@ Les démonstrations ont joué un double rôle : vérifier qu'un scénario pouvai
 \end{longtable}
 \normalsize
 
-Les démonstrations ont également servi de point de départ à plusieurs évolutions du produit. Les changements apportés après une démonstration ne sont pas tous des demandes explicites des directeurs. Certains résultent de retours recueillis, d'autres d'une décision technique interne prise après l'observation des limites de l'incrément.
+Les démonstrations ont également servi de point de départ à plusieurs évolutions du produit. Les changements apportés après une démonstration ne sont pas tous des demandes explicites des directeurs. Certains résultent de retours recueillis, d'autres d'une décision technique interne prise après l'observation des limites de l'incrément. Le Tableau~\ref{tab:observations-evolutions-ch5} relie ces observations aux évolutions correspondantes.
 
 \begin{table}[H]
     \centering
+    \caption{Lien entre observations, décisions et évolutions du produit}
+    \label{tab:observations-evolutions-ch5}
     \small
     \arrayrulecolor{cgigray}
     \rowcolors{2}{cgilight!55}{white}
@@ -150,8 +154,6 @@ Les démonstrations ont également servi de point de départ à plusieurs évolu
         Périmètre Angular 18--21 trop restreint pour certains cas réels & Évolution de l'objectif fonctionnel & Extension planifiée vers Angular 11--21. \\
         \hline
     \end{tabularx}
-    \caption{Lien entre observations, décisions et évolutions du produit}
-    \label{tab:observations-evolutions-ch5}
     \rowcolors{2}{white}{white}
     \arrayrulecolor{black}
 \end{table}
@@ -166,10 +168,12 @@ La déclinaison Java constitue le système le plus complet et fournit le premier
 
 Le parcours progressif réduit la distance entre deux validations. Une migration n'est pas considérée comme réussie parce qu'un agent l'affirme : le statut dépend des commandes exécutées, de leur code de sortie et des tests disponibles.
 
-Cette couverture fonctionnelle est complétée par des preuves d'intégration issues d'une campagne ciblée. Une campagne d'intégration liée au nouveau frontend et à l'assistant a produit les résultats suivants :
+Cette couverture fonctionnelle est complétée par des preuves d'intégration issues d'une campagne ciblée. Le Tableau~\ref{tab:resultats-integration-java-ch5} résume les résultats de la campagne liée au nouveau frontend et à l'assistant.
 
 \begin{table}[H]
     \centering
+    \caption{Résultats d'une campagne d'intégration Java}
+    \label{tab:resultats-integration-java-ch5}
     \small
     \arrayrulecolor{cgigray}
     \rowcolors{2}{cgilight!55}{white}
@@ -189,8 +193,6 @@ Cette couverture fonctionnelle est complétée par des preuves d'intégration is
         Tests frontend & 12 échecs au baseline, 11 après intégration & Comparaison utilisée pour séparer défauts préexistants et nouvelle régression. \\
         \hline
     \end{tabularx}
-    \caption{Résultats d'une campagne d'intégration Java}
-    \label{tab:resultats-integration-java-ch5}
     \rowcolors{2}{white}{white}
     \arrayrulecolor{black}
 \end{table}
@@ -233,7 +235,7 @@ Les essais ont également mis en évidence des conflits de dépendances réels p
 
 \subsection{Extension visée d'Angular 11 vers Angular 21}
 
-L'objectif reste d'achever la trajectoire progressive jusqu'à Angular 21. Il ne s'agit pas d'effectuer un saut direct depuis Angular 11 : chaque version majeure constitue un stage distinct, associé à un profil de compatibilité, un espace de travail isolé, une installation propre, une construction et l'exécution des tests disponibles. Cette stratégie suit la recommandation officielle d'Angular consistant à franchir successivement les versions majeures \cite{angular-update,angular-releases}.
+L'objectif reste d'achever la trajectoire progressive jusqu'à Angular 21. Il ne s'agit pas d'effectuer un saut direct depuis Angular 11 : chaque version majeure constitue un stage distinct, associé à un profil de compatibilité, un espace de travail isolé, une installation propre, une construction et l'exécution des tests disponibles. Cette stratégie suit la recommandation officielle d'Angular consistant à franchir successivement les versions majeures \cite{angular-update,angular-releases}. La Figure~\ref{fig:roadmap-angular-11-21-ch5} représente la trajectoire cible complète.
 
 \begin{figure}[H]
     \centering
@@ -275,11 +277,13 @@ La figure représente la trajectoire cible complète. Les transitions déjà sce
 % ============================================================
 \section{Analyse qualitative par caractéristique de qualité}
 
-Cette analyse reprend les critères définis en Section~5.2 et les confronte aux preuves présentées dans les Sections~5.3 à~5.5. Les démonstrations CGI apportent une validation progressive par les parties prenantes, tandis que les campagnes d'intégration, les états persistés et les résultats de stages fournissent des éléments techniques plus directement vérifiables. L'objectif n'est donc pas d'attribuer une note globale à la Migration Factory, mais d'identifier, pour chaque caractéristique jugée importante, ce qui est effectivement observé, l'impact de ces mécanismes sur le processus de migration et les limites qui empêchent encore une conclusion quantitative générale.
+Cette analyse reprend les critères définis en Section~5.2 et les confronte aux preuves présentées dans les Sections~5.3 à~5.5. Les démonstrations CGI apportent une validation progressive par les parties prenantes, tandis que les campagnes d'intégration, les états persistés et les résultats de stages fournissent des éléments techniques plus directement vérifiables. L'objectif n'est donc pas d'attribuer une note globale à la Migration Factory, mais d'identifier, pour chaque caractéristique jugée importante, ce qui est effectivement observé, l'impact de ces mécanismes sur le processus de migration et les limites qui empêchent encore une conclusion quantitative générale. Le Tableau~\ref{tab:qualite-iso25010-ch5} synthétise cette lecture qualitative.
 % ============================================================
 
 \begin{table}[H]
     \centering
+    \caption{Analyse qualitative selon des caractéristiques d'ISO/IEC 25010}
+    \label{tab:qualite-iso25010-ch5}
     \small
     \arrayrulecolor{cgigray}
     \rowcolors{2}{cgilight!55}{white}
@@ -305,8 +309,6 @@ Cette analyse reprend les critères définis en Section~5.2 et les confronte aux
         Portabilité & Profils documentés et exécution locale. & Orientation Windows et scripts PowerShell importants. \\
         \hline
     \end{tabularx}
-    \caption{Analyse qualitative selon des caractéristiques d'ISO/IEC 25010}
-    \label{tab:qualite-iso25010-ch5}
     \rowcolors{2}{white}{white}
     \arrayrulecolor{black}
 \end{table}
@@ -327,16 +329,12 @@ Enfin, l'analyse met en évidence une \textbf{asymétrie de maturité} qui doit 
 
 L'impact principal de ces résultats concerne donc l'\textbf{industrialisation}. La Factory dispose d'une base structurée pour contrôler l'exécution, isoler les modifications et conserver des preuves, mais plusieurs éléments doivent encore être renforcés avant un usage à plus grande échelle : instrumentation systématique des durées et coûts, authentification et autorisation, validation sur un corpus plus large, exécution répétée dans des environnements contrôlés et consolidation de la portabilité. L'analyse qualitative permet de prioriser ces travaux sans présenter comme acquises des propriétés qui n'ont pas encore fait l'objet d'une mesure suffisante.
 
-
-% ============================================================
-% ============================================================
-\subsection{Évaluation de l'intégration Azure OpenAI}
-% ============================================================
-
-L'intégration Azure doit être évaluée séparément de la qualité fonctionnelle des agents. Un modèle peut produire une sortie correcte alors que la configuration du fournisseur reste fragile, et inversement. Les critères portent donc sur la configurabilité, la disponibilité, la confidentialité, la traçabilité et la résilience.
+L'intégration Azure OpenAI constitue une dimension particulière de cette analyse qualitative et doit être évaluée séparément de la qualité fonctionnelle des agents. Un modèle peut produire une sortie correcte alors que la configuration du fournisseur reste fragile, et inversement. Les critères portent donc sur la configurabilité, la disponibilité, la confidentialité, la traçabilité et la résilience. Le Tableau~\ref{tab:evaluation-azure-ch5} synthétise l'état observé et les validations restantes.
 
 \begin{table}[H]
     \centering
+    \caption{Critères d'évaluation de l'intégration Azure OpenAI}
+    \label{tab:evaluation-azure-ch5}
     \scriptsize
     \arrayrulecolor{cgigray}
     \rowcolors{2}{cgilight!55}{white}
@@ -360,8 +358,6 @@ L'intégration Azure doit être évaluée séparément de la qualité fonctionne
         Authentification d'entreprise & Utiliser une identité sans clé et des permissions minimales. & Non validé dans le runtime observé ; clé API utilisée. & Intégrer Microsoft Entra ID, identité managée et coffre de secrets. \\
         \hline
     \end{tabularx}
-    \caption{Critères d'évaluation de l'intégration Azure OpenAI}
-    \label{tab:evaluation-azure-ch5}
     \rowcolors{2}{white}{white}
     \arrayrulecolor{black}
 \end{table}
@@ -373,11 +369,13 @@ La déclinaison Angular ne doit pas être incluse dans cette évaluation Azure t
 % ============================================================
 \section{Comparaison avec le processus manuel}
 
-La comparaison avec le processus manuel vise à évaluer la valeur opérationnelle de la Factory à partir d'un même enchaînement de tâches : préparer l'environnement, déterminer la trajectoire, exécuter les transformations, diagnostiquer les échecs, corriger puis revalider. L'enjeu n'est pas d'opposer une automatisation complète à un travail humain, puisque le développeur conserve un rôle de décision dans la solution proposée. Il s'agit plutôt d'identifier quelles opérations restent entièrement manuelles dans une migration classique, lesquelles sont structurées ou automatisées par la Factory, et comment cette transformation modifie la traçabilité, la reproductibilité et le risque d'erreur.
+La comparaison avec le processus manuel vise à évaluer la valeur opérationnelle de la Factory à partir d'un même enchaînement de tâches : préparer l'environnement, déterminer la trajectoire, exécuter les transformations, diagnostiquer les échecs, corriger puis revalider. L'enjeu n'est pas d'opposer une automatisation complète à un travail humain, puisque le développeur conserve un rôle de décision dans la solution proposée. Il s'agit plutôt d'identifier quelles opérations restent entièrement manuelles dans une migration classique, lesquelles sont structurées ou automatisées par la Factory, et comment cette transformation modifie la traçabilité, la reproductibilité et le risque d'erreur. Le Tableau~\ref{tab:comparaison-manuel-factory-ch5} résume cette comparaison qualitative.
 % ============================================================
 
 \begin{table}[H]
     \centering
+    \caption{Comparaison qualitative avec le processus manuel}
+    \label{tab:comparaison-manuel-factory-ch5}
     \small
     \arrayrulecolor{cgigray}
     \rowcolors{2}{cgilight!55}{white}
@@ -401,8 +399,6 @@ La comparaison avec le processus manuel vise à évaluer la valeur opérationnel
         Mesure & Souvent limitée à la réussite finale. & Possibilité de mesurer stages, commandes, appels et tentatives. \\
         \hline
     \end{tabularx}
-    \caption{Comparaison qualitative avec le processus manuel}
-    \label{tab:comparaison-manuel-factory-ch5}
     \rowcolors{2}{white}{white}
     \arrayrulecolor{black}
 \end{table}
@@ -428,9 +424,6 @@ L'impact sur la \textbf{traçabilité} est également important. Dans le process
 Enfin, la comparaison met en évidence un déplacement du rôle du développeur. Dans le processus manuel, une part importante du temps est consacrée à l'enchaînement des commandes, à la collecte d'informations et à la reconstruction de l'état. Dans la Factory, ces opérations sont davantage structurées par le système ; l'intervention humaine se concentre sur la validation des choix sensibles, l'examen des propositions et les situations qui dépassent les règles disponibles. Ce déplacement correspond à l'objectif du projet : assister le développeur dans la migration sans lui retirer l'autorité sur les décisions importantes.
 
 Cette analyse reste qualitative. Elle ne permet pas encore d'affirmer qu'une migration réalisée avec la Factory est, par exemple, deux fois plus rapide qu'une migration manuelle. Une telle conclusion exigerait un protocole contrôlé, plusieurs applications comparables, des répétitions et une mesure précise du temps actif du développeur. En revanche, le cas Angular montre déjà de manière concrète que la Factory transforme une succession d'actions techniques en un processus persistant, explicite et réutilisable, ce qui constitue l'apport principal recherché avant même la mesure d'un gain temporel.
-
-
-Cette comparaison exprime les capacités du système ; elle ne remplace pas une expérience chronométrée sur deux groupes comparables. Une telle étude reste à réaliser avant de quantifier un gain de productivité.
 
 % ============================================================
 \section{Limites de l'évaluation}
